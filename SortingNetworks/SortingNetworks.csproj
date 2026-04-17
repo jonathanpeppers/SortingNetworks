@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>SortingNetworks</PackageId>
+    <Description>Sorting-network-based specializations for small arrays, including depth-13 networks for 27 and 28 channels from arXiv:2511.04107.</Description>
+    <Authors>Jonathan Peppers</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/jonathanpeppers/SortingNetworks</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jonathanpeppers/SortingNetworks</RepositoryUrl>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+</Project>
