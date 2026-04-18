@@ -12,6 +12,9 @@ public class FloatSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private float[] _source = null!;
     private float[][] _batch = null!;
 

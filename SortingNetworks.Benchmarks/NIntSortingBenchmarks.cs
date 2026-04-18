@@ -12,6 +12,9 @@ public class NIntSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private nint[] _source = null!;
     private nint[][] _batch = null!;
 

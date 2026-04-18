@@ -12,6 +12,9 @@ public class NUIntSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private nuint[] _source = null!;
     private nuint[][] _batch = null!;
 

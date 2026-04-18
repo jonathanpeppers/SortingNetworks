@@ -12,6 +12,9 @@ public class CharSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private char[] _source = null!;
     private char[][] _batch = null!;
 
