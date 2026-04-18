@@ -12,6 +12,9 @@ public class StringSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private string[] _source = null!;
     private string[][] _batch = null!;
 

@@ -12,6 +12,9 @@ public class SByteSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private sbyte[] _source = null!;
     private sbyte[][] _batch = null!;
 

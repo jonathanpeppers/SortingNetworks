@@ -12,6 +12,9 @@ public class UShortSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private ushort[] _source = null!;
     private ushort[][] _batch = null!;
 
