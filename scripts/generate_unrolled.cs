@@ -245,6 +245,18 @@ string ArmMaxExpr(string typeName, string v, string s) => typeName switch
     _ => $"AdvSimd.Max({v}, {s})",
 };
 
+string ArmMinExpr16(string typeName, string v, string s) => typeName switch
+{
+    "short" => $"AdvSimd.Min({v}.AsInt16(), {s}.AsInt16()).AsByte()",
+    _ => $"AdvSimd.Min({v}.AsUInt16(), {s}.AsUInt16()).AsByte()",
+};
+
+string ArmMaxExpr16(string typeName, string v, string s) => typeName switch
+{
+    "short" => $"AdvSimd.Max({v}.AsInt16(), {s}.AsInt16()).AsByte()",
+    _ => $"AdvSimd.Max({v}.AsUInt16(), {s}.AsUInt16()).AsByte()",
+};
+
 string FmtVec256(byte[] values) =>
     $"Vector256.Create((byte){string.Join(", ", values.Select(v => $"0x{v:X2}"))})";
 
@@ -532,6 +544,80 @@ void WriteArmSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> st
     w.WriteLine("    }");
 }
 
+void WriteArmSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
+{
+    int v3ReadOffset = (n - 8) * 2;
+    int v3ShiftBytes = (32 - n) * 2;
+    int v3StoreShift = 16 - v3ShiftBytes;
+    string suffix = $"_{typeName}";
+    string refCast = $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));";
+
+    w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
+    w.WriteLine($"    private static void SortSimdArm{n}{suffix}(Span<{typeName}> span)");
+    w.WriteLine("    {");
+    w.WriteLine($"        {refCast}");
+    w.WriteLine("        var v0 = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);");
+    w.WriteLine("        var v1 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 16));");
+    w.WriteLine("        var v2 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 32));");
+    w.WriteLine($"        var v3 = AdvSimd.ExtractVector128(");
+    w.WriteLine($"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {v3ReadOffset})),");
+    w.WriteLine($"            Vector128<byte>.Zero,");
+    w.WriteLine($"            {v3ShiftBytes});");
+
+    for (int si = 0; si < steps.Count; si++)
+    {
+        var step = steps[si];
+        int[] perm = Enumerable.Range(0, 32).ToArray();
+        foreach (var (a, b) in step) { perm[a] = b; perm[b] = a; }
+
+        byte[] blend = new byte[32];
+        foreach (var (a, b) in step)
+            blend[Math.Max(a, b)] = 0xFF;
+
+        string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+
+        w.WriteLine();
+        w.WriteLine($"        // Step {si}: {pairStr}");
+        w.WriteLine("        {");
+        w.WriteLine("            var table = (v0, v1, v2, v3);");
+
+        for (int vi = 0; vi < 4; vi++)
+        {
+            byte[] shuffleIdx = new byte[16];
+            for (int ei = 0; ei < 8; ei++)
+            {
+                int srcElem = perm[vi * 8 + ei];
+                shuffleIdx[ei * 2] = (byte)(srcElem * 2);
+                shuffleIdx[ei * 2 + 1] = (byte)(srcElem * 2 + 1);
+            }
+            w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(table, {FmtVec128(shuffleIdx)});");
+        }
+
+        for (int vi = 0; vi < 4; vi++)
+        {
+            byte[] blendMask = new byte[16];
+            for (int ei = 0; ei < 8; ei++)
+            {
+                blendMask[ei * 2] = blend[vi * 8 + ei];
+                blendMask[ei * 2 + 1] = blend[vi * 8 + ei];
+            }
+            w.WriteLine($"            var mins{vi} = {ArmMinExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
+            w.WriteLine($"            var maxs{vi} = {ArmMaxExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
+            w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+        }
+
+        w.WriteLine("        }");
+    }
+
+    w.WriteLine();
+    w.WriteLine($"        AdvSimd.ExtractVector128(Vector128<byte>.Zero, v3, {v3StoreShift})");
+    w.WriteLine($"            .StoreUnsafe(ref Unsafe.Add(ref first, {v3ReadOffset}));");
+    w.WriteLine("        v2.StoreUnsafe(ref Unsafe.Add(ref first, 32));");
+    w.WriteLine("        v1.StoreUnsafe(ref Unsafe.Add(ref first, 16));");
+    w.WriteLine("        v0.StoreUnsafe(ref first);");
+    w.WriteLine("    }");
+}
+
 void WriteArmSimdFile(StreamWriter w)
 {
     w.Write("""
@@ -561,6 +647,16 @@ void WriteArmSimdFile(StreamWriter w)
             if (!first) w.WriteLine();
             WriteArmSimdSortMethod(w, n, steps, typeName);
             first = false;
+        }
+    }
+
+    foreach (string typeName in new[] { "short", "ushort", "char" })
+    {
+        foreach (int n in new[] { 27, 28 })
+        {
+            var steps = GetNetworkSteps(n);
+            w.WriteLine();
+            WriteArmSimdSortMethod16(w, n, steps, typeName);
         }
     }
 

@@ -215,6 +215,15 @@ public static partial class NetworkSort
                 return;
             }
 
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_short(span);
+                else
+                    SortSimdArm28_short(span);
+                return;
+            }
+
             ref short first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -293,6 +302,15 @@ public static partial class NetworkSort
                     SortSimd27_ushort(span);
                 else
                     SortSimd28_ushort(span);
+                return;
+            }
+
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_ushort(span);
+                else
+                    SortSimdArm28_ushort(span);
                 return;
             }
 
@@ -806,6 +824,15 @@ public static partial class NetworkSort
                     SortSimd27_char(span);
                 else
                     SortSimd28_char(span);
+                return;
+            }
+
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_char(span);
+                else
+                    SortSimdArm28_char(span);
                 return;
             }
 
