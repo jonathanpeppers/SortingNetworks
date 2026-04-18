@@ -61,7 +61,7 @@ Set-Content $mdDest $mdContent -Encoding UTF8
 Write-Host "Wrote $mdDest ($($mdFiles.Count) report(s) combined)" -ForegroundColor Green
 
 # Copy JSON report(s) -> benchmark-results.json
-$jsonFiles = Get-ChildItem $resultsDir -Filter "*-report.json" | Sort-Object Name
+$jsonFiles = Get-ChildItem $resultsDir -Filter "*.json" | Sort-Object Name
 if ($jsonFiles.Count -eq 0) { throw "No JSON report files found in $resultsDir" }
 if ($jsonFiles.Count -eq 1) {
     Copy-Item $jsonFiles[0].FullName (Join-Path $resultsOut "benchmark-results.json")
