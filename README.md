@@ -23,7 +23,7 @@ int[] data = {
 NetworkSort.Sort(data);
 NetworkSort.Sort(data, comparer);  // IComparer<int> path
 
-// Length 27 uses a depth-13 sorting network
+// Span overload also uses the sorting network
 Span<int> span = stackalloc int[] {
     27, 26, 25, 24, 23, 22, 21, 20, 19,
     18, 17, 16, 15, 14, 13, 12, 11, 10,
@@ -114,6 +114,8 @@ provides a smaller benefit:
 | char | 87 ns | 94 ns | ~1x |
 | ulong | 114 ns | 97 ns | ~1.2x |
 
+> **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and NetworkSort may be slower for these types.
+
 #### string (specialized `Sort(string[])` path)
 
 The specialized `Sort(string[])` overload uses `string.CompareOrdinal` in the
@@ -158,6 +160,8 @@ speedup over `Array.Sort` as on x86:
 | 28 | Reversed | 88 ns | **0.98x** (tied) |
 | 28 | Duplicates | 83 ns | **0.74x** (26% faster) |
 
+> Results vary by hardware and run. Sorting networks execute a fixed comparison sequence regardless of input order, so they don't benefit from already-sorted or reversed patterns the way adaptive sorts can.
+
 ## Building
 
 ```
@@ -179,9 +183,9 @@ dotnet run generate_unrolled.cs
 ## Projects
 
 - **SortingNetworks** -- class library (future NuGet package)
-- **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 0-64
+- **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 27-28
   across all 13 primitive types, plus string via the specialized `Sort(string[])`
-  overload (1,466 tests)
+  overload, with stress tests using 100 random seeds (81 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   `NetworkSort.Sort` vs `Array.Sort` for sizes 27 and 28 across all primitive
   types
