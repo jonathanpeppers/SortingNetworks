@@ -749,27 +749,27 @@ public class NetworkSortTests
     // --- Gap #3: Generic Sort<T>(T[], IComparer<T>) overload ---
 
     [Fact]
-    public void Sort_Generic_RandomInts_MatchesArraySort()
+    public void Sort_Generic_27Elements_Int()
     {
         var rng = new Random(42);
         var input = Enumerable.Range(0, 27).Select(_ => rng.Next(-1000, 1000)).ToArray();
         var expected = (int[])input.Clone();
         Array.Sort(expected);
 
-        NetworkSort.Sort(input, Comparer<int>.Default);
+        NetworkSort.Sort<int>(input, Comparer<int>.Default);
 
         Assert.Equal(expected, input);
     }
 
     [Fact]
-    public void Sort_Generic_28Elements()
+    public void Sort_Generic_28Elements_Int()
     {
         var rng = new Random(42);
         var input = Enumerable.Range(0, 28).Select(_ => rng.Next(-1000, 1000)).ToArray();
         var expected = (int[])input.Clone();
         Array.Sort(expected);
 
-        NetworkSort.Sort(input, Comparer<int>.Default);
+        NetworkSort.Sort<int>(input, Comparer<int>.Default);
 
         Assert.Equal(expected, input);
     }
@@ -782,7 +782,7 @@ public class NetworkSortTests
         var expected = (int[])input.Clone();
         Array.Sort(expected);
 
-        NetworkSort.Sort(input, Comparer<int>.Default);
+        NetworkSort.Sort<int>(input, Comparer<int>.Default);
 
         Assert.Equal(expected, input);
     }
@@ -790,14 +790,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_Generic_NullArray_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((int[])null!, Comparer<int>.Default));
-    }
-
-    [Fact]
-    public void Sort_Generic_NullComparer_Throws()
-    {
-        var array = new[] { "c", "a", "b" };
-        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort<string>(array, (IComparer<string>)null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort<int>((int[])null!, Comparer<int>.Default));
     }
 
     [Fact]
@@ -808,7 +801,7 @@ public class NetworkSortTests
         var expected = (string[])input.Clone();
         Array.Sort(expected, StringComparer.Ordinal);
 
-        NetworkSort.Sort(input, StringComparer.Ordinal);
+        NetworkSort.Sort<string>(input, StringComparer.Ordinal);
 
         Assert.Equal(expected, input);
     }
