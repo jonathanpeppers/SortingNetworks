@@ -953,6 +953,80 @@ public static partial class NetworkSort
     }
 
     /// <summary>
+    /// Sorts a span of string using a sorting network when possible.
+    /// Uses ordinal comparison for maximum performance.
+    /// </summary>
+    public static void Sort(Span<string> span)
+    {
+        int n = span.Length;
+        if (n == 27 || n == 28)
+        {
+            ref string first = ref MemoryMarshal.GetReference(span);
+            if (n == 27)
+                Sort27(ref first);
+            else
+                Sort28(ref first);
+            return;
+        }
+
+        span.Sort(StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// Sorts an array of string using a sorting network when possible.
+    /// Uses ordinal comparison for maximum performance.
+    /// </summary>
+    public static void Sort(string[] array)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
+
+    /// <summary>
+    /// Sorts a span of string using a sorting network when possible,
+    /// with a custom comparer.
+    /// </summary>
+    public static void Sort(Span<string> span, IComparer<string>? comparer)
+    {
+        comparer ??= Comparer<string>.Default;
+        int n = span.Length;
+        if (n == 27 || n == 28)
+        {
+            ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
+            return;
+        }
+
+        span.Sort(comparer);
+    }
+
+    /// <summary>
+    /// Sorts an array of string using a sorting network when possible,
+    /// with a custom comparer.
+    /// </summary>
+    public static void Sort(string[] array, IComparer<string>? comparer)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void ApplyNetworkWithComparer(Span<string> span, int[] network, IComparer<string> comparer)
+    {
+        ref string first = ref MemoryMarshal.GetReference(span);
+        for (int i = 0; i < network.Length; i += 2)
+        {
+            ref string a = ref Unsafe.Add(ref first, network[i]);
+            ref string b = ref Unsafe.Add(ref first, network[i + 1]);
+            if (comparer.Compare(a, b) > 0)
+            {
+                string temp = a;
+                a = b;
+                b = temp;
+            }
+        }
+    }
+
+    /// <summary>
     /// Sorts an array of <typeparamref name="T"/> using a sorting network when possible.
     /// </summary>
     public static void Sort<T>(T[] array, IComparer<T> comparer)

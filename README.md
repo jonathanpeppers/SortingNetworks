@@ -38,9 +38,13 @@ NetworkSort.Sort(doubles);
 byte[] bytes = { 0xFF, 0x01, 0x80 };
 NetworkSort.Sort(bytes);
 
-// Generic Sort<T> for non-primitive types like string
+// Specialized string overload using ordinal comparison
 string[] names = { "Charlie", "Alice", "Bob" };
-NetworkSort.Sort(names, StringComparer.Ordinal);
+NetworkSort.Sort(names);
+NetworkSort.Sort(names, StringComparer.OrdinalIgnoreCase);  // custom comparer
+
+// Generic Sort<T> for other non-primitive types
+NetworkSort.Sort(myArray, myComparer);
 ```
 
 ## Design
@@ -72,15 +76,15 @@ sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,385 ns | 94 ns | **15x** |
-| sbyte | 1,409 ns | 98 ns | **14x** |
-| short | 1,527 ns | 104 ns | **15x** |
-| ushort | 1,394 ns | 97 ns | **14x** |
-| float | 1,601 ns | 105 ns | **15x** |
-| double | 1,719 ns | 108 ns | **16x** |
-| long | 1,460 ns | 102 ns | **14x** |
-| nint | 1,474 ns | 102 ns | **14x** |
-| nuint | 1,525 ns | 96 ns | **16x** |
+| byte | 1,359 ns | 98 ns | **14x** |
+| sbyte | 1,514 ns | 96 ns | **16x** |
+| short | 1,671 ns | 97 ns | **17x** |
+| ushort | 1,469 ns | 97 ns | **15x** |
+| float | 1,657 ns | 104 ns | **16x** |
+| double | 1,726 ns | 108 ns | **16x** |
+| long | 1,495 ns | 102 ns | **15x** |
+| nint | 1,472 ns | 100 ns | **15x** |
+| nuint | 1,471 ns | 104 ns | **14x** |
 
 ### Types where Array.Sort is already SIMD-optimized
 
@@ -90,32 +94,32 @@ provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| int | 103 ns | 98 ns | ~1x |
+| int | 106 ns | 99 ns | ~1x |
 | uint | 103 ns | 95 ns | ~1x |
-| char | 93 ns | 94 ns | ~1x |
-| ulong | 114 ns | 101 ns | ~1.1x |
+| char | 87 ns | 94 ns | ~1x |
+| ulong | 114 ns | 97 ns | ~1.2x |
 
-### string (generic `Sort<T>` path)
+### string (specialized `Sort(string[])` path)
 
-The generic `Sort<T>(T[], IComparer<T>)` path uses the comparer-based
-network (not unrolled), which is slower than `Array.Sort` for reference types:
+The specialized `Sort(string[])` overload uses `string.CompareOrdinal` in the
+unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| string | 951 ns | 3,606 ns | 0.26x (slower) |
+| string | 927 ns | 3,342 ns | 0.28x (slower) |
 
 ### int detailed results (SIMD-optimized baseline)
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 98 ns | **0.95x** (tied) |
-| 27 | Sorted | 74 ns | 1.13x |
-| 27 | Reversed | 99 ns | 1.20x |
-| 27 | Duplicates | 79 ns | **0.76x** (24% faster) |
-| 28 | Random | 103 ns | **0.80x** (20% faster) |
-| 28 | Sorted | 73 ns | **1.05x** (tied) |
-| 28 | Reversed | 88 ns | **0.97x** (tied) |
-| 28 | Duplicates | 82 ns | **0.75x** (25% faster) |
+| 27 | Random | 99 ns | **0.94x** (tied) |
+| 27 | Sorted | 73 ns | 1.11x |
+| 27 | Reversed | 99 ns | 1.22x |
+| 27 | Duplicates | 81 ns | **0.78x** (22% faster) |
+| 28 | Random | 100 ns | **0.86x** (14% faster) |
+| 28 | Sorted | 74 ns | **1.03x** (tied) |
+| 28 | Reversed | 88 ns | **0.98x** (tied) |
+| 28 | Duplicates | 83 ns | **0.74x** (26% faster) |
 
 ## Building
 
@@ -138,8 +142,8 @@ dotnet run generate_unrolled.cs
 
 - **SortingNetworks** -- class library (future NuGet package)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 0-64
-  across all 13 primitive types, plus string via the generic `Sort<T>`
-  overload (1,332 tests)
+  across all 13 primitive types, plus string via the specialized `Sort(string[])`
+  overload (1,466 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   `NetworkSort.Sort` vs `Array.Sort` for sizes 27 and 28 across all primitive
   types

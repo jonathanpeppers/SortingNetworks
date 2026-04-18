@@ -129,7 +129,12 @@ string GenerateUnrolledMethod(int n, List<(int A, int B)> pairs, string typeName
         lines.Add($"        {typeName} e{i} = Unsafe.Add(ref first, {i});");
     lines.Add("");
     foreach (var (a, b) in pairs)
-        lines.Add($"        if (e{a} > e{b}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
+    {
+        if (typeName == "string")
+            lines.Add($"        if (string.CompareOrdinal(e{a}, e{b}) > 0) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
+        else
+            lines.Add($"        if (e{a} > e{b}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
+    }
     lines.Add("");
     lines.Add("        first = e0;");
     for (int i = 1; i < n; i++)
@@ -226,6 +231,96 @@ string GeneratePublicApi(string typeName)
     return string.Join("\n", lines);
 }
 
+string GenerateStringApi()
+{
+    var lines = new List<string>();
+
+    // Sort(Span<string>) — uses ordinal comparison via unrolled network
+    lines.Add("    /// <summary>");
+    lines.Add("    /// Sorts a span of string using a sorting network when possible.");
+    lines.Add("    /// Uses ordinal comparison for maximum performance.");
+    lines.Add("    /// </summary>");
+    lines.Add("    public static void Sort(Span<string> span)");
+    lines.Add("    {");
+    lines.Add("        int n = span.Length;");
+    lines.Add("        if (n == 27 || n == 28)");
+    lines.Add("        {");
+    lines.Add("            ref string first = ref MemoryMarshal.GetReference(span);");
+    lines.Add("            if (n == 27)");
+    lines.Add("                Sort27(ref first);");
+    lines.Add("            else");
+    lines.Add("                Sort28(ref first);");
+    lines.Add("            return;");
+    lines.Add("        }");
+    lines.Add("");
+    lines.Add("        span.Sort(StringComparer.Ordinal);");
+    lines.Add("    }");
+    lines.Add("");
+
+    // Sort(string[])
+    lines.Add("    /// <summary>");
+    lines.Add("    /// Sorts an array of string using a sorting network when possible.");
+    lines.Add("    /// Uses ordinal comparison for maximum performance.");
+    lines.Add("    /// </summary>");
+    lines.Add("    public static void Sort(string[] array)");
+    lines.Add("    {");
+    lines.Add("        ArgumentNullException.ThrowIfNull(array);");
+    lines.Add("        Sort(array.AsSpan());");
+    lines.Add("    }");
+    lines.Add("");
+
+    // Sort(Span<string>, IComparer<string>?)
+    lines.Add("    /// <summary>");
+    lines.Add("    /// Sorts a span of string using a sorting network when possible,");
+    lines.Add("    /// with a custom comparer.");
+    lines.Add("    /// </summary>");
+    lines.Add("    public static void Sort(Span<string> span, IComparer<string>? comparer)");
+    lines.Add("    {");
+    lines.Add("        comparer ??= Comparer<string>.Default;");
+    lines.Add("        int n = span.Length;");
+    lines.Add("        if (n == 27 || n == 28)");
+    lines.Add("        {");
+    lines.Add("            ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);");
+    lines.Add("            return;");
+    lines.Add("        }");
+    lines.Add("");
+    lines.Add("        span.Sort(comparer);");
+    lines.Add("    }");
+    lines.Add("");
+
+    // Sort(string[], IComparer<string>?)
+    lines.Add("    /// <summary>");
+    lines.Add("    /// Sorts an array of string using a sorting network when possible,");
+    lines.Add("    /// with a custom comparer.");
+    lines.Add("    /// </summary>");
+    lines.Add("    public static void Sort(string[] array, IComparer<string>? comparer)");
+    lines.Add("    {");
+    lines.Add("        ArgumentNullException.ThrowIfNull(array);");
+    lines.Add("        Sort(array.AsSpan(), comparer);");
+    lines.Add("    }");
+    lines.Add("");
+
+    // ApplyNetworkWithComparer for string
+    lines.Add("    [MethodImpl(MethodImplOptions.AggressiveInlining)]");
+    lines.Add("    private static void ApplyNetworkWithComparer(Span<string> span, int[] network, IComparer<string> comparer)");
+    lines.Add("    {");
+    lines.Add("        ref string first = ref MemoryMarshal.GetReference(span);");
+    lines.Add("        for (int i = 0; i < network.Length; i += 2)");
+    lines.Add("        {");
+    lines.Add("            ref string a = ref Unsafe.Add(ref first, network[i]);");
+    lines.Add("            ref string b = ref Unsafe.Add(ref first, network[i + 1]);");
+    lines.Add("            if (comparer.Compare(a, b) > 0)");
+    lines.Add("            {");
+    lines.Add("                string temp = a;");
+    lines.Add("                a = b;");
+    lines.Add("                b = temp;");
+    lines.Add("            }");
+    lines.Add("        }");
+    lines.Add("    }");
+
+    return string.Join("\n", lines);
+}
+
 string GenerateApiFile()
 {
     var lines = new List<string>();
@@ -253,6 +348,9 @@ string GenerateApiFile()
         if (i > 0) lines.Add("");
         lines.Add(GeneratePublicApi(primitiveTypes[i]));
     }
+
+    lines.Add("");
+    lines.Add(GenerateStringApi());
 
     lines.Add("");
     lines.Add("    /// <summary>");
@@ -304,7 +402,7 @@ string GenerateUnrolledFile()
     lines.Add("{");
 
     bool firstMethod = true;
-    foreach (string typeName in primitiveTypes)
+    foreach (string typeName in primitiveTypes.Concat(["string"]))
     {
         foreach (int n in new[] { 27, 28 })
         {
