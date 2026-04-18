@@ -85,21 +85,21 @@ to execute as a vectorized min/max/blend operation:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,369 ns | 40 ns | **34x** |
-| sbyte | 1,535 ns | 42 ns | **37x** |
+| byte | 1,298 ns | 41 ns | **32x** |
+| sbyte | 1,426 ns | 43 ns | **33x** |
 
 For other types without a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| short | 1,671 ns | 97 ns | **17x** |
-| ushort | 1,469 ns | 97 ns | **15x** |
-| float | 1,657 ns | 104 ns | **16x** |
-| double | 1,726 ns | 108 ns | **16x** |
-| long | 1,495 ns | 102 ns | **15x** |
-| nint | 1,472 ns | 100 ns | **15x** |
-| nuint | 1,471 ns | 104 ns | **14x** |
+| short | 1,388 ns | 101 ns | **14x** |
+| ushort | 1,329 ns | 100 ns | **13x** |
+| float | 1,629 ns | 108 ns | **15x** |
+| double | 1,694 ns | 112 ns | **15x** |
+| long | 1,407 ns | 104 ns | **14x** |
+| nint | 1,430 ns | 106 ns | **14x** |
+| nuint | 1,393 ns | 105 ns | **13x** |
 
 #### Types where Array.Sort is already SIMD-optimized
 
@@ -109,10 +109,10 @@ provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| int | 106 ns | 99 ns | ~1x |
-| uint | 103 ns | 95 ns | ~1x |
-| char | 87 ns | 94 ns | ~1x |
-| ulong | 114 ns | 97 ns | ~1.2x |
+| int | 107 ns | 101 ns | ~1x |
+| uint | 107 ns | 99 ns | ~1x |
+| char | 94 ns | 97 ns | ~1x |
+| ulong | 118 ns | 100 ns | ~1.2x |
 
 > **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and NetworkSort may be slower for these types.
 
@@ -123,7 +123,7 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| string | 943 ns | 527 ns | **1.8x** |
+| string | 964 ns | 525 ns | **1.8x** |
 
 ### ARM64 (Apple M1, AdvSimd/NEON)
 
@@ -151,14 +151,14 @@ speedup over `Array.Sort` as on x86:
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 99 ns | **0.94x** (tied) |
-| 27 | Sorted | 73 ns | 1.11x |
-| 27 | Reversed | 99 ns | 1.22x |
-| 27 | Duplicates | 81 ns | **0.78x** (22% faster) |
-| 28 | Random | 100 ns | **0.86x** (14% faster) |
-| 28 | Sorted | 74 ns | **1.03x** (tied) |
-| 28 | Reversed | 88 ns | **0.98x** (tied) |
-| 28 | Duplicates | 83 ns | **0.74x** (26% faster) |
+| 27 | Random | 101 ns | **0.95x** (tied) |
+| 27 | Sorted | 74 ns | 1.04x |
+| 27 | Reversed | 102 ns | 1.20x |
+| 27 | Duplicates | 84 ns | **0.77x** (23% faster) |
+| 28 | Random | 104 ns | **0.86x** (14% faster) |
+| 28 | Sorted | 77 ns | 1.06x |
+| 28 | Reversed | 93 ns | 1.03x |
+| 28 | Duplicates | 85 ns | **0.76x** (24% faster) |
 
 > Results vary by hardware and run. Sorting networks execute a fixed comparison sequence regardless of input order, so they don't benefit from already-sorted or reversed patterns the way adaptive sorts can.
 
