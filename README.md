@@ -37,6 +37,10 @@ NetworkSort.Sort(doubles);
 
 byte[] bytes = { 0xFF, 0x01, 0x80 };
 NetworkSort.Sort(bytes);
+
+// Generic Sort<T> for non-primitive types like string
+string[] names = { "Charlie", "Alice", "Bob" };
+NetworkSort.Sort(names, StringComparer.Ordinal);
 ```
 
 ## Design
@@ -68,15 +72,15 @@ sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,382 ns | 93 ns | **15x** |
-| sbyte | 1,437 ns | 134 ns | **11x** |
-| short | 1,481 ns | 97 ns | **15x** |
-| ushort | 1,395 ns | 96 ns | **14x** |
-| float | 1,575 ns | 102 ns | **15x** |
-| double | 1,775 ns | 104 ns | **17x** |
-| long | 1,453 ns | 99 ns | **15x** |
-| nint | 1,436 ns | 98 ns | **15x** |
-| nuint | 1,423 ns | 98 ns | **14x** |
+| byte | 1,350 ns | 93 ns | **15x** |
+| sbyte | 1,466 ns | 96 ns | **15x** |
+| short | 1,500 ns | 100 ns | **15x** |
+| ushort | 1,395 ns | 96 ns | **15x** |
+| float | 1,721 ns | 102 ns | **17x** |
+| double | 1,787 ns | 105 ns | **17x** |
+| long | 1,484 ns | 99 ns | **15x** |
+| nint | 1,478 ns | 99 ns | **15x** |
+| nuint | 1,517 ns | 96 ns | **16x** |
 
 ### Types where Array.Sort is already SIMD-optimized
 
@@ -86,23 +90,23 @@ provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| int | 100 ns | 79-167 ns | ~1x |
-| uint | 101 ns | 96 ns | ~1x |
-| char | 109 ns | 93 ns | ~1.2x |
-| ulong | 147 ns | 97 ns | ~1.5x |
+| int | 101 ns | 98 ns | ~1x |
+| uint | 102 ns | 95 ns | ~1x |
+| char | 89 ns | 93 ns | ~1x |
+| ulong | 116 ns | 95 ns | ~1.2x |
 
 ### int detailed results (SIMD-optimized baseline)
 
 | Size | Kind | NetworkSort_Span | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 167 ns | 1.67x |
-| 27 | Sorted | 70 ns | **1.08x** |
-| 27 | Reversed | 98 ns | 1.13x |
-| 27 | Duplicates | 79 ns | **0.77x** (23% faster) |
-| 28 | Random | 99 ns | **0.87x** (13% faster) |
-| 28 | Sorted | 73 ns | **1.08x** |
-| 28 | Reversed | 91 ns | **1.09x** |
-| 28 | Duplicates | 81 ns | **0.74x** (26% faster) |
+| 27 | Random | 98 ns | **0.97x** (tied) |
+| 27 | Sorted | 68 ns | **1.05x** |
+| 27 | Reversed | 97 ns | 1.19x |
+| 27 | Duplicates | 85 ns | **0.84x** (16% faster) |
+| 28 | Random | 102 ns | **0.86x** (14% faster) |
+| 28 | Sorted | 72 ns | **1.07x** |
+| 28 | Reversed | 89 ns | **1.03x** (tied) |
+| 28 | Duplicates | 83 ns | **0.62x** (38% faster) |
 
 ## Building
 
@@ -125,8 +129,8 @@ python generate_unrolled.py
 
 - **SortingNetworks** -- class library (future NuGet package)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 0-64
-  across all 13 primitive types, various input patterns, and the 27/28-element
-  specialized paths (1,265 tests)
+  across all 13 primitive types, plus string via the generic `Sort<T>`
+  overload (1,332 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   `NetworkSort.Sort` vs `Array.Sort` for sizes 27 and 28 across all primitive
   types
