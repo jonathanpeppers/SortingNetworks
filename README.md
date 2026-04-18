@@ -65,22 +65,22 @@ instruction and matches the performance of the BCL's internal sort helpers.
 Results comparing `NetworkSort` vs `Array.Sort` on .NET 10 (Intel Core
 i9-9900K):
 
-### Types where NetworkSort is significantly faster (10-17x)
+### Types where NetworkSort is significantly faster (14-16x)
 
 For types **without** a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,366 ns | 92 ns | **15x** |
-| sbyte | 1,468 ns | 97 ns | **15x** |
-| short | 1,505 ns | 97 ns | **16x** |
-| ushort | 1,372 ns | 96 ns | **14x** |
-| float | 1,565 ns | 102 ns | **15x** |
-| double | 1,745 ns | 109 ns | **16x** |
-| long | 1,450 ns | 98 ns | **15x** |
-| nint | 1,466 ns | 99 ns | **15x** |
-| nuint | 1,496 ns | 95 ns | **16x** |
+| byte | 1,356 ns | 98 ns | **14x** |
+| sbyte | 1,524 ns | 97 ns | **16x** |
+| short | 1,462 ns | 97 ns | **15x** |
+| ushort | 1,562 ns | 97 ns | **16x** |
+| float | 1,646 ns | 105 ns | **16x** |
+| double | 1,726 ns | 109 ns | **16x** |
+| long | 1,523 ns | 99 ns | **15x** |
+| nint | 1,481 ns | 104 ns | **14x** |
+| nuint | 1,505 ns | 102 ns | **15x** |
 
 ### Types where Array.Sort is already SIMD-optimized
 
@@ -90,10 +90,10 @@ provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| int | 99 ns | 96 ns | ~1x |
-| uint | 104 ns | 96 ns | ~1x |
-| char | 88 ns | 92 ns | ~1x |
-| ulong | 132 ns | 97 ns | ~1.4x |
+| int | 105 ns | 100 ns | ~1x |
+| uint | 100 ns | 97 ns | ~1x |
+| char | 97 ns | 94 ns | ~1x |
+| ulong | 119 ns | 96 ns | ~1.2x |
 
 ### string (generic `Sort<T>` path)
 
@@ -102,20 +102,20 @@ network (not unrolled), which is slower than `Array.Sort` for reference types:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| string | 952 ns | 3,625 ns | 0.26x (slower) |
+| string | 918 ns | 3,626 ns | 0.25x (slower) |
 
 ### int detailed results (SIMD-optimized baseline)
 
-| Size | Kind | NetworkSort_Span | Ratio vs ArraySort |
+| Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 96 ns | **0.97x** (tied) |
-| 27 | Sorted | 69 ns | **1.07x** |
-| 27 | Reversed | 97 ns | 1.18x |
-| 27 | Duplicates | 78 ns | **0.76x** (24% faster) |
-| 28 | Random | 105 ns | **0.92x** |
-| 28 | Sorted | 72 ns | **1.08x** |
-| 28 | Reversed | 87 ns | **1.04x** (tied) |
-| 28 | Duplicates | 81 ns | **0.74x** (26% faster) |
+| 27 | Random | 100 ns | **0.95x** (tied) |
+| 27 | Sorted | 92 ns | 1.31x |
+| 27 | Reversed | 101 ns | 1.19x |
+| 27 | Duplicates | 92 ns | **0.89x** (11% faster) |
+| 28 | Random | 102 ns | **0.84x** (16% faster) |
+| 28 | Sorted | 73 ns | **1.01x** (tied) |
+| 28 | Reversed | 87 ns | **0.99x** (tied) |
+| 28 | Duplicates | 82 ns | **0.77x** (23% faster) |
 
 ## Building
 
