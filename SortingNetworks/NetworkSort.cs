@@ -39,7 +39,10 @@ public static partial class NetworkSort
     /// Sorts an array of byte using a sorting network when possible.
     /// </summary>
     public static void Sort(byte[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of byte using a sorting network when possible,
@@ -63,7 +66,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(byte[] array, IComparer<byte>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<byte> span, int[] network, IComparer<byte> comparer)
@@ -105,7 +111,10 @@ public static partial class NetworkSort
     /// Sorts an array of sbyte using a sorting network when possible.
     /// </summary>
     public static void Sort(sbyte[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of sbyte using a sorting network when possible,
@@ -129,7 +138,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(sbyte[] array, IComparer<sbyte>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<sbyte> span, int[] network, IComparer<sbyte> comparer)
@@ -171,7 +183,10 @@ public static partial class NetworkSort
     /// Sorts an array of short using a sorting network when possible.
     /// </summary>
     public static void Sort(short[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of short using a sorting network when possible,
@@ -195,7 +210,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(short[] array, IComparer<short>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<short> span, int[] network, IComparer<short> comparer)
@@ -237,7 +255,10 @@ public static partial class NetworkSort
     /// Sorts an array of ushort using a sorting network when possible.
     /// </summary>
     public static void Sort(ushort[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of ushort using a sorting network when possible,
@@ -261,7 +282,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(ushort[] array, IComparer<ushort>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<ushort> span, int[] network, IComparer<ushort> comparer)
@@ -303,7 +327,10 @@ public static partial class NetworkSort
     /// Sorts an array of int using a sorting network when possible.
     /// </summary>
     public static void Sort(int[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of int using a sorting network when possible,
@@ -327,7 +354,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(int[] array, IComparer<int>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<int> span, int[] network, IComparer<int> comparer)
@@ -369,7 +399,10 @@ public static partial class NetworkSort
     /// Sorts an array of uint using a sorting network when possible.
     /// </summary>
     public static void Sort(uint[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of uint using a sorting network when possible,
@@ -393,7 +426,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(uint[] array, IComparer<uint>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<uint> span, int[] network, IComparer<uint> comparer)
@@ -435,7 +471,10 @@ public static partial class NetworkSort
     /// Sorts an array of long using a sorting network when possible.
     /// </summary>
     public static void Sort(long[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of long using a sorting network when possible,
@@ -459,7 +498,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(long[] array, IComparer<long>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<long> span, int[] network, IComparer<long> comparer)
@@ -501,7 +543,10 @@ public static partial class NetworkSort
     /// Sorts an array of ulong using a sorting network when possible.
     /// </summary>
     public static void Sort(ulong[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of ulong using a sorting network when possible,
@@ -525,7 +570,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(ulong[] array, IComparer<ulong>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<ulong> span, int[] network, IComparer<ulong> comparer)
@@ -567,7 +615,10 @@ public static partial class NetworkSort
     /// Sorts an array of nint using a sorting network when possible.
     /// </summary>
     public static void Sort(nint[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of nint using a sorting network when possible,
@@ -591,7 +642,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(nint[] array, IComparer<nint>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<nint> span, int[] network, IComparer<nint> comparer)
@@ -633,7 +687,10 @@ public static partial class NetworkSort
     /// Sorts an array of nuint using a sorting network when possible.
     /// </summary>
     public static void Sort(nuint[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of nuint using a sorting network when possible,
@@ -657,7 +714,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(nuint[] array, IComparer<nuint>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<nuint> span, int[] network, IComparer<nuint> comparer)
@@ -699,7 +759,10 @@ public static partial class NetworkSort
     /// Sorts an array of char using a sorting network when possible.
     /// </summary>
     public static void Sort(char[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of char using a sorting network when possible,
@@ -723,7 +786,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(char[] array, IComparer<char>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<char> span, int[] network, IComparer<char> comparer)
@@ -765,7 +831,10 @@ public static partial class NetworkSort
     /// Sorts an array of float using a sorting network when possible.
     /// </summary>
     public static void Sort(float[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of float using a sorting network when possible,
@@ -789,7 +858,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(float[] array, IComparer<float>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<float> span, int[] network, IComparer<float> comparer)
@@ -831,7 +903,10 @@ public static partial class NetworkSort
     /// Sorts an array of double using a sorting network when possible.
     /// </summary>
     public static void Sort(double[] array)
-        => Sort(array.AsSpan());
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan());
+    }
 
     /// <summary>
     /// Sorts a span of double using a sorting network when possible,
@@ -855,7 +930,10 @@ public static partial class NetworkSort
     /// with a custom comparer.
     /// </summary>
     public static void Sort(double[] array, IComparer<double>? comparer)
-        => Sort(array.AsSpan(), comparer);
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        Sort(array.AsSpan(), comparer);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void ApplyNetworkWithComparer(Span<double> span, int[] network, IComparer<double> comparer)

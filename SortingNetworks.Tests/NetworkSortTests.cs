@@ -385,6 +385,78 @@ public class NetworkSortTests
         }
     }
 
+    [Fact]
+    public void Sort_NullArray_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((byte[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((sbyte[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((short[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((ushort[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((int[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((uint[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((long[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((ulong[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((float[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((double[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((char[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((string[])null!, StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void Sort_NullComparer_Throws_Generic()
+    {
+        var array = new string[] { "a", "b" };
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort(array, (IComparer<string>)null!));
+    }
+
+    [Fact]
+    public void Sort_NullComparer_UsesDefault_Primitives()
+    {
+        var bytes = new byte[] { 3, 1, 2 };
+        NetworkSort.Sort(bytes, null);
+        Assert.Equal(new byte[] { 1, 2, 3 }, bytes);
+
+        var sbytes = new sbyte[] { 3, 1, 2 };
+        NetworkSort.Sort(sbytes, null);
+        Assert.Equal(new sbyte[] { 1, 2, 3 }, sbytes);
+
+        var shorts = new short[] { 3, 1, 2 };
+        NetworkSort.Sort(shorts, null);
+        Assert.Equal(new short[] { 1, 2, 3 }, shorts);
+
+        var ushorts = new ushort[] { 3, 1, 2 };
+        NetworkSort.Sort(ushorts, null);
+        Assert.Equal(new ushort[] { 1, 2, 3 }, ushorts);
+
+        var ints = new int[] { 3, 1, 2 };
+        NetworkSort.Sort(ints, null);
+        Assert.Equal(new int[] { 1, 2, 3 }, ints);
+
+        var uints = new uint[] { 3, 1, 2 };
+        NetworkSort.Sort(uints, null);
+        Assert.Equal(new uint[] { 1, 2, 3 }, uints);
+
+        var longs = new long[] { 3, 1, 2 };
+        NetworkSort.Sort(longs, null);
+        Assert.Equal(new long[] { 1, 2, 3 }, longs);
+
+        var ulongs = new ulong[] { 3, 1, 2 };
+        NetworkSort.Sort(ulongs, null);
+        Assert.Equal(new ulong[] { 1, 2, 3 }, ulongs);
+
+        var floats = new float[] { 3, 1, 2 };
+        NetworkSort.Sort(floats, null);
+        Assert.Equal(new float[] { 1, 2, 3 }, floats);
+
+        var doubles = new double[] { 3, 1, 2 };
+        NetworkSort.Sort(doubles, null);
+        Assert.Equal(new double[] { 1, 2, 3 }, doubles);
+
+        var chars = new char[] { 'c', 'a', 'b' };
+        NetworkSort.Sort(chars, null);
+        Assert.Equal(new char[] { 'a', 'b', 'c' }, chars);
+    }
+
 
     public static TheoryData<int> Lengths
     {
