@@ -1434,11 +1434,11 @@ public static partial class NetworkSort
         // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 0, 0, 0, 0)), 0x0E);
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 0, 0, 0, 0)), 0x0E);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0)), 0x0F);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
             var min0 = Avx2.Min(v0, s0);
@@ -1478,8 +1478,8 @@ public static partial class NetworkSort
         // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
-            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2)), 0xA9);
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
             var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
@@ -1504,9 +1504,9 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 7));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 7)), 0x85);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x40);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 0, 0, 0, 0, 0)), 0x04);
@@ -1528,13 +1528,13 @@ public static partial class NetworkSort
         // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
-            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0)), 0x03);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
             var min0 = Avx2.Min(v0, s0);
@@ -1553,8 +1553,8 @@ public static partial class NetworkSort
 
         // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
         {
-            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0)), 0x09);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 3, 6, 0, 4, 0));
@@ -1582,15 +1582,15 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3)), 0xAD);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF9);
             var min0 = Avx2.Min(v0, s0);
             var max0 = Avx2.Max(v0, s0);
             v0 = Avx2.Blend(min0, max0, 0x00);
@@ -1609,11 +1609,11 @@ public static partial class NetworkSort
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
-            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0)), 0x81);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0)), 0x51);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
             var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
@@ -1641,8 +1641,8 @@ public static partial class NetworkSort
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0, s0);
             var max0 = Avx2.Max(v0, s0);
             v0 = Avx2.Blend(min0, max0, 0x50);
@@ -1665,8 +1665,8 @@ public static partial class NetworkSort
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0, s0);
             var max0 = Avx2.Max(v0, s0);
             v0 = Avx2.Blend(min0, max0, 0x80);
@@ -1771,11 +1771,11 @@ public static partial class NetworkSort
 
         // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
         {
-            var s0 = Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s0 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0)), 0x0F);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0)), 0x0F);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
             var min0 = Avx2.Min(v0, s0);
@@ -1815,8 +1815,8 @@ public static partial class NetworkSort
         // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
-            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2)), 0xA9);
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
             var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 3, 0, 1, 4, 5, 6, 7));
@@ -1841,9 +1841,9 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 0));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 0)), 0x05);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 3)), 0xC0);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 7, 0, 0, 0, 0)), 0x0C);
@@ -1865,13 +1865,13 @@ public static partial class NetworkSort
         // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
-            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0)), 0x03);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
             var min0 = Avx2.Min(v0, s0);
@@ -1890,8 +1890,8 @@ public static partial class NetworkSort
 
         // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
         {
-            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0)), 0x09);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 0, 6, 0, 4, 0));
@@ -1919,15 +1919,15 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3)), 0xAD);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF9);
             var min0 = Avx2.Min(v0, s0);
             var max0 = Avx2.Max(v0, s0);
             v0 = Avx2.Blend(min0, max0, 0x00);
@@ -1946,11 +1946,11 @@ public static partial class NetworkSort
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
-            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0)), 0x81);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0)), 0x51);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
             var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
@@ -1978,8 +1978,8 @@ public static partial class NetworkSort
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0, s0);
             var max0 = Avx2.Max(v0, s0);
             v0 = Avx2.Blend(min0, max0, 0x50);
@@ -2002,8 +2002,8 @@ public static partial class NetworkSort
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0, s0);
             var max0 = Avx2.Max(v0, s0);
             v0 = Avx2.Blend(min0, max0, 0x80);
@@ -2110,11 +2110,11 @@ public static partial class NetworkSort
         // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 0, 0, 0, 0)), 0x0E);
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 0, 0, 0, 0)), 0x0E);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0)), 0x0F);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
@@ -2154,8 +2154,8 @@ public static partial class NetworkSort
         // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
-            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2)), 0xA9);
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
             var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
@@ -2180,9 +2180,9 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 7));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 7)), 0x85);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x40);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 0, 0, 0, 0, 0)), 0x04);
@@ -2204,13 +2204,13 @@ public static partial class NetworkSort
         // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
-            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0)), 0x03);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
@@ -2229,8 +2229,8 @@ public static partial class NetworkSort
 
         // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
         {
-            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0)), 0x09);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 3, 6, 0, 4, 0));
@@ -2258,15 +2258,15 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3)), 0xAD);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF9);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             v0 = Avx2.Blend(min0, max0, 0x00);
@@ -2285,11 +2285,11 @@ public static partial class NetworkSort
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
-            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0)), 0x81);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0)), 0x51);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
             var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
@@ -2317,8 +2317,8 @@ public static partial class NetworkSort
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             v0 = Avx2.Blend(min0, max0, 0x50);
@@ -2341,8 +2341,8 @@ public static partial class NetworkSort
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             v0 = Avx2.Blend(min0, max0, 0x80);
@@ -2447,11 +2447,11 @@ public static partial class NetworkSort
 
         // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
         {
-            var s0 = Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s0 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0)), 0x0F);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0)), 0x0F);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
@@ -2491,8 +2491,8 @@ public static partial class NetworkSort
         // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
-            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2)), 0xA9);
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
             var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 3, 0, 1, 4, 5, 6, 7));
@@ -2517,9 +2517,9 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 0));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 0)), 0x05);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 3)), 0xC0);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 7, 0, 0, 0, 0)), 0x0C);
@@ -2541,13 +2541,13 @@ public static partial class NetworkSort
         // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
             var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
-            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0)), 0x03);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
             var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
@@ -2566,8 +2566,8 @@ public static partial class NetworkSort
 
         // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
         {
-            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
-            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0)), 0x09);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 0, 6, 0, 4, 0));
@@ -2595,15 +2595,15 @@ public static partial class NetworkSort
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
             var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            var s2 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3)), 0xAD);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF9);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             v0 = Avx2.Blend(min0, max0, 0x00);
@@ -2622,11 +2622,11 @@ public static partial class NetworkSort
         {
             var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
             s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
-            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0)), 0x81);
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
-            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
-            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
-            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0)), 0x51);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
             var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
             s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
@@ -2654,8 +2654,8 @@ public static partial class NetworkSort
             var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             v0 = Avx2.Blend(min0, max0, 0x50);
@@ -2678,8 +2678,8 @@ public static partial class NetworkSort
             s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
             var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
             s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
-            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
-            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7)), 0xFD);
             var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
             v0 = Avx2.Blend(min0, max0, 0x80);

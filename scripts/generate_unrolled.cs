@@ -468,7 +468,7 @@ void WriteSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> ste
 void WriteSimdSortMethod32_Avx2(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
 {
     int v3ReadOffset = (n - 4) * 4;
-    int v3ShiftBytes = (4 - (n - 24)) * 4;
+    int v3ShiftBytes = (28 - n) * 4;
     string suffix = $"_{typeName}";
     string refCast = $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));";
 
@@ -547,8 +547,10 @@ void WriteSimdSortMethod32_Avx2(StreamWriter w, int n, List<List<(int A, int B)>
             {
                 // Cross-vector shuffle
                 bool firstSource = true;
-                foreach (var (srcVec, lanes) in sourceMap)
+                for (int srcVec = 0; srcVec < 4; srcVec++)
                 {
+                    if (!sourceMap.TryGetValue(srcVec, out var lanes))
+                        continue;
                     int[] indices = new int[8];
                     foreach (var (destLane, srcLane) in lanes)
                         indices[destLane] = srcLane;
