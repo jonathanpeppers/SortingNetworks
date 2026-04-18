@@ -76,18 +76,24 @@ def get_network(n):
 
 def generate_unrolled_method(n, pairs):
     lines = []
-    lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
+    # Only inline small methods; larger ones can't be inlined anyway
+    if n <= 8:
+        lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
     lines.append(f"    private static void Sort{n}<T>(ref T first) where T : IComparable<T>")
     lines.append(f"    {{")
-    # Declare ref locals for each element position
-    for i in range(n):
-        if i == 0:
-            lines.append(f"        ref T e0 = ref first;")
-        else:
-            lines.append(f"        ref T e{i} = ref Unsafe.Add(ref first, {i});")
+    # Load values into locals (not ref locals) to enable register allocation
+    lines.append(f"        T e0 = first;")
+    for i in range(1, n):
+        lines.append(f"        T e{i} = Unsafe.Add(ref first, {i});")
+    lines.append(f"")
     # Emit compare-and-swap for each comparator
     for a, b in pairs:
         lines.append(f"        if (e{a}.CompareTo(e{b}) > 0) {{ T temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
+    lines.append(f"")
+    # Write values back to memory
+    lines.append(f"        first = e0;")
+    for i in range(1, n):
+        lines.append(f"        Unsafe.Add(ref first, {i}) = e{i};")
     lines.append(f"    }}")
     return "\n".join(lines)
 
