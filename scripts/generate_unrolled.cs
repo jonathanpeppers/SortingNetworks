@@ -287,6 +287,21 @@ string MaxExpr16(string typeName, string v, string s) => typeName switch
     _ => $"Avx512BW.Max({v}, {s})",
 };
 
+string FmtVec256_Int(int[] values) =>
+    $"Vector256.Create({string.Join(", ", values)})";
+
+string MinExpr32(string typeName, string v, string s) => typeName switch
+{
+    "uint" => $"Avx2.Min({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()",
+    _ => $"Avx2.Min({v}, {s})",
+};
+
+string MaxExpr32(string typeName, string v, string s) => typeName switch
+{
+    "uint" => $"Avx2.Max({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()",
+    _ => $"Avx2.Max({v}, {s})",
+};
+
 // --- Code generation ---
 
 void WriteFileHeader(StreamWriter w)
@@ -450,6 +465,160 @@ void WriteSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> ste
     w.WriteLine("    }");
 }
 
+void WriteSimdSortMethod32_Avx2(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
+{
+    int v3ReadOffset = (n - 4) * 4;
+    int v3ShiftBytes = (4 - (n - 24)) * 4;
+    string suffix = $"_{typeName}";
+    string refCast = $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));";
+
+    w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
+    w.WriteLine($"    private static void SortSimd{n}{suffix}(Span<{typeName}> span)");
+    w.WriteLine("    {");
+    w.WriteLine($"        {refCast}");
+    w.WriteLine("        var v0 = Unsafe.ReadUnaligned<Vector256<byte>>(ref first).AsInt32();");
+    w.WriteLine("        var v1 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 32)).AsInt32();");
+    w.WriteLine("        var v2 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 64)).AsInt32();");
+    if (v3ShiftBytes == 0)
+    {
+        w.WriteLine($"        var v3 = Vector256.Create(");
+        w.WriteLine($"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {v3ReadOffset})),");
+        w.WriteLine("            Vector128<byte>.Zero).AsInt32();");
+    }
+    else
+    {
+        w.WriteLine($"        var v3 = Vector256.Create(");
+        w.WriteLine("            Sse2.ShiftRightLogical128BitLane(");
+        w.WriteLine($"                Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {v3ReadOffset})),");
+        w.WriteLine($"                {v3ShiftBytes}),");
+        w.WriteLine("            Vector128<byte>.Zero).AsInt32();");
+    }
+
+    for (int si = 0; si < steps.Count; si++)
+    {
+        var step = steps[si];
+        int[] perm = Enumerable.Range(0, 32).ToArray();
+        foreach (var (a, b) in step) { perm[a] = b; perm[b] = a; }
+
+        int[] blendMask = new int[32];
+        foreach (var (a, b) in step)
+            blendMask[Math.Max(a, b)] = unchecked((int)0xFFFFFFFF);
+
+        string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+
+        w.WriteLine();
+        w.WriteLine($"        // Step {si}: {pairStr}");
+        w.WriteLine("        {");
+
+        // Build shuffled companion for each of the 4 vectors
+        for (int d = 0; d < 4; d++)
+        {
+            // Group sources by which vector they come from
+            var sourceMap = new Dictionary<int, List<(int destLane, int srcLane)>>();
+            for (int j = 0; j < 8; j++)
+            {
+                int pos = d * 8 + j;
+                if (pos >= 32) break;
+                int srcPos = perm[pos];
+                int srcVec = srcPos / 8;
+                int srcLane = srcPos % 8;
+                if (!sourceMap.ContainsKey(srcVec))
+                    sourceMap[srcVec] = new List<(int, int)>();
+                sourceMap[srcVec].Add((j, srcLane));
+            }
+
+            if (sourceMap.Count == 1 && sourceMap.ContainsKey(d))
+            {
+                // All sources from same vector (intra-vector permute)
+                int[] indices = new int[8];
+                for (int j = 0; j < 8; j++)
+                    indices[j] = perm[d * 8 + j] % 8;
+
+                bool isIdentity = true;
+                for (int j = 0; j < 8; j++)
+                    if (indices[j] != j) { isIdentity = false; break; }
+
+                if (!isIdentity)
+                    w.WriteLine($"            var s{d} = Avx2.PermuteVar8x32(v{d}, {FmtVec256_Int(indices)});");
+                else
+                    w.WriteLine($"            var s{d} = v{d};");
+            }
+            else
+            {
+                // Cross-vector shuffle
+                bool firstSource = true;
+                foreach (var (srcVec, lanes) in sourceMap)
+                {
+                    int[] indices = new int[8];
+                    foreach (var (destLane, srcLane) in lanes)
+                        indices[destLane] = srcLane;
+
+                    int blendBits = 0;
+                    foreach (var (destLane, _) in lanes)
+                        blendBits |= 1 << destLane;
+
+                    if (firstSource)
+                    {
+                        w.WriteLine($"            var s{d} = Avx2.PermuteVar8x32(v{srcVec}, {FmtVec256_Int(indices)});");
+                        firstSource = false;
+                    }
+                    else
+                    {
+                        w.WriteLine($"            s{d} = Avx2.Blend(s{d}, Avx2.PermuteVar8x32(v{srcVec}, {FmtVec256_Int(indices)}), 0x{blendBits:X2});");
+                    }
+                }
+            }
+        }
+
+        // Min, Max, Blend for each vector
+        for (int d = 0; d < 4; d++)
+        {
+            // Check if any element in this vector participates in a swap
+            bool vectorModified = false;
+            for (int j = 0; j < 8; j++)
+            {
+                int pos = d * 8 + j;
+                if (pos < 32 && perm[pos] != pos)
+                {
+                    vectorModified = true;
+                    break;
+                }
+            }
+
+            if (!vectorModified) continue;
+
+            int blendImm = 0;
+            for (int j = 0; j < 8; j++)
+            {
+                if (blendMask[d * 8 + j] != 0)
+                    blendImm |= 1 << j;
+            }
+
+            w.WriteLine($"            var min{d} = {MinExpr32(typeName, $"v{d}", $"s{d}")};");
+            w.WriteLine($"            var max{d} = {MaxExpr32(typeName, $"v{d}", $"s{d}")};");
+            w.WriteLine($"            v{d} = Avx2.Blend(min{d}, max{d}, 0x{blendImm:X2});");
+        }
+
+        w.WriteLine("        }");
+    }
+
+    // Store results (reverse order for overlapping writes)
+    w.WriteLine();
+    if (v3ShiftBytes == 0)
+    {
+        w.WriteLine($"        v3.GetLower().AsByte().StoreUnsafe(ref Unsafe.Add(ref first, {v3ReadOffset}));");
+    }
+    else
+    {
+        w.WriteLine($"        Sse2.ShiftLeftLogical128BitLane(v3.GetLower().AsByte(), {v3ShiftBytes})");
+        w.WriteLine($"            .StoreUnsafe(ref Unsafe.Add(ref first, {v3ReadOffset}));");
+    }
+    w.WriteLine("        v2.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 64));");
+    w.WriteLine("        v1.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 32));");
+    w.WriteLine("        v0.AsByte().StoreUnsafe(ref first);");
+    w.WriteLine("    }");
+}
+
 void WriteSimdFile(StreamWriter w)
 {
     w.Write("""
@@ -489,6 +658,16 @@ void WriteSimdFile(StreamWriter w)
             var steps = GetNetworkSteps(n);
             w.WriteLine();
             WriteSimdSortMethod16(w, n, steps, typeName);
+        }
+    }
+
+    foreach (string typeName in new[] { "int", "uint" })
+    {
+        foreach (int n in new[] { 27, 28 })
+        {
+            var steps = GetNetworkSteps(n);
+            w.WriteLine();
+            WriteSimdSortMethod32_Avx2(w, n, steps, typeName);
         }
     }
 
@@ -668,6 +847,7 @@ void WritePublicApi(StreamWriter w, string t)
     string suffix = t != "byte" ? $"_{t}" : "";
     bool hasSimd8 = t == "byte" || t == "sbyte";
     bool hasSimd16 = t == "short" || t == "ushort" || t == "char";
+    bool hasSimd32 = t == "int" || t == "uint";
 
     w.WriteLine("    /// <summary>");
     w.WriteLine($"    /// Sorts a span of {t} using a sorting network when possible.");
@@ -677,9 +857,9 @@ void WritePublicApi(StreamWriter w, string t)
     w.WriteLine("        int n = span.Length;");
     w.WriteLine("        if (n == 27 || n == 28)");
     w.WriteLine("        {");
-    if (hasSimd8 || hasSimd16)
+    if (hasSimd8 || hasSimd16 || hasSimd32)
     {
-        string isaCheck = hasSimd8 ? "Avx2.IsSupported" : "Avx512BW.IsSupported";
+        string isaCheck = hasSimd8 || hasSimd32 ? "Avx2.IsSupported" : "Avx512BW.IsSupported";
         w.WriteLine($"            if ({isaCheck})");
         w.WriteLine("            {");
         w.WriteLine($"                if (n == 27)");
@@ -689,15 +869,18 @@ void WritePublicApi(StreamWriter w, string t)
         w.WriteLine("                return;");
         w.WriteLine("            }");
         w.WriteLine();
-        w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimdArm27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimdArm28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
-        w.WriteLine();
+        if (hasSimd8 || hasSimd16)
+        {
+            w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
+            w.WriteLine("            {");
+            w.WriteLine($"                if (n == 27)");
+            w.WriteLine($"                    SortSimdArm27{suffix}(span);");
+            w.WriteLine("                else");
+            w.WriteLine($"                    SortSimdArm28{suffix}(span);");
+            w.WriteLine("                return;");
+            w.WriteLine("            }");
+            w.WriteLine();
+        }
     }
     w.WriteLine($"            ref {t} first = ref MemoryMarshal.GetReference(span);");
     w.WriteLine("            if (n == 27)");

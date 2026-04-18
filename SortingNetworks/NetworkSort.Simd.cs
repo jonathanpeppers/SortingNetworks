@@ -1417,4 +1417,1356 @@ public static partial class NetworkSort
         hiLo.StoreUnsafe(ref Unsafe.Add(ref first, 32));
         lo256.StoreUnsafe(ref first);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd27_int(Span<int> span)
+    {
+        ref byte first = ref Unsafe.As<int, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<byte>>(ref first).AsInt32();
+        var v1 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 32)).AsInt32();
+        var v2 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 64)).AsInt32();
+        var v3 = Vector256.Create(
+            Sse2.ShiftRightLogical128BitLane(
+                Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 92)),
+                4),
+            Vector128<byte>.Zero).AsInt32();
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 0, 0, 0, 0)), 0x0E);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xCA);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xFA);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x07);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(1, 0, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 3, 0, 1, 5, 4, 7, 6));
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xAA);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xCC);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xAC);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xCC);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x50);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xCF);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x04);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 5, 0, 0, 0, 1, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 4, 5, 0, 0, 0, 0)), 0x0C);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 7));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x40);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 0, 0, 0, 0, 0)), 0x04);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x30);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xA8);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x07);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x44);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x32);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xDB);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x05);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 3, 6, 0, 4, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 1, 0, 2)), 0xA4);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 7, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xD0);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xAB);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x42);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x07);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 5, 0, 0, 4, 1, 0)), 0x76);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x37);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xF0);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x06);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x10);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xC8);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 4, 3, 2, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 5, 2, 7, 0, 1, 0, 3)), 0xAE);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xA1);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 7, 3, 0, 5, 0, 2));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x80);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xCD);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xA4);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 1, 7, 6, 5, 4));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 0, 2, 6, 5, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x88);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 7, 6, 5, 4)), 0xFC);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xC8);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x52);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xCB);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x04);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 4, 0, 5, 1, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 2)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 0, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 3, 0, 1, 5, 4, 7, 6)), 0xFA);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xA8);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x34);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xAD);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x55);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        Sse2.ShiftLeftLogical128BitLane(v3.GetLower().AsByte(), 4)
+            .StoreUnsafe(ref Unsafe.Add(ref first, 92));
+        v2.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 64));
+        v1.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 32));
+        v0.AsByte().StoreUnsafe(ref first);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd28_int(Span<int> span)
+    {
+        ref byte first = ref Unsafe.As<int, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<byte>>(ref first).AsInt32();
+        var v1 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 32)).AsInt32();
+        var v2 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 64)).AsInt32();
+        var v3 = Vector256.Create(
+            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 96)),
+            Vector128<byte>.Zero).AsInt32();
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var s0 = Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xCA);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xFA);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x0F);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(1, 0, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 3, 0, 1, 5, 4, 7, 6));
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 3, 2, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xAA);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xCC);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xAC);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x0A);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 3, 0, 1, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xCC);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x50);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xCF);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x0C);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 5, 0, 0, 0, 1, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 4, 5, 0, 0, 0, 0)), 0x0C);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 3)), 0xC0);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 7, 0, 0, 0, 0)), 0x0C);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x30);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xA8);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x0F);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x44);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x32);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xDB);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x05);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 0, 6, 0, 4, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 0, 1, 0, 2)), 0xAC);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 7, 3, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xD0);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xAB);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x42);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x0F);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 5, 0, 0, 4, 1, 0)), 0x76);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x37);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xF0);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x06);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x10);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xC8);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 4, 3, 2, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 5, 2, 7, 0, 1, 0, 3)), 0xAE);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xA1);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 7, 3, 0, 5, 0, 2));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x80);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0xCD);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xA4);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 1, 7, 6, 5, 4));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 0, 2, 6, 5, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x88);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 7, 6, 5, 4)), 0xFC);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xC8);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x52);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xCB);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x04);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 4, 0, 5, 1, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 2)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 0, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 3, 0, 1, 5, 4, 7, 6)), 0xFA);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0xA8);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x34);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0xAD);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0, s0);
+            var max0 = Avx2.Max(v0, s0);
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1, s1);
+            var max1 = Avx2.Max(v1, s1);
+            v1 = Avx2.Blend(min1, max1, 0x55);
+            var min2 = Avx2.Min(v2, s2);
+            var max2 = Avx2.Max(v2, s2);
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3, s3);
+            var max3 = Avx2.Max(v3, s3);
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        v3.GetLower().AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 96));
+        v2.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 64));
+        v1.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 32));
+        v0.AsByte().StoreUnsafe(ref first);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd27_uint(Span<uint> span)
+    {
+        ref byte first = ref Unsafe.As<uint, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<byte>>(ref first).AsInt32();
+        var v1 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 32)).AsInt32();
+        var v2 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 64)).AsInt32();
+        var v3 = Vector256.Create(
+            Sse2.ShiftRightLogical128BitLane(
+                Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 92)),
+                4),
+            Vector128<byte>.Zero).AsInt32();
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 0, 0, 0, 0)), 0x0E);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xCA);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xFA);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x07);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(1, 0, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 3, 0, 1, 5, 4, 7, 6));
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xAA);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xCC);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xAC);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xCC);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x50);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xCF);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x04);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 5, 0, 0, 0, 1, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 4, 5, 0, 0, 0, 0)), 0x0C);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 7));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x40);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 0, 0, 0, 0, 0)), 0x04);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x30);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xA8);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x07);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x44);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x32);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xDB);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x05);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 3, 6, 0, 4, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 1, 0, 2)), 0xA4);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 7, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7)), 0xF8);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xD0);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xAB);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x42);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x07);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 5, 0, 0, 4, 1, 0)), 0x76);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x37);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xF0);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x06);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x10);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xC8);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 4, 3, 2, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 5, 2, 7, 0, 1, 0, 3)), 0xAE);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xA1);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 7, 3, 0, 5, 0, 2));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x80);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xCD);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xA4);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 1, 7, 6, 5, 4));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 0, 2, 6, 5, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x88);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 7, 6, 5, 4)), 0xFC);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xC8);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x52);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xCB);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x04);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 4, 0, 5, 1, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 2)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 0, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 3, 0, 1, 5, 4, 7, 6)), 0xFA);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xA8);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x34);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xAD);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x55);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        Sse2.ShiftLeftLogical128BitLane(v3.GetLower().AsByte(), 4)
+            .StoreUnsafe(ref Unsafe.Add(ref first, 92));
+        v2.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 64));
+        v1.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 32));
+        v0.AsByte().StoreUnsafe(ref first);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd28_uint(Span<uint> span)
+    {
+        ref byte first = ref Unsafe.As<uint, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<byte>>(ref first).AsInt32();
+        var v1 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 32)).AsInt32();
+        var v2 = Unsafe.ReadUnaligned<Vector256<byte>>(ref Unsafe.Add(ref first, 64)).AsInt32();
+        var v3 = Vector256.Create(
+            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 96)),
+            Vector128<byte>.Zero).AsInt32();
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var s0 = Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 6, 5, 4)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xCA);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xFA);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x0F);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(1, 0, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 3, 0, 1, 5, 4, 7, 6));
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 3, 2, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xAA);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xCC);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xAC);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x0A);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var s1 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 0, 0, 0, 0, 1, 0, 2));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 0, 1, 0, 2, 0)), 0x56);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 6, 7, 4, 5)), 0xF0);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 3, 0, 1, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xCC);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x50);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xCF);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x0C);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 5, 0, 0, 0, 1, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 4, 5, 0, 0, 0, 0)), 0x0C);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 0, 1, 7, 0, 0, 4));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 3, 0)), 0x44);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 0, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 0, 6, 0, 0, 0, 0)), 0x0A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 2, 3, 0, 0)), 0x30);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 3)), 0xC0);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 6, 7, 0, 0, 0, 0)), 0x0C);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x30);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xA8);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x0F);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 0, 6, 0, 4, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x08);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 6, 0, 4)), 0xA0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 0, 7, 0, 5)), 0xAC);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 5, 0)), 0x50);
+            var s3 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x44);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x32);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xDB);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x05);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 1, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 0, 1, 7, 2, 5)), 0xF6);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 3, 2, 5, 4, 7, 6)), 0xFC);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 0, 0, 6, 0, 4, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 0, 1, 0, 2)), 0xAC);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 7, 3, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 4, 5, 6, 7)), 0xF0);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xD0);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xAB);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x42);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x0F);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 5, 0, 0, 4, 1, 0)), 0x76);
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 4)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 0, 5, 2, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 3, 0, 0, 0, 0)), 0x08);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 1, 0)), 0x40);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 6)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 5, 7, 0, 2, 0, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 0, 0, 0, 0, 0, 0)), 0x02);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 0, 7, 0, 0, 0)), 0x10);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 7, 0)), 0x40);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 0, 0, 0, 0, 0, 0)), 0x02);
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 1, 0, 0, 0, 0, 0)), 0x04);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x00);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x37);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xF0);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x06);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 0, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 6, 3)), 0xC0);
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 3, 5, 0, 0)), 0x36);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v0, Vector256.Create(0, 0, 0, 7, 0, 0, 6, 0)), 0x48);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 0, 0, 0, 0, 0, 6, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 0, 5, 0, 0)), 0x2E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x10);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xC8);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x3E);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 4, 3, 2, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 5, 2, 7, 0, 1, 0, 3)), 0xAE);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 0, 4, 3, 6, 5, 0)), 0x7A);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xA1);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 7, 3, 0, 5, 0, 2));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 2, 0)), 0x50);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 0, 6, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 0, 1, 6, 7, 4, 5)), 0xFA);
+            var s2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 0, 1, 6, 3));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 1, 0, 0, 0)), 0x10);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 2, 3, 4, 5, 6, 7));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 0, 0, 0, 0, 0, 0)), 0x02);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x80);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0xCD);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xA4);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 1, 7, 6, 5, 4));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 0, 2, 6, 5, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 1)), 0x88);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 7, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 3, 2, 7, 6, 5, 4)), 0xFC);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xC8);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x52);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xCB);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x04);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var s1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 4, 0, 5, 1, 3, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 2)), 0xC0);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 0, 7, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 3, 0, 1, 5, 4, 7, 6)), 0xFA);
+            var s3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0xA8);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x34);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0xAD);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x02);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var s0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 0));
+            s0 = Avx2.Blend(s0, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s1 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s1 = Avx2.Blend(s1, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s2 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v2, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 0)), 0x7E);
+            s2 = Avx2.Blend(s2, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0)), 0x80);
+            var s3 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 0, 0, 0, 0, 0, 0, 0));
+            s3 = Avx2.Blend(s3, Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7)), 0xFE);
+            var min0 = Avx2.Min(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx2.Max(v0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            v0 = Avx2.Blend(min0, max0, 0x50);
+            var min1 = Avx2.Min(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx2.Max(v1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            v1 = Avx2.Blend(min1, max1, 0x55);
+            var min2 = Avx2.Min(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            var max2 = Avx2.Max(v2.AsUInt32(), s2.AsUInt32()).AsInt32();
+            v2 = Avx2.Blend(min2, max2, 0x55);
+            var min3 = Avx2.Min(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            var max3 = Avx2.Max(v3.AsUInt32(), s3.AsUInt32()).AsInt32();
+            v3 = Avx2.Blend(min3, max3, 0x01);
+        }
+
+        v3.GetLower().AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 96));
+        v2.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 64));
+        v1.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 32));
+        v0.AsByte().StoreUnsafe(ref first);
+    }
 }
