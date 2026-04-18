@@ -36,7 +36,7 @@ if (Test-Path $artifactsDir) {
 Write-Host "Running benchmarks with filter: $Filter" -ForegroundColor Cyan
 Push-Location (Join-Path $repoRoot "SortingNetworks.Benchmarks")
 try {
-    dotnet run -c Release -- --filter $Filter --join --exporters github json
+    dotnet run -c Release -- --filter $Filter --join --exporters GitHub JSON
     if ($LASTEXITCODE -ne 0) { throw "Benchmark run failed with exit code $LASTEXITCODE" }
 } finally {
     Pop-Location
