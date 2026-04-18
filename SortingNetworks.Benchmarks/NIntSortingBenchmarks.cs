@@ -1,0 +1,48 @@
+using BenchmarkDotNet.Attributes;
+using SortingNetworks;
+
+namespace SortingNetworks.Benchmarks;
+
+[MemoryDiagnoser]
+[ShortRunJob]
+public class NIntSortingBenchmarks
+{
+    private const int OpsPerInvoke = 1000;
+
+    [Params(27, 28)]
+    public int Length { get; set; }
+
+    private nint[] _source = null!;
+    private nint[][] _batch = null!;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        var rng = new Random(42);
+        _source = Enumerable.Range(0, Length).Select(_ => (nint)rng.Next(-1000, 1000)).ToArray();
+        _batch = new nint[OpsPerInvoke][];
+        for (int i = 0; i < OpsPerInvoke; i++)
+            _batch[i] = new nint[Length];
+    }
+
+    [IterationSetup]
+    public void IterationSetup()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            Array.Copy(_source, _batch[i], Length);
+    }
+
+    [Benchmark(Baseline = true, OperationsPerInvoke = OpsPerInvoke)]
+    public void ArraySort()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            Array.Sort(_batch[i]);
+    }
+
+    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
+    public void NetworkSort_Span()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            NetworkSort.Sort(_batch[i].AsSpan());
+    }
+}

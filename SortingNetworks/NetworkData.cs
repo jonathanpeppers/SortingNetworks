@@ -29,8 +29,6 @@ internal static class NetworkData
 
     internal static int[] GetNetwork(int n) => s_networks[n];
 
-    #region Batcher's Odd-Even Merge Sort Network Generator
-
     /// <summary>
     /// Generates a sorting network using Batcher's odd-even merge sort.
     /// Pads to the next power of 2 and filters out comparators with indices >= n.
@@ -81,10 +79,6 @@ internal static class NetworkData
             }
         }
     }
-
-    #endregion
-
-    #region Paper's 28-Channel Depth-13 Sorting Network
 
     /// <summary>
     /// The 28-channel depth-13 sorting network from
@@ -141,5 +135,4 @@ internal static class NetworkData
         return pairs.ToArray();
     }
 
-    #endregion
 }

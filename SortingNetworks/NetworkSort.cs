@@ -16,8 +16,6 @@ namespace SortingNetworks;
 /// </summary>
 public static partial class NetworkSort
 {
-    #region byte
-
     /// <summary>
     /// Sorts a span of byte using a sorting network when possible.
     /// </summary>
@@ -83,9 +81,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region sbyte
 
     /// <summary>
     /// Sorts a span of sbyte using a sorting network when possible.
@@ -152,9 +147,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region short
 
     /// <summary>
     /// Sorts a span of short using a sorting network when possible.
@@ -221,9 +213,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region ushort
 
     /// <summary>
     /// Sorts a span of ushort using a sorting network when possible.
@@ -290,9 +279,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region int
 
     /// <summary>
     /// Sorts a span of int using a sorting network when possible.
@@ -359,9 +345,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region uint
 
     /// <summary>
     /// Sorts a span of uint using a sorting network when possible.
@@ -428,9 +411,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region long
 
     /// <summary>
     /// Sorts a span of long using a sorting network when possible.
@@ -497,9 +477,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region ulong
 
     /// <summary>
     /// Sorts a span of ulong using a sorting network when possible.
@@ -566,9 +543,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region nint
 
     /// <summary>
     /// Sorts a span of nint using a sorting network when possible.
@@ -635,9 +609,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region nuint
 
     /// <summary>
     /// Sorts a span of nuint using a sorting network when possible.
@@ -704,9 +675,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region char
 
     /// <summary>
     /// Sorts a span of char using a sorting network when possible.
@@ -773,9 +741,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region float
 
     /// <summary>
     /// Sorts a span of float using a sorting network when possible.
@@ -842,9 +807,6 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
-
-    #region double
 
     /// <summary>
     /// Sorts a span of double using a sorting network when possible.
@@ -911,5 +873,4 @@ public static partial class NetworkSort
             }
         }
     }
-    #endregion
 }

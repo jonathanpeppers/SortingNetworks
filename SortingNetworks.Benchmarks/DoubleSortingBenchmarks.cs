@@ -1,0 +1,48 @@
+using BenchmarkDotNet.Attributes;
+using SortingNetworks;
+
+namespace SortingNetworks.Benchmarks;
+
+[MemoryDiagnoser]
+[ShortRunJob]
+public class DoubleSortingBenchmarks
+{
+    private const int OpsPerInvoke = 1000;
+
+    [Params(27, 28)]
+    public int Length { get; set; }
+
+    private double[] _source = null!;
+    private double[][] _batch = null!;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        var rng = new Random(42);
+        _source = Enumerable.Range(0, Length).Select(_ => rng.NextDouble() * 2000 - 1000).ToArray();
+        _batch = new double[OpsPerInvoke][];
+        for (int i = 0; i < OpsPerInvoke; i++)
+            _batch[i] = new double[Length];
+    }
+
+    [IterationSetup]
+    public void IterationSetup()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            Array.Copy(_source, _batch[i], Length);
+    }
+
+    [Benchmark(Baseline = true, OperationsPerInvoke = OpsPerInvoke)]
+    public void ArraySort()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            Array.Sort(_batch[i]);
+    }
+
+    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
+    public void NetworkSort_Span()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            NetworkSort.Sort(_batch[i].AsSpan());
+    }
+}

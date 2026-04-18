@@ -4,7 +4,6 @@ namespace SortingNetworks.Tests;
 
 public class NetworkSortTests
 {
-    #region Helper
 
     private static void VerifySort<T>(int length, Func<Random, T> generator, Action<T[]> sort) where T : IComparable<T>
     {
@@ -35,9 +34,7 @@ public class NetworkSortTests
         }
     }
 
-    #endregion
 
-    #region int (detailed tests)
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -183,9 +180,7 @@ public class NetworkSortTests
         Assert.Equal(expected, input);
     }
 
-    #endregion
 
-    #region byte
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -198,9 +193,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Byte() => StressSort(28, rng => (byte)rng.Next(0, 256), NetworkSort.Sort);
 
-    #endregion
 
-    #region sbyte
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -213,9 +206,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_SByte() => StressSort(28, rng => (sbyte)rng.Next(-128, 128), NetworkSort.Sort);
 
-    #endregion
 
-    #region short
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -228,9 +219,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Short() => StressSort(28, rng => (short)rng.Next(-1000, 1000), NetworkSort.Sort);
 
-    #endregion
 
-    #region ushort
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -243,9 +232,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_UShort() => StressSort(28, rng => (ushort)rng.Next(0, 2000), NetworkSort.Sort);
 
-    #endregion
 
-    #region uint
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -258,9 +245,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_UInt() => StressSort(28, rng => (uint)rng.Next(0, 2000), NetworkSort.Sort);
 
-    #endregion
 
-    #region long
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -273,9 +258,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Long() => StressSort(28, rng => (long)rng.Next(-10000, 10000), NetworkSort.Sort);
 
-    #endregion
 
-    #region ulong
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -288,9 +271,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_ULong() => StressSort(28, rng => (ulong)rng.Next(0, 20000), NetworkSort.Sort);
 
-    #endregion
 
-    #region nint
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -303,9 +284,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_NInt() => StressSort(28, rng => (nint)rng.Next(-10000, 10000), NetworkSort.Sort);
 
-    #endregion
 
-    #region nuint
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -318,9 +297,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_NUInt() => StressSort(28, rng => (nuint)rng.Next(0, 20000), NetworkSort.Sort);
 
-    #endregion
 
-    #region char
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -333,9 +310,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Char() => StressSort(28, rng => (char)rng.Next(32, 127), NetworkSort.Sort);
 
-    #endregion
 
-    #region float
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -348,9 +323,7 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Float() => StressSort(28, rng => (float)(rng.NextDouble() * 20000 - 10000), NetworkSort.Sort);
 
-    #endregion
 
-    #region double
 
     [Theory]
     [MemberData(nameof(Lengths))]
@@ -363,7 +336,6 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Double() => StressSort(28, rng => rng.NextDouble() * 20000 - 10000, NetworkSort.Sort);
 
-    #endregion
 
     public static TheoryData<int> Lengths
     {

@@ -199,10 +199,7 @@ def generate_api_file():
     for i, type_name in enumerate(PRIMITIVE_TYPES):
         if i > 0:
             lines.append("")
-        lines.append(f"    #region {type_name}")
-        lines.append("")
         lines.append(generate_public_api(type_name))
-        lines.append(f"    #endregion")
 
     lines.append("}")
     lines.append("")
