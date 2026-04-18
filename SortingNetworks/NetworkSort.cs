@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 
 namespace SortingNetworks;
 
@@ -24,6 +25,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27(span);
+                else
+                    SortSimd28(span);
+                return;
+            }
+
             ref byte first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -96,6 +106,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_sbyte(span);
+                else
+                    SortSimd28_sbyte(span);
+                return;
+            }
+
             ref sbyte first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
