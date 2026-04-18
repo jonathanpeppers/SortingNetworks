@@ -76,6 +76,7 @@ def get_network(n):
 
 def generate_unrolled_method(n, pairs):
     lines = []
+    # Only inline small methods; larger ones can't be inlined anyway
     if n <= 8:
         lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
     lines.append(f"    private static void Sort{n}(ref int first)")
@@ -108,7 +109,7 @@ def generate_file():
     lines.append("public static partial class NetworkSort")
     lines.append("{")
     
-    for n in range(2, 29):
+    for n in [27, 28]:
         pairs = get_network(n)
         lines.append(generate_unrolled_method(n, pairs))
         if n < 28:
@@ -126,6 +127,6 @@ if __name__ == "__main__":
     print(f"Generated {output_path}")
     
     # Print stats
-    for n in range(2, 29):
+    for n in [27, 28]:
         pairs = get_network(n)
         print(f"  Sort{n}: {len(pairs)} compare-swaps")

@@ -41,6 +41,37 @@ public class NetworkSortTests
 
     [Theory]
     [MemberData(nameof(Lengths))]
+    public void Sort_WithComparer_RandomInts_MatchesArraySort(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        var actual = (int[])input.Clone();
+        NetworkSort.Sort(actual, Comparer<int>.Default);
+
+        Assert.Equal(expected, actual);
+    }
+
+    // TODO: Re-enable when generic Sort<T> is restored
+    // [Theory]
+    // [MemberData(nameof(Lengths))]
+    // public void Sort_Strings_MatchesArraySort(int length)
+    // {
+    //     var rng = new Random(42 + length);
+    //     var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 100).ToString()).ToArray();
+    //     var expected = (string[])input.Clone();
+    //     Array.Sort(expected, StringComparer.Ordinal);
+    //
+    //     var actual = (string[])input.Clone();
+    //     NetworkSort.Sort(actual, StringComparer.Ordinal);
+    //
+    //     Assert.Equal(expected, actual);
+    // }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
     public void Sort_AlreadySorted(int length)
     {
         var input = Enumerable.Range(0, length).ToArray();
@@ -123,21 +154,6 @@ public class NetworkSortTests
 
             Assert.Equal(expected, input);
         }
-    }
-
-    [Theory]
-    [MemberData(nameof(Lengths))]
-    public void Sort_WithComparer_RandomInts_MatchesArraySort(int length)
-    {
-        var rng = new Random(42 + length);
-        var input = Enumerable.Range(0, length).Select(_ => rng.Next(-1000, 1000)).ToArray();
-        var expected = (int[])input.Clone();
-        Array.Sort(expected);
-
-        var actual = (int[])input.Clone();
-        NetworkSort.Sort(actual, Comparer<int>.Default);
-
-        Assert.Equal(expected, actual);
     }
 
     [Fact]
