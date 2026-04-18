@@ -55,7 +55,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -187,7 +187,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -319,7 +319,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -385,7 +385,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -451,7 +451,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -517,7 +517,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -583,7 +583,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -649,7 +649,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -715,7 +715,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -781,7 +781,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -847,7 +847,7 @@ public static partial class NetworkSort
             return;
         }
 
-        span.Sort(comparer.Compare);
+        span.Sort(comparer);
     }
 
     /// <summary>
@@ -879,6 +879,8 @@ public static partial class NetworkSort
     /// </summary>
     public static void Sort<T>(T[] array, IComparer<T> comparer)
     {
+        ArgumentNullException.ThrowIfNull(array);
+        ArgumentNullException.ThrowIfNull(comparer);
         int n = array.Length;
         if (n == 27 || n == 28)
         {
