@@ -10,6 +10,1746 @@ namespace SortingNetworks;
 
 public static partial class NetworkSort
 {
+    private static void Sort27(ref byte first)
+    {
+        byte e0 = first;
+        byte e1 = Unsafe.Add(ref first, 1);
+        byte e2 = Unsafe.Add(ref first, 2);
+        byte e3 = Unsafe.Add(ref first, 3);
+        byte e4 = Unsafe.Add(ref first, 4);
+        byte e5 = Unsafe.Add(ref first, 5);
+        byte e6 = Unsafe.Add(ref first, 6);
+        byte e7 = Unsafe.Add(ref first, 7);
+        byte e8 = Unsafe.Add(ref first, 8);
+        byte e9 = Unsafe.Add(ref first, 9);
+        byte e10 = Unsafe.Add(ref first, 10);
+        byte e11 = Unsafe.Add(ref first, 11);
+        byte e12 = Unsafe.Add(ref first, 12);
+        byte e13 = Unsafe.Add(ref first, 13);
+        byte e14 = Unsafe.Add(ref first, 14);
+        byte e15 = Unsafe.Add(ref first, 15);
+        byte e16 = Unsafe.Add(ref first, 16);
+        byte e17 = Unsafe.Add(ref first, 17);
+        byte e18 = Unsafe.Add(ref first, 18);
+        byte e19 = Unsafe.Add(ref first, 19);
+        byte e20 = Unsafe.Add(ref first, 20);
+        byte e21 = Unsafe.Add(ref first, 21);
+        byte e22 = Unsafe.Add(ref first, 22);
+        byte e23 = Unsafe.Add(ref first, 23);
+        byte e24 = Unsafe.Add(ref first, 24);
+        byte e25 = Unsafe.Add(ref first, 25);
+        byte e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { byte temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { byte temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { byte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { byte temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { byte temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { byte temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { byte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { byte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { byte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { byte temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { byte temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { byte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { byte temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { byte temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { byte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { byte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { byte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { byte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { byte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { byte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { byte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { byte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { byte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { byte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { byte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { byte temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { byte temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { byte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { byte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { byte temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { byte temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { byte temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { byte temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { byte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { byte temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { byte temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { byte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { byte temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { byte temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { byte temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { byte temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { byte temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { byte temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { byte temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { byte temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { byte temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { byte temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { byte temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { byte temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { byte temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { byte temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { byte temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { byte temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { byte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { byte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { byte temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { byte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { byte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { byte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { byte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { byte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { byte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { byte temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { byte temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { byte temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { byte temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { byte temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { byte temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { byte temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { byte temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { byte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { byte temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { byte temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { byte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { byte temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { byte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { byte temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { byte temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { byte temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { byte temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { byte temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { byte temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { byte temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { byte temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { byte temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { byte temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { byte temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { byte temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { byte temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { byte temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { byte temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { byte temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { byte temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { byte temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { byte temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { byte temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { byte temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { byte temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { byte temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { byte temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { byte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { byte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { byte temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { byte temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { byte temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { byte temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { byte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { byte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { byte temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { byte temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { byte temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { byte temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { byte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { byte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { byte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { byte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { byte temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { byte temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { byte temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { byte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { byte temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { byte temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { byte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { byte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { byte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { byte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { byte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { byte temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { byte temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { byte temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { byte temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { byte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { byte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { byte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { byte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { byte temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { byte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { byte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { byte temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { byte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { byte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { byte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { byte temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { byte temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { byte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { byte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { byte temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { byte temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { byte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { byte temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { byte temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { byte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { byte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { byte temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref byte first)
+    {
+        byte e0 = first;
+        byte e1 = Unsafe.Add(ref first, 1);
+        byte e2 = Unsafe.Add(ref first, 2);
+        byte e3 = Unsafe.Add(ref first, 3);
+        byte e4 = Unsafe.Add(ref first, 4);
+        byte e5 = Unsafe.Add(ref first, 5);
+        byte e6 = Unsafe.Add(ref first, 6);
+        byte e7 = Unsafe.Add(ref first, 7);
+        byte e8 = Unsafe.Add(ref first, 8);
+        byte e9 = Unsafe.Add(ref first, 9);
+        byte e10 = Unsafe.Add(ref first, 10);
+        byte e11 = Unsafe.Add(ref first, 11);
+        byte e12 = Unsafe.Add(ref first, 12);
+        byte e13 = Unsafe.Add(ref first, 13);
+        byte e14 = Unsafe.Add(ref first, 14);
+        byte e15 = Unsafe.Add(ref first, 15);
+        byte e16 = Unsafe.Add(ref first, 16);
+        byte e17 = Unsafe.Add(ref first, 17);
+        byte e18 = Unsafe.Add(ref first, 18);
+        byte e19 = Unsafe.Add(ref first, 19);
+        byte e20 = Unsafe.Add(ref first, 20);
+        byte e21 = Unsafe.Add(ref first, 21);
+        byte e22 = Unsafe.Add(ref first, 22);
+        byte e23 = Unsafe.Add(ref first, 23);
+        byte e24 = Unsafe.Add(ref first, 24);
+        byte e25 = Unsafe.Add(ref first, 25);
+        byte e26 = Unsafe.Add(ref first, 26);
+        byte e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { byte temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { byte temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { byte temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { byte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { byte temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { byte temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { byte temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { byte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { byte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { byte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { byte temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { byte temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { byte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { byte temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { byte temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { byte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { byte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { byte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { byte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { byte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { byte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { byte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { byte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { byte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { byte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { byte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { byte temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { byte temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { byte temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { byte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { byte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { byte temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { byte temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { byte temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { byte temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { byte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { byte temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { byte temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { byte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { byte temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { byte temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { byte temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { byte temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { byte temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { byte temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { byte temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { byte temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { byte temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { byte temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { byte temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { byte temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { byte temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { byte temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { byte temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { byte temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { byte temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { byte temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { byte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { byte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { byte temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { byte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { byte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { byte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { byte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { byte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { byte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { byte temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { byte temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { byte temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { byte temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { byte temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { byte temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { byte temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { byte temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { byte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { byte temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { byte temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { byte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { byte temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { byte temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { byte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { byte temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { byte temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { byte temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { byte temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { byte temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { byte temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { byte temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { byte temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { byte temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { byte temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { byte temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { byte temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { byte temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { byte temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { byte temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { byte temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { byte temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { byte temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { byte temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { byte temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { byte temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { byte temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { byte temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { byte temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { byte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { byte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { byte temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { byte temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { byte temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { byte temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { byte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { byte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { byte temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { byte temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { byte temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { byte temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { byte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { byte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { byte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { byte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { byte temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { byte temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { byte temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { byte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { byte temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { byte temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { byte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { byte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { byte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { byte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { byte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { byte temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { byte temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { byte temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { byte temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { byte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { byte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { byte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { byte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { byte temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { byte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { byte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { byte temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { byte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { byte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { byte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { byte temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { byte temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { byte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { byte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { byte temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { byte temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { byte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { byte temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { byte temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { byte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { byte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { byte temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref sbyte first)
+    {
+        sbyte e0 = first;
+        sbyte e1 = Unsafe.Add(ref first, 1);
+        sbyte e2 = Unsafe.Add(ref first, 2);
+        sbyte e3 = Unsafe.Add(ref first, 3);
+        sbyte e4 = Unsafe.Add(ref first, 4);
+        sbyte e5 = Unsafe.Add(ref first, 5);
+        sbyte e6 = Unsafe.Add(ref first, 6);
+        sbyte e7 = Unsafe.Add(ref first, 7);
+        sbyte e8 = Unsafe.Add(ref first, 8);
+        sbyte e9 = Unsafe.Add(ref first, 9);
+        sbyte e10 = Unsafe.Add(ref first, 10);
+        sbyte e11 = Unsafe.Add(ref first, 11);
+        sbyte e12 = Unsafe.Add(ref first, 12);
+        sbyte e13 = Unsafe.Add(ref first, 13);
+        sbyte e14 = Unsafe.Add(ref first, 14);
+        sbyte e15 = Unsafe.Add(ref first, 15);
+        sbyte e16 = Unsafe.Add(ref first, 16);
+        sbyte e17 = Unsafe.Add(ref first, 17);
+        sbyte e18 = Unsafe.Add(ref first, 18);
+        sbyte e19 = Unsafe.Add(ref first, 19);
+        sbyte e20 = Unsafe.Add(ref first, 20);
+        sbyte e21 = Unsafe.Add(ref first, 21);
+        sbyte e22 = Unsafe.Add(ref first, 22);
+        sbyte e23 = Unsafe.Add(ref first, 23);
+        sbyte e24 = Unsafe.Add(ref first, 24);
+        sbyte e25 = Unsafe.Add(ref first, 25);
+        sbyte e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { sbyte temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { sbyte temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { sbyte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { sbyte temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { sbyte temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { sbyte temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { sbyte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { sbyte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { sbyte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { sbyte temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { sbyte temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { sbyte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { sbyte temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { sbyte temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { sbyte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { sbyte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { sbyte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { sbyte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { sbyte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { sbyte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { sbyte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { sbyte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { sbyte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { sbyte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { sbyte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { sbyte temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { sbyte temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { sbyte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { sbyte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { sbyte temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { sbyte temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { sbyte temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { sbyte temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { sbyte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { sbyte temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { sbyte temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { sbyte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { sbyte temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { sbyte temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { sbyte temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { sbyte temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { sbyte temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { sbyte temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { sbyte temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { sbyte temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { sbyte temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { sbyte temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { sbyte temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { sbyte temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { sbyte temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { sbyte temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { sbyte temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { sbyte temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { sbyte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { sbyte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { sbyte temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { sbyte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { sbyte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { sbyte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { sbyte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { sbyte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { sbyte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { sbyte temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { sbyte temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { sbyte temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { sbyte temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { sbyte temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { sbyte temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { sbyte temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { sbyte temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { sbyte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { sbyte temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { sbyte temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { sbyte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { sbyte temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { sbyte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { sbyte temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { sbyte temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { sbyte temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { sbyte temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { sbyte temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { sbyte temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { sbyte temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { sbyte temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { sbyte temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { sbyte temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { sbyte temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { sbyte temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { sbyte temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { sbyte temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { sbyte temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { sbyte temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { sbyte temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { sbyte temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { sbyte temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { sbyte temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { sbyte temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { sbyte temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { sbyte temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { sbyte temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { sbyte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { sbyte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { sbyte temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { sbyte temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { sbyte temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { sbyte temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { sbyte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { sbyte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { sbyte temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { sbyte temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { sbyte temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { sbyte temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { sbyte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { sbyte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { sbyte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { sbyte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { sbyte temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { sbyte temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { sbyte temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { sbyte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { sbyte temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { sbyte temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { sbyte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { sbyte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { sbyte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { sbyte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { sbyte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { sbyte temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { sbyte temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { sbyte temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { sbyte temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { sbyte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { sbyte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { sbyte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { sbyte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { sbyte temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { sbyte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { sbyte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { sbyte temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { sbyte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { sbyte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { sbyte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { sbyte temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { sbyte temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { sbyte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { sbyte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { sbyte temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { sbyte temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { sbyte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { sbyte temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { sbyte temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { sbyte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { sbyte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { sbyte temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref sbyte first)
+    {
+        sbyte e0 = first;
+        sbyte e1 = Unsafe.Add(ref first, 1);
+        sbyte e2 = Unsafe.Add(ref first, 2);
+        sbyte e3 = Unsafe.Add(ref first, 3);
+        sbyte e4 = Unsafe.Add(ref first, 4);
+        sbyte e5 = Unsafe.Add(ref first, 5);
+        sbyte e6 = Unsafe.Add(ref first, 6);
+        sbyte e7 = Unsafe.Add(ref first, 7);
+        sbyte e8 = Unsafe.Add(ref first, 8);
+        sbyte e9 = Unsafe.Add(ref first, 9);
+        sbyte e10 = Unsafe.Add(ref first, 10);
+        sbyte e11 = Unsafe.Add(ref first, 11);
+        sbyte e12 = Unsafe.Add(ref first, 12);
+        sbyte e13 = Unsafe.Add(ref first, 13);
+        sbyte e14 = Unsafe.Add(ref first, 14);
+        sbyte e15 = Unsafe.Add(ref first, 15);
+        sbyte e16 = Unsafe.Add(ref first, 16);
+        sbyte e17 = Unsafe.Add(ref first, 17);
+        sbyte e18 = Unsafe.Add(ref first, 18);
+        sbyte e19 = Unsafe.Add(ref first, 19);
+        sbyte e20 = Unsafe.Add(ref first, 20);
+        sbyte e21 = Unsafe.Add(ref first, 21);
+        sbyte e22 = Unsafe.Add(ref first, 22);
+        sbyte e23 = Unsafe.Add(ref first, 23);
+        sbyte e24 = Unsafe.Add(ref first, 24);
+        sbyte e25 = Unsafe.Add(ref first, 25);
+        sbyte e26 = Unsafe.Add(ref first, 26);
+        sbyte e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { sbyte temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { sbyte temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { sbyte temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { sbyte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { sbyte temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { sbyte temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { sbyte temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { sbyte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { sbyte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { sbyte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { sbyte temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { sbyte temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { sbyte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { sbyte temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { sbyte temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { sbyte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { sbyte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { sbyte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { sbyte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { sbyte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { sbyte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { sbyte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { sbyte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { sbyte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { sbyte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { sbyte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { sbyte temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { sbyte temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { sbyte temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { sbyte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { sbyte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { sbyte temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { sbyte temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { sbyte temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { sbyte temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { sbyte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { sbyte temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { sbyte temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { sbyte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { sbyte temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { sbyte temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { sbyte temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { sbyte temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { sbyte temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { sbyte temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { sbyte temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { sbyte temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { sbyte temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { sbyte temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { sbyte temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { sbyte temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { sbyte temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { sbyte temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { sbyte temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { sbyte temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { sbyte temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { sbyte temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { sbyte temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { sbyte temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { sbyte temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { sbyte temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { sbyte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { sbyte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { sbyte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { sbyte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { sbyte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { sbyte temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { sbyte temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { sbyte temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { sbyte temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { sbyte temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { sbyte temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { sbyte temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { sbyte temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { sbyte temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { sbyte temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { sbyte temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { sbyte temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { sbyte temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { sbyte temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { sbyte temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { sbyte temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { sbyte temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { sbyte temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { sbyte temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { sbyte temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { sbyte temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { sbyte temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { sbyte temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { sbyte temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { sbyte temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { sbyte temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { sbyte temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { sbyte temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { sbyte temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { sbyte temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { sbyte temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { sbyte temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { sbyte temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { sbyte temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { sbyte temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { sbyte temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { sbyte temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { sbyte temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { sbyte temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { sbyte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { sbyte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { sbyte temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { sbyte temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { sbyte temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { sbyte temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { sbyte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { sbyte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { sbyte temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { sbyte temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { sbyte temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { sbyte temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { sbyte temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { sbyte temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { sbyte temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { sbyte temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { sbyte temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { sbyte temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { sbyte temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { sbyte temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { sbyte temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { sbyte temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { sbyte temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { sbyte temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { sbyte temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { sbyte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { sbyte temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { sbyte temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { sbyte temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { sbyte temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { sbyte temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { sbyte temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { sbyte temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { sbyte temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { sbyte temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { sbyte temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { sbyte temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { sbyte temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { sbyte temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { sbyte temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { sbyte temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { sbyte temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { sbyte temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { sbyte temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { sbyte temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { sbyte temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { sbyte temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { sbyte temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { sbyte temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { sbyte temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { sbyte temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { sbyte temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { sbyte temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { sbyte temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref short first)
+    {
+        short e0 = first;
+        short e1 = Unsafe.Add(ref first, 1);
+        short e2 = Unsafe.Add(ref first, 2);
+        short e3 = Unsafe.Add(ref first, 3);
+        short e4 = Unsafe.Add(ref first, 4);
+        short e5 = Unsafe.Add(ref first, 5);
+        short e6 = Unsafe.Add(ref first, 6);
+        short e7 = Unsafe.Add(ref first, 7);
+        short e8 = Unsafe.Add(ref first, 8);
+        short e9 = Unsafe.Add(ref first, 9);
+        short e10 = Unsafe.Add(ref first, 10);
+        short e11 = Unsafe.Add(ref first, 11);
+        short e12 = Unsafe.Add(ref first, 12);
+        short e13 = Unsafe.Add(ref first, 13);
+        short e14 = Unsafe.Add(ref first, 14);
+        short e15 = Unsafe.Add(ref first, 15);
+        short e16 = Unsafe.Add(ref first, 16);
+        short e17 = Unsafe.Add(ref first, 17);
+        short e18 = Unsafe.Add(ref first, 18);
+        short e19 = Unsafe.Add(ref first, 19);
+        short e20 = Unsafe.Add(ref first, 20);
+        short e21 = Unsafe.Add(ref first, 21);
+        short e22 = Unsafe.Add(ref first, 22);
+        short e23 = Unsafe.Add(ref first, 23);
+        short e24 = Unsafe.Add(ref first, 24);
+        short e25 = Unsafe.Add(ref first, 25);
+        short e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { short temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { short temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { short temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { short temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { short temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { short temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { short temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { short temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { short temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { short temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { short temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { short temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { short temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { short temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { short temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { short temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { short temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { short temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { short temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { short temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { short temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { short temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { short temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { short temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { short temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { short temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { short temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { short temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { short temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { short temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { short temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { short temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { short temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { short temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { short temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { short temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { short temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { short temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { short temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { short temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { short temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { short temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { short temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { short temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { short temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { short temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { short temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { short temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { short temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { short temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { short temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { short temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { short temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { short temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { short temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { short temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { short temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { short temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { short temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { short temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { short temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { short temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { short temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { short temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { short temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { short temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { short temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { short temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { short temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { short temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { short temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { short temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { short temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { short temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { short temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { short temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { short temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { short temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { short temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { short temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { short temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { short temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { short temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { short temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { short temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { short temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { short temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { short temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { short temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { short temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { short temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { short temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { short temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { short temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { short temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { short temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { short temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { short temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { short temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { short temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { short temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { short temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { short temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { short temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { short temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { short temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { short temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { short temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { short temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { short temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { short temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { short temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { short temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { short temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { short temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { short temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { short temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { short temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { short temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { short temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { short temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { short temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { short temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { short temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { short temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { short temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { short temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { short temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { short temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { short temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { short temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { short temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { short temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { short temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { short temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { short temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { short temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { short temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { short temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { short temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { short temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { short temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { short temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { short temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { short temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { short temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { short temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { short temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { short temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { short temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { short temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { short temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { short temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { short temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref short first)
+    {
+        short e0 = first;
+        short e1 = Unsafe.Add(ref first, 1);
+        short e2 = Unsafe.Add(ref first, 2);
+        short e3 = Unsafe.Add(ref first, 3);
+        short e4 = Unsafe.Add(ref first, 4);
+        short e5 = Unsafe.Add(ref first, 5);
+        short e6 = Unsafe.Add(ref first, 6);
+        short e7 = Unsafe.Add(ref first, 7);
+        short e8 = Unsafe.Add(ref first, 8);
+        short e9 = Unsafe.Add(ref first, 9);
+        short e10 = Unsafe.Add(ref first, 10);
+        short e11 = Unsafe.Add(ref first, 11);
+        short e12 = Unsafe.Add(ref first, 12);
+        short e13 = Unsafe.Add(ref first, 13);
+        short e14 = Unsafe.Add(ref first, 14);
+        short e15 = Unsafe.Add(ref first, 15);
+        short e16 = Unsafe.Add(ref first, 16);
+        short e17 = Unsafe.Add(ref first, 17);
+        short e18 = Unsafe.Add(ref first, 18);
+        short e19 = Unsafe.Add(ref first, 19);
+        short e20 = Unsafe.Add(ref first, 20);
+        short e21 = Unsafe.Add(ref first, 21);
+        short e22 = Unsafe.Add(ref first, 22);
+        short e23 = Unsafe.Add(ref first, 23);
+        short e24 = Unsafe.Add(ref first, 24);
+        short e25 = Unsafe.Add(ref first, 25);
+        short e26 = Unsafe.Add(ref first, 26);
+        short e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { short temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { short temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { short temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { short temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { short temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { short temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { short temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { short temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { short temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { short temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { short temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { short temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { short temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { short temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { short temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { short temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { short temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { short temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { short temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { short temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { short temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { short temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { short temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { short temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { short temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { short temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { short temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { short temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { short temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { short temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { short temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { short temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { short temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { short temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { short temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { short temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { short temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { short temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { short temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { short temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { short temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { short temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { short temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { short temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { short temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { short temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { short temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { short temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { short temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { short temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { short temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { short temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { short temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { short temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { short temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { short temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { short temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { short temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { short temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { short temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { short temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { short temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { short temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { short temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { short temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { short temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { short temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { short temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { short temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { short temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { short temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { short temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { short temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { short temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { short temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { short temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { short temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { short temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { short temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { short temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { short temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { short temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { short temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { short temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { short temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { short temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { short temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { short temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { short temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { short temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { short temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { short temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { short temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { short temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { short temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { short temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { short temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { short temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { short temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { short temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { short temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { short temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { short temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { short temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { short temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { short temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { short temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { short temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { short temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { short temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { short temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { short temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { short temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { short temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { short temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { short temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { short temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { short temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { short temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { short temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { short temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { short temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { short temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { short temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { short temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { short temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { short temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { short temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { short temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { short temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { short temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { short temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { short temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { short temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { short temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { short temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { short temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { short temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { short temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { short temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { short temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { short temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { short temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { short temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { short temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { short temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { short temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { short temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { short temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { short temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { short temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { short temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { short temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { short temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { short temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { short temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { short temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { short temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { short temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref ushort first)
+    {
+        ushort e0 = first;
+        ushort e1 = Unsafe.Add(ref first, 1);
+        ushort e2 = Unsafe.Add(ref first, 2);
+        ushort e3 = Unsafe.Add(ref first, 3);
+        ushort e4 = Unsafe.Add(ref first, 4);
+        ushort e5 = Unsafe.Add(ref first, 5);
+        ushort e6 = Unsafe.Add(ref first, 6);
+        ushort e7 = Unsafe.Add(ref first, 7);
+        ushort e8 = Unsafe.Add(ref first, 8);
+        ushort e9 = Unsafe.Add(ref first, 9);
+        ushort e10 = Unsafe.Add(ref first, 10);
+        ushort e11 = Unsafe.Add(ref first, 11);
+        ushort e12 = Unsafe.Add(ref first, 12);
+        ushort e13 = Unsafe.Add(ref first, 13);
+        ushort e14 = Unsafe.Add(ref first, 14);
+        ushort e15 = Unsafe.Add(ref first, 15);
+        ushort e16 = Unsafe.Add(ref first, 16);
+        ushort e17 = Unsafe.Add(ref first, 17);
+        ushort e18 = Unsafe.Add(ref first, 18);
+        ushort e19 = Unsafe.Add(ref first, 19);
+        ushort e20 = Unsafe.Add(ref first, 20);
+        ushort e21 = Unsafe.Add(ref first, 21);
+        ushort e22 = Unsafe.Add(ref first, 22);
+        ushort e23 = Unsafe.Add(ref first, 23);
+        ushort e24 = Unsafe.Add(ref first, 24);
+        ushort e25 = Unsafe.Add(ref first, 25);
+        ushort e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { ushort temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { ushort temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { ushort temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { ushort temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { ushort temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { ushort temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { ushort temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ushort temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { ushort temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { ushort temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { ushort temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { ushort temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { ushort temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { ushort temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { ushort temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ushort temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ushort temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ushort temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { ushort temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ushort temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ushort temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ushort temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { ushort temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ushort temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ushort temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ushort temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { ushort temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { ushort temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { ushort temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { ushort temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { ushort temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { ushort temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { ushort temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { ushort temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { ushort temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { ushort temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { ushort temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { ushort temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { ushort temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { ushort temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { ushort temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { ushort temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { ushort temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { ushort temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { ushort temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { ushort temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { ushort temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { ushort temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { ushort temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { ushort temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { ushort temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { ushort temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { ushort temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { ushort temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { ushort temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { ushort temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { ushort temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ushort temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ushort temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { ushort temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ushort temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { ushort temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ushort temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { ushort temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { ushort temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { ushort temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { ushort temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { ushort temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { ushort temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { ushort temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { ushort temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { ushort temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { ushort temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { ushort temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { ushort temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { ushort temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { ushort temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { ushort temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { ushort temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { ushort temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { ushort temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { ushort temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { ushort temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { ushort temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { ushort temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { ushort temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { ushort temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { ushort temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { ushort temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { ushort temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { ushort temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { ushort temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { ushort temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { ushort temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { ushort temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { ushort temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { ushort temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { ushort temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { ushort temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { ushort temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { ushort temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ushort temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { ushort temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { ushort temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { ushort temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { ushort temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { ushort temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ushort temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { ushort temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { ushort temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { ushort temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { ushort temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { ushort temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ushort temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ushort temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ushort temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { ushort temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { ushort temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { ushort temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { ushort temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { ushort temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { ushort temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { ushort temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ushort temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { ushort temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { ushort temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { ushort temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ushort temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { ushort temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { ushort temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { ushort temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { ushort temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ushort temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ushort temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ushort temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { ushort temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { ushort temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ushort temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { ushort temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { ushort temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ushort temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ushort temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ushort temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { ushort temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { ushort temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ushort temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { ushort temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { ushort temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { ushort temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { ushort temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { ushort temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { ushort temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ushort temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { ushort temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref ushort first)
+    {
+        ushort e0 = first;
+        ushort e1 = Unsafe.Add(ref first, 1);
+        ushort e2 = Unsafe.Add(ref first, 2);
+        ushort e3 = Unsafe.Add(ref first, 3);
+        ushort e4 = Unsafe.Add(ref first, 4);
+        ushort e5 = Unsafe.Add(ref first, 5);
+        ushort e6 = Unsafe.Add(ref first, 6);
+        ushort e7 = Unsafe.Add(ref first, 7);
+        ushort e8 = Unsafe.Add(ref first, 8);
+        ushort e9 = Unsafe.Add(ref first, 9);
+        ushort e10 = Unsafe.Add(ref first, 10);
+        ushort e11 = Unsafe.Add(ref first, 11);
+        ushort e12 = Unsafe.Add(ref first, 12);
+        ushort e13 = Unsafe.Add(ref first, 13);
+        ushort e14 = Unsafe.Add(ref first, 14);
+        ushort e15 = Unsafe.Add(ref first, 15);
+        ushort e16 = Unsafe.Add(ref first, 16);
+        ushort e17 = Unsafe.Add(ref first, 17);
+        ushort e18 = Unsafe.Add(ref first, 18);
+        ushort e19 = Unsafe.Add(ref first, 19);
+        ushort e20 = Unsafe.Add(ref first, 20);
+        ushort e21 = Unsafe.Add(ref first, 21);
+        ushort e22 = Unsafe.Add(ref first, 22);
+        ushort e23 = Unsafe.Add(ref first, 23);
+        ushort e24 = Unsafe.Add(ref first, 24);
+        ushort e25 = Unsafe.Add(ref first, 25);
+        ushort e26 = Unsafe.Add(ref first, 26);
+        ushort e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { ushort temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { ushort temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { ushort temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { ushort temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { ushort temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { ushort temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { ushort temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { ushort temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ushort temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { ushort temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { ushort temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { ushort temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { ushort temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { ushort temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { ushort temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { ushort temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ushort temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ushort temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ushort temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { ushort temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ushort temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ushort temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ushort temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { ushort temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ushort temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ushort temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ushort temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { ushort temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { ushort temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { ushort temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { ushort temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { ushort temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { ushort temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { ushort temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { ushort temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { ushort temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { ushort temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { ushort temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { ushort temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { ushort temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { ushort temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { ushort temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { ushort temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { ushort temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { ushort temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { ushort temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { ushort temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { ushort temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { ushort temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { ushort temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { ushort temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { ushort temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { ushort temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { ushort temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { ushort temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { ushort temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { ushort temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { ushort temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { ushort temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { ushort temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { ushort temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ushort temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ushort temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { ushort temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ushort temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { ushort temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ushort temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { ushort temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { ushort temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { ushort temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { ushort temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { ushort temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { ushort temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { ushort temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { ushort temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { ushort temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { ushort temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { ushort temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { ushort temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { ushort temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { ushort temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { ushort temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { ushort temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { ushort temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { ushort temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { ushort temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { ushort temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { ushort temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { ushort temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { ushort temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { ushort temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { ushort temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { ushort temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { ushort temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { ushort temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { ushort temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { ushort temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { ushort temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { ushort temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { ushort temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { ushort temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { ushort temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { ushort temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { ushort temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { ushort temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { ushort temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ushort temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { ushort temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { ushort temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { ushort temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { ushort temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { ushort temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ushort temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { ushort temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { ushort temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { ushort temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { ushort temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { ushort temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ushort temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ushort temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ushort temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { ushort temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { ushort temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { ushort temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { ushort temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { ushort temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { ushort temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { ushort temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ushort temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { ushort temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { ushort temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { ushort temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ushort temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { ushort temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { ushort temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { ushort temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { ushort temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ushort temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ushort temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ushort temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { ushort temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { ushort temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ushort temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { ushort temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { ushort temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ushort temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ushort temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ushort temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { ushort temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { ushort temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ushort temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { ushort temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { ushort temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { ushort temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { ushort temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { ushort temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { ushort temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ushort temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { ushort temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
     private static void Sort27(ref int first)
     {
         int e0 = first;
@@ -414,6 +2154,3486 @@ public static partial class NetworkSort
         if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
         if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
         if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref uint first)
+    {
+        uint e0 = first;
+        uint e1 = Unsafe.Add(ref first, 1);
+        uint e2 = Unsafe.Add(ref first, 2);
+        uint e3 = Unsafe.Add(ref first, 3);
+        uint e4 = Unsafe.Add(ref first, 4);
+        uint e5 = Unsafe.Add(ref first, 5);
+        uint e6 = Unsafe.Add(ref first, 6);
+        uint e7 = Unsafe.Add(ref first, 7);
+        uint e8 = Unsafe.Add(ref first, 8);
+        uint e9 = Unsafe.Add(ref first, 9);
+        uint e10 = Unsafe.Add(ref first, 10);
+        uint e11 = Unsafe.Add(ref first, 11);
+        uint e12 = Unsafe.Add(ref first, 12);
+        uint e13 = Unsafe.Add(ref first, 13);
+        uint e14 = Unsafe.Add(ref first, 14);
+        uint e15 = Unsafe.Add(ref first, 15);
+        uint e16 = Unsafe.Add(ref first, 16);
+        uint e17 = Unsafe.Add(ref first, 17);
+        uint e18 = Unsafe.Add(ref first, 18);
+        uint e19 = Unsafe.Add(ref first, 19);
+        uint e20 = Unsafe.Add(ref first, 20);
+        uint e21 = Unsafe.Add(ref first, 21);
+        uint e22 = Unsafe.Add(ref first, 22);
+        uint e23 = Unsafe.Add(ref first, 23);
+        uint e24 = Unsafe.Add(ref first, 24);
+        uint e25 = Unsafe.Add(ref first, 25);
+        uint e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { uint temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { uint temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { uint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { uint temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { uint temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { uint temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { uint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { uint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { uint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { uint temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { uint temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { uint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { uint temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { uint temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { uint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { uint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { uint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { uint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { uint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { uint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { uint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { uint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { uint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { uint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { uint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { uint temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { uint temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { uint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { uint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { uint temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { uint temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { uint temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { uint temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { uint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { uint temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { uint temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { uint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { uint temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { uint temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { uint temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { uint temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { uint temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { uint temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { uint temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { uint temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { uint temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { uint temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { uint temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { uint temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { uint temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { uint temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { uint temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { uint temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { uint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { uint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { uint temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { uint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { uint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { uint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { uint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { uint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { uint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { uint temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { uint temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { uint temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { uint temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { uint temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { uint temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { uint temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { uint temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { uint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { uint temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { uint temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { uint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { uint temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { uint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { uint temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { uint temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { uint temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { uint temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { uint temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { uint temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { uint temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { uint temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { uint temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { uint temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { uint temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { uint temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { uint temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { uint temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { uint temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { uint temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { uint temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { uint temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { uint temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { uint temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { uint temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { uint temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { uint temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { uint temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { uint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { uint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { uint temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { uint temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { uint temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { uint temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { uint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { uint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { uint temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { uint temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { uint temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { uint temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { uint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { uint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { uint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { uint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { uint temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { uint temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { uint temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { uint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { uint temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { uint temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { uint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { uint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { uint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { uint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { uint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { uint temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { uint temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { uint temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { uint temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { uint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { uint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { uint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { uint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { uint temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { uint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { uint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { uint temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { uint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { uint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { uint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { uint temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { uint temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { uint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { uint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { uint temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { uint temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { uint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { uint temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { uint temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { uint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { uint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { uint temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref uint first)
+    {
+        uint e0 = first;
+        uint e1 = Unsafe.Add(ref first, 1);
+        uint e2 = Unsafe.Add(ref first, 2);
+        uint e3 = Unsafe.Add(ref first, 3);
+        uint e4 = Unsafe.Add(ref first, 4);
+        uint e5 = Unsafe.Add(ref first, 5);
+        uint e6 = Unsafe.Add(ref first, 6);
+        uint e7 = Unsafe.Add(ref first, 7);
+        uint e8 = Unsafe.Add(ref first, 8);
+        uint e9 = Unsafe.Add(ref first, 9);
+        uint e10 = Unsafe.Add(ref first, 10);
+        uint e11 = Unsafe.Add(ref first, 11);
+        uint e12 = Unsafe.Add(ref first, 12);
+        uint e13 = Unsafe.Add(ref first, 13);
+        uint e14 = Unsafe.Add(ref first, 14);
+        uint e15 = Unsafe.Add(ref first, 15);
+        uint e16 = Unsafe.Add(ref first, 16);
+        uint e17 = Unsafe.Add(ref first, 17);
+        uint e18 = Unsafe.Add(ref first, 18);
+        uint e19 = Unsafe.Add(ref first, 19);
+        uint e20 = Unsafe.Add(ref first, 20);
+        uint e21 = Unsafe.Add(ref first, 21);
+        uint e22 = Unsafe.Add(ref first, 22);
+        uint e23 = Unsafe.Add(ref first, 23);
+        uint e24 = Unsafe.Add(ref first, 24);
+        uint e25 = Unsafe.Add(ref first, 25);
+        uint e26 = Unsafe.Add(ref first, 26);
+        uint e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { uint temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { uint temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { uint temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { uint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { uint temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { uint temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { uint temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { uint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { uint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { uint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { uint temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { uint temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { uint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { uint temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { uint temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { uint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { uint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { uint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { uint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { uint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { uint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { uint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { uint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { uint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { uint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { uint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { uint temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { uint temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { uint temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { uint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { uint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { uint temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { uint temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { uint temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { uint temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { uint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { uint temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { uint temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { uint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { uint temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { uint temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { uint temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { uint temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { uint temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { uint temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { uint temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { uint temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { uint temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { uint temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { uint temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { uint temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { uint temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { uint temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { uint temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { uint temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { uint temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { uint temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { uint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { uint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { uint temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { uint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { uint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { uint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { uint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { uint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { uint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { uint temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { uint temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { uint temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { uint temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { uint temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { uint temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { uint temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { uint temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { uint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { uint temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { uint temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { uint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { uint temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { uint temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { uint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { uint temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { uint temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { uint temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { uint temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { uint temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { uint temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { uint temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { uint temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { uint temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { uint temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { uint temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { uint temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { uint temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { uint temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { uint temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { uint temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { uint temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { uint temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { uint temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { uint temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { uint temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { uint temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { uint temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { uint temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { uint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { uint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { uint temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { uint temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { uint temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { uint temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { uint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { uint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { uint temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { uint temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { uint temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { uint temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { uint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { uint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { uint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { uint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { uint temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { uint temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { uint temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { uint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { uint temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { uint temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { uint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { uint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { uint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { uint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { uint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { uint temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { uint temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { uint temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { uint temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { uint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { uint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { uint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { uint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { uint temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { uint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { uint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { uint temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { uint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { uint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { uint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { uint temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { uint temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { uint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { uint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { uint temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { uint temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { uint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { uint temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { uint temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { uint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { uint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { uint temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref long first)
+    {
+        long e0 = first;
+        long e1 = Unsafe.Add(ref first, 1);
+        long e2 = Unsafe.Add(ref first, 2);
+        long e3 = Unsafe.Add(ref first, 3);
+        long e4 = Unsafe.Add(ref first, 4);
+        long e5 = Unsafe.Add(ref first, 5);
+        long e6 = Unsafe.Add(ref first, 6);
+        long e7 = Unsafe.Add(ref first, 7);
+        long e8 = Unsafe.Add(ref first, 8);
+        long e9 = Unsafe.Add(ref first, 9);
+        long e10 = Unsafe.Add(ref first, 10);
+        long e11 = Unsafe.Add(ref first, 11);
+        long e12 = Unsafe.Add(ref first, 12);
+        long e13 = Unsafe.Add(ref first, 13);
+        long e14 = Unsafe.Add(ref first, 14);
+        long e15 = Unsafe.Add(ref first, 15);
+        long e16 = Unsafe.Add(ref first, 16);
+        long e17 = Unsafe.Add(ref first, 17);
+        long e18 = Unsafe.Add(ref first, 18);
+        long e19 = Unsafe.Add(ref first, 19);
+        long e20 = Unsafe.Add(ref first, 20);
+        long e21 = Unsafe.Add(ref first, 21);
+        long e22 = Unsafe.Add(ref first, 22);
+        long e23 = Unsafe.Add(ref first, 23);
+        long e24 = Unsafe.Add(ref first, 24);
+        long e25 = Unsafe.Add(ref first, 25);
+        long e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { long temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { long temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { long temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { long temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { long temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { long temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { long temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { long temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { long temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { long temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { long temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { long temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { long temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { long temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { long temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { long temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { long temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { long temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { long temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { long temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { long temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { long temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { long temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { long temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { long temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { long temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { long temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { long temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { long temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { long temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { long temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { long temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { long temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { long temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { long temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { long temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { long temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { long temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { long temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { long temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { long temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { long temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { long temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { long temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { long temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { long temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { long temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { long temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { long temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { long temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { long temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { long temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { long temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { long temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { long temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { long temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { long temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { long temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { long temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { long temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { long temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { long temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { long temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { long temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { long temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { long temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { long temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { long temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { long temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { long temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { long temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { long temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { long temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { long temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { long temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { long temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { long temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { long temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { long temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { long temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { long temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { long temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { long temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { long temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { long temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { long temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { long temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { long temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { long temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { long temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { long temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { long temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { long temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { long temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { long temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { long temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { long temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { long temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { long temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { long temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { long temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { long temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { long temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { long temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { long temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { long temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { long temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { long temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { long temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { long temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { long temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { long temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { long temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { long temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { long temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { long temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { long temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { long temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { long temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { long temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { long temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { long temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { long temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { long temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { long temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { long temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { long temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { long temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { long temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { long temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { long temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { long temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { long temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { long temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { long temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { long temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { long temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { long temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { long temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { long temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { long temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { long temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { long temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { long temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { long temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { long temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { long temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { long temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { long temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { long temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { long temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { long temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { long temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { long temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref long first)
+    {
+        long e0 = first;
+        long e1 = Unsafe.Add(ref first, 1);
+        long e2 = Unsafe.Add(ref first, 2);
+        long e3 = Unsafe.Add(ref first, 3);
+        long e4 = Unsafe.Add(ref first, 4);
+        long e5 = Unsafe.Add(ref first, 5);
+        long e6 = Unsafe.Add(ref first, 6);
+        long e7 = Unsafe.Add(ref first, 7);
+        long e8 = Unsafe.Add(ref first, 8);
+        long e9 = Unsafe.Add(ref first, 9);
+        long e10 = Unsafe.Add(ref first, 10);
+        long e11 = Unsafe.Add(ref first, 11);
+        long e12 = Unsafe.Add(ref first, 12);
+        long e13 = Unsafe.Add(ref first, 13);
+        long e14 = Unsafe.Add(ref first, 14);
+        long e15 = Unsafe.Add(ref first, 15);
+        long e16 = Unsafe.Add(ref first, 16);
+        long e17 = Unsafe.Add(ref first, 17);
+        long e18 = Unsafe.Add(ref first, 18);
+        long e19 = Unsafe.Add(ref first, 19);
+        long e20 = Unsafe.Add(ref first, 20);
+        long e21 = Unsafe.Add(ref first, 21);
+        long e22 = Unsafe.Add(ref first, 22);
+        long e23 = Unsafe.Add(ref first, 23);
+        long e24 = Unsafe.Add(ref first, 24);
+        long e25 = Unsafe.Add(ref first, 25);
+        long e26 = Unsafe.Add(ref first, 26);
+        long e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { long temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { long temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { long temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { long temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { long temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { long temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { long temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { long temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { long temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { long temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { long temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { long temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { long temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { long temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { long temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { long temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { long temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { long temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { long temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { long temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { long temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { long temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { long temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { long temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { long temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { long temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { long temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { long temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { long temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { long temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { long temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { long temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { long temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { long temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { long temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { long temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { long temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { long temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { long temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { long temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { long temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { long temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { long temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { long temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { long temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { long temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { long temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { long temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { long temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { long temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { long temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { long temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { long temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { long temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { long temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { long temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { long temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { long temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { long temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { long temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { long temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { long temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { long temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { long temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { long temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { long temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { long temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { long temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { long temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { long temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { long temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { long temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { long temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { long temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { long temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { long temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { long temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { long temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { long temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { long temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { long temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { long temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { long temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { long temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { long temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { long temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { long temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { long temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { long temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { long temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { long temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { long temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { long temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { long temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { long temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { long temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { long temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { long temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { long temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { long temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { long temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { long temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { long temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { long temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { long temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { long temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { long temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { long temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { long temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { long temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { long temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { long temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { long temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { long temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { long temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { long temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { long temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { long temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { long temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { long temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { long temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { long temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { long temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { long temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { long temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { long temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { long temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { long temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { long temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { long temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { long temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { long temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { long temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { long temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { long temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { long temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { long temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { long temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { long temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { long temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { long temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { long temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { long temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { long temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { long temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { long temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { long temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { long temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { long temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { long temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { long temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { long temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { long temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { long temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { long temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { long temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { long temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { long temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { long temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref ulong first)
+    {
+        ulong e0 = first;
+        ulong e1 = Unsafe.Add(ref first, 1);
+        ulong e2 = Unsafe.Add(ref first, 2);
+        ulong e3 = Unsafe.Add(ref first, 3);
+        ulong e4 = Unsafe.Add(ref first, 4);
+        ulong e5 = Unsafe.Add(ref first, 5);
+        ulong e6 = Unsafe.Add(ref first, 6);
+        ulong e7 = Unsafe.Add(ref first, 7);
+        ulong e8 = Unsafe.Add(ref first, 8);
+        ulong e9 = Unsafe.Add(ref first, 9);
+        ulong e10 = Unsafe.Add(ref first, 10);
+        ulong e11 = Unsafe.Add(ref first, 11);
+        ulong e12 = Unsafe.Add(ref first, 12);
+        ulong e13 = Unsafe.Add(ref first, 13);
+        ulong e14 = Unsafe.Add(ref first, 14);
+        ulong e15 = Unsafe.Add(ref first, 15);
+        ulong e16 = Unsafe.Add(ref first, 16);
+        ulong e17 = Unsafe.Add(ref first, 17);
+        ulong e18 = Unsafe.Add(ref first, 18);
+        ulong e19 = Unsafe.Add(ref first, 19);
+        ulong e20 = Unsafe.Add(ref first, 20);
+        ulong e21 = Unsafe.Add(ref first, 21);
+        ulong e22 = Unsafe.Add(ref first, 22);
+        ulong e23 = Unsafe.Add(ref first, 23);
+        ulong e24 = Unsafe.Add(ref first, 24);
+        ulong e25 = Unsafe.Add(ref first, 25);
+        ulong e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { ulong temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { ulong temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { ulong temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { ulong temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { ulong temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { ulong temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { ulong temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ulong temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { ulong temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { ulong temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { ulong temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { ulong temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { ulong temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { ulong temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { ulong temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ulong temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ulong temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ulong temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { ulong temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ulong temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ulong temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ulong temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { ulong temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ulong temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ulong temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ulong temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { ulong temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { ulong temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { ulong temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { ulong temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { ulong temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { ulong temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { ulong temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { ulong temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { ulong temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { ulong temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { ulong temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { ulong temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { ulong temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { ulong temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { ulong temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { ulong temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { ulong temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { ulong temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { ulong temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { ulong temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { ulong temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { ulong temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { ulong temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { ulong temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { ulong temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { ulong temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { ulong temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { ulong temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { ulong temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { ulong temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { ulong temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ulong temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ulong temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { ulong temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ulong temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { ulong temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ulong temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { ulong temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { ulong temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { ulong temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { ulong temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { ulong temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { ulong temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { ulong temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { ulong temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { ulong temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { ulong temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { ulong temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { ulong temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { ulong temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { ulong temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { ulong temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { ulong temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { ulong temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { ulong temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { ulong temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { ulong temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { ulong temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { ulong temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { ulong temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { ulong temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { ulong temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { ulong temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { ulong temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { ulong temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { ulong temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { ulong temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { ulong temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { ulong temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { ulong temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { ulong temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { ulong temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { ulong temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { ulong temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { ulong temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ulong temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { ulong temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { ulong temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { ulong temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { ulong temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { ulong temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ulong temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { ulong temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { ulong temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { ulong temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { ulong temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { ulong temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ulong temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ulong temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ulong temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { ulong temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { ulong temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { ulong temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { ulong temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { ulong temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { ulong temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { ulong temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ulong temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { ulong temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { ulong temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { ulong temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ulong temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { ulong temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { ulong temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { ulong temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { ulong temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ulong temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ulong temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ulong temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { ulong temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { ulong temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ulong temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { ulong temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { ulong temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ulong temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ulong temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ulong temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { ulong temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { ulong temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ulong temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { ulong temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { ulong temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { ulong temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { ulong temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { ulong temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { ulong temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ulong temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { ulong temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref ulong first)
+    {
+        ulong e0 = first;
+        ulong e1 = Unsafe.Add(ref first, 1);
+        ulong e2 = Unsafe.Add(ref first, 2);
+        ulong e3 = Unsafe.Add(ref first, 3);
+        ulong e4 = Unsafe.Add(ref first, 4);
+        ulong e5 = Unsafe.Add(ref first, 5);
+        ulong e6 = Unsafe.Add(ref first, 6);
+        ulong e7 = Unsafe.Add(ref first, 7);
+        ulong e8 = Unsafe.Add(ref first, 8);
+        ulong e9 = Unsafe.Add(ref first, 9);
+        ulong e10 = Unsafe.Add(ref first, 10);
+        ulong e11 = Unsafe.Add(ref first, 11);
+        ulong e12 = Unsafe.Add(ref first, 12);
+        ulong e13 = Unsafe.Add(ref first, 13);
+        ulong e14 = Unsafe.Add(ref first, 14);
+        ulong e15 = Unsafe.Add(ref first, 15);
+        ulong e16 = Unsafe.Add(ref first, 16);
+        ulong e17 = Unsafe.Add(ref first, 17);
+        ulong e18 = Unsafe.Add(ref first, 18);
+        ulong e19 = Unsafe.Add(ref first, 19);
+        ulong e20 = Unsafe.Add(ref first, 20);
+        ulong e21 = Unsafe.Add(ref first, 21);
+        ulong e22 = Unsafe.Add(ref first, 22);
+        ulong e23 = Unsafe.Add(ref first, 23);
+        ulong e24 = Unsafe.Add(ref first, 24);
+        ulong e25 = Unsafe.Add(ref first, 25);
+        ulong e26 = Unsafe.Add(ref first, 26);
+        ulong e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { ulong temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { ulong temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { ulong temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { ulong temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { ulong temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { ulong temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { ulong temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { ulong temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ulong temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { ulong temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { ulong temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { ulong temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { ulong temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { ulong temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { ulong temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { ulong temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ulong temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ulong temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ulong temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { ulong temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ulong temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ulong temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ulong temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { ulong temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ulong temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ulong temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ulong temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { ulong temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { ulong temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { ulong temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { ulong temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { ulong temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { ulong temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { ulong temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { ulong temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { ulong temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { ulong temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { ulong temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { ulong temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { ulong temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { ulong temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { ulong temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { ulong temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { ulong temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { ulong temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { ulong temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { ulong temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { ulong temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { ulong temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { ulong temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { ulong temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { ulong temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { ulong temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { ulong temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { ulong temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { ulong temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { ulong temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { ulong temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { ulong temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { ulong temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { ulong temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { ulong temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ulong temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { ulong temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ulong temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { ulong temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ulong temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { ulong temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { ulong temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { ulong temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { ulong temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { ulong temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { ulong temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { ulong temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { ulong temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { ulong temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { ulong temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { ulong temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { ulong temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { ulong temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { ulong temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { ulong temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { ulong temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { ulong temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { ulong temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { ulong temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { ulong temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { ulong temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { ulong temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { ulong temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { ulong temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { ulong temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { ulong temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { ulong temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { ulong temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { ulong temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { ulong temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { ulong temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { ulong temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { ulong temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { ulong temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { ulong temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { ulong temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { ulong temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { ulong temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { ulong temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ulong temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { ulong temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { ulong temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { ulong temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { ulong temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { ulong temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ulong temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { ulong temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { ulong temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { ulong temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { ulong temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { ulong temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { ulong temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { ulong temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { ulong temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { ulong temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { ulong temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { ulong temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { ulong temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { ulong temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { ulong temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { ulong temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { ulong temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { ulong temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { ulong temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { ulong temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { ulong temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { ulong temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { ulong temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { ulong temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { ulong temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { ulong temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { ulong temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { ulong temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { ulong temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { ulong temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { ulong temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { ulong temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { ulong temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { ulong temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { ulong temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { ulong temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { ulong temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { ulong temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { ulong temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { ulong temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { ulong temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { ulong temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { ulong temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { ulong temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { ulong temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { ulong temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { ulong temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref nint first)
+    {
+        nint e0 = first;
+        nint e1 = Unsafe.Add(ref first, 1);
+        nint e2 = Unsafe.Add(ref first, 2);
+        nint e3 = Unsafe.Add(ref first, 3);
+        nint e4 = Unsafe.Add(ref first, 4);
+        nint e5 = Unsafe.Add(ref first, 5);
+        nint e6 = Unsafe.Add(ref first, 6);
+        nint e7 = Unsafe.Add(ref first, 7);
+        nint e8 = Unsafe.Add(ref first, 8);
+        nint e9 = Unsafe.Add(ref first, 9);
+        nint e10 = Unsafe.Add(ref first, 10);
+        nint e11 = Unsafe.Add(ref first, 11);
+        nint e12 = Unsafe.Add(ref first, 12);
+        nint e13 = Unsafe.Add(ref first, 13);
+        nint e14 = Unsafe.Add(ref first, 14);
+        nint e15 = Unsafe.Add(ref first, 15);
+        nint e16 = Unsafe.Add(ref first, 16);
+        nint e17 = Unsafe.Add(ref first, 17);
+        nint e18 = Unsafe.Add(ref first, 18);
+        nint e19 = Unsafe.Add(ref first, 19);
+        nint e20 = Unsafe.Add(ref first, 20);
+        nint e21 = Unsafe.Add(ref first, 21);
+        nint e22 = Unsafe.Add(ref first, 22);
+        nint e23 = Unsafe.Add(ref first, 23);
+        nint e24 = Unsafe.Add(ref first, 24);
+        nint e25 = Unsafe.Add(ref first, 25);
+        nint e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { nint temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { nint temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { nint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { nint temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { nint temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { nint temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { nint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { nint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { nint temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { nint temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { nint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { nint temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { nint temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { nint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { nint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { nint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nint temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { nint temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { nint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { nint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { nint temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { nint temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { nint temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { nint temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { nint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { nint temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { nint temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { nint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { nint temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { nint temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { nint temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { nint temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { nint temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { nint temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { nint temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { nint temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { nint temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { nint temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { nint temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { nint temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { nint temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { nint temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { nint temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { nint temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { nint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { nint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { nint temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { nint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { nint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { nint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nint temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { nint temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { nint temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { nint temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { nint temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { nint temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { nint temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { nint temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { nint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { nint temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { nint temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { nint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { nint temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { nint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { nint temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { nint temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { nint temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { nint temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { nint temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { nint temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { nint temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { nint temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { nint temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { nint temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { nint temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { nint temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { nint temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { nint temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { nint temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { nint temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { nint temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { nint temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { nint temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { nint temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { nint temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { nint temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { nint temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { nint temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { nint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { nint temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { nint temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { nint temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { nint temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { nint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { nint temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { nint temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { nint temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { nint temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { nint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { nint temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { nint temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { nint temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { nint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { nint temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { nint temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { nint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { nint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { nint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { nint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nint temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { nint temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { nint temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { nint temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { nint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { nint temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { nint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { nint temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { nint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nint temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { nint temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { nint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { nint temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { nint temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { nint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { nint temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { nint temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { nint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { nint temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref nint first)
+    {
+        nint e0 = first;
+        nint e1 = Unsafe.Add(ref first, 1);
+        nint e2 = Unsafe.Add(ref first, 2);
+        nint e3 = Unsafe.Add(ref first, 3);
+        nint e4 = Unsafe.Add(ref first, 4);
+        nint e5 = Unsafe.Add(ref first, 5);
+        nint e6 = Unsafe.Add(ref first, 6);
+        nint e7 = Unsafe.Add(ref first, 7);
+        nint e8 = Unsafe.Add(ref first, 8);
+        nint e9 = Unsafe.Add(ref first, 9);
+        nint e10 = Unsafe.Add(ref first, 10);
+        nint e11 = Unsafe.Add(ref first, 11);
+        nint e12 = Unsafe.Add(ref first, 12);
+        nint e13 = Unsafe.Add(ref first, 13);
+        nint e14 = Unsafe.Add(ref first, 14);
+        nint e15 = Unsafe.Add(ref first, 15);
+        nint e16 = Unsafe.Add(ref first, 16);
+        nint e17 = Unsafe.Add(ref first, 17);
+        nint e18 = Unsafe.Add(ref first, 18);
+        nint e19 = Unsafe.Add(ref first, 19);
+        nint e20 = Unsafe.Add(ref first, 20);
+        nint e21 = Unsafe.Add(ref first, 21);
+        nint e22 = Unsafe.Add(ref first, 22);
+        nint e23 = Unsafe.Add(ref first, 23);
+        nint e24 = Unsafe.Add(ref first, 24);
+        nint e25 = Unsafe.Add(ref first, 25);
+        nint e26 = Unsafe.Add(ref first, 26);
+        nint e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { nint temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { nint temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { nint temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { nint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { nint temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { nint temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { nint temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { nint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { nint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { nint temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { nint temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { nint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { nint temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { nint temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { nint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { nint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { nint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nint temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { nint temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { nint temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { nint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { nint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { nint temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { nint temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { nint temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { nint temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { nint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { nint temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { nint temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { nint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { nint temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { nint temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { nint temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { nint temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { nint temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { nint temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { nint temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { nint temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { nint temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { nint temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { nint temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { nint temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { nint temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { nint temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { nint temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { nint temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { nint temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { nint temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { nint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { nint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { nint temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { nint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { nint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { nint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nint temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { nint temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { nint temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { nint temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { nint temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { nint temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { nint temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { nint temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { nint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { nint temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { nint temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { nint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { nint temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { nint temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { nint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { nint temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { nint temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { nint temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { nint temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { nint temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { nint temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { nint temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { nint temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { nint temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { nint temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { nint temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { nint temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { nint temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { nint temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { nint temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { nint temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { nint temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { nint temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { nint temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { nint temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { nint temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { nint temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { nint temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { nint temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { nint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { nint temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { nint temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { nint temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { nint temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { nint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { nint temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { nint temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { nint temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { nint temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { nint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { nint temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { nint temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { nint temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { nint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { nint temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { nint temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { nint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { nint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { nint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { nint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nint temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { nint temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { nint temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { nint temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { nint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { nint temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { nint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { nint temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { nint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nint temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { nint temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { nint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { nint temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { nint temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { nint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { nint temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { nint temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { nint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { nint temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref nuint first)
+    {
+        nuint e0 = first;
+        nuint e1 = Unsafe.Add(ref first, 1);
+        nuint e2 = Unsafe.Add(ref first, 2);
+        nuint e3 = Unsafe.Add(ref first, 3);
+        nuint e4 = Unsafe.Add(ref first, 4);
+        nuint e5 = Unsafe.Add(ref first, 5);
+        nuint e6 = Unsafe.Add(ref first, 6);
+        nuint e7 = Unsafe.Add(ref first, 7);
+        nuint e8 = Unsafe.Add(ref first, 8);
+        nuint e9 = Unsafe.Add(ref first, 9);
+        nuint e10 = Unsafe.Add(ref first, 10);
+        nuint e11 = Unsafe.Add(ref first, 11);
+        nuint e12 = Unsafe.Add(ref first, 12);
+        nuint e13 = Unsafe.Add(ref first, 13);
+        nuint e14 = Unsafe.Add(ref first, 14);
+        nuint e15 = Unsafe.Add(ref first, 15);
+        nuint e16 = Unsafe.Add(ref first, 16);
+        nuint e17 = Unsafe.Add(ref first, 17);
+        nuint e18 = Unsafe.Add(ref first, 18);
+        nuint e19 = Unsafe.Add(ref first, 19);
+        nuint e20 = Unsafe.Add(ref first, 20);
+        nuint e21 = Unsafe.Add(ref first, 21);
+        nuint e22 = Unsafe.Add(ref first, 22);
+        nuint e23 = Unsafe.Add(ref first, 23);
+        nuint e24 = Unsafe.Add(ref first, 24);
+        nuint e25 = Unsafe.Add(ref first, 25);
+        nuint e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { nuint temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { nuint temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { nuint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { nuint temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { nuint temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { nuint temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { nuint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nuint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { nuint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { nuint temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { nuint temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { nuint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { nuint temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { nuint temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { nuint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nuint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nuint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nuint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { nuint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nuint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nuint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nuint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { nuint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nuint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nuint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nuint temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { nuint temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { nuint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { nuint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { nuint temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { nuint temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { nuint temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { nuint temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { nuint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { nuint temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { nuint temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { nuint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { nuint temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { nuint temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { nuint temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { nuint temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { nuint temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { nuint temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { nuint temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { nuint temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { nuint temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { nuint temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { nuint temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { nuint temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { nuint temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { nuint temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { nuint temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { nuint temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { nuint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { nuint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { nuint temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { nuint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nuint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nuint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { nuint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nuint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { nuint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nuint temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { nuint temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { nuint temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { nuint temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { nuint temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { nuint temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { nuint temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { nuint temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { nuint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { nuint temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { nuint temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { nuint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { nuint temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { nuint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { nuint temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { nuint temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { nuint temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { nuint temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { nuint temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { nuint temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { nuint temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { nuint temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { nuint temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { nuint temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { nuint temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { nuint temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { nuint temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { nuint temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { nuint temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { nuint temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { nuint temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { nuint temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { nuint temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { nuint temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { nuint temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { nuint temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { nuint temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { nuint temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { nuint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nuint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { nuint temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { nuint temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { nuint temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { nuint temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { nuint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nuint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { nuint temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { nuint temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { nuint temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { nuint temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { nuint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nuint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nuint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nuint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { nuint temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { nuint temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { nuint temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { nuint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { nuint temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { nuint temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { nuint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nuint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { nuint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { nuint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { nuint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nuint temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { nuint temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { nuint temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { nuint temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { nuint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nuint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nuint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nuint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { nuint temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { nuint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nuint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { nuint temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { nuint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nuint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nuint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nuint temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { nuint temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { nuint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nuint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { nuint temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { nuint temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { nuint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { nuint temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { nuint temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { nuint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nuint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { nuint temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref nuint first)
+    {
+        nuint e0 = first;
+        nuint e1 = Unsafe.Add(ref first, 1);
+        nuint e2 = Unsafe.Add(ref first, 2);
+        nuint e3 = Unsafe.Add(ref first, 3);
+        nuint e4 = Unsafe.Add(ref first, 4);
+        nuint e5 = Unsafe.Add(ref first, 5);
+        nuint e6 = Unsafe.Add(ref first, 6);
+        nuint e7 = Unsafe.Add(ref first, 7);
+        nuint e8 = Unsafe.Add(ref first, 8);
+        nuint e9 = Unsafe.Add(ref first, 9);
+        nuint e10 = Unsafe.Add(ref first, 10);
+        nuint e11 = Unsafe.Add(ref first, 11);
+        nuint e12 = Unsafe.Add(ref first, 12);
+        nuint e13 = Unsafe.Add(ref first, 13);
+        nuint e14 = Unsafe.Add(ref first, 14);
+        nuint e15 = Unsafe.Add(ref first, 15);
+        nuint e16 = Unsafe.Add(ref first, 16);
+        nuint e17 = Unsafe.Add(ref first, 17);
+        nuint e18 = Unsafe.Add(ref first, 18);
+        nuint e19 = Unsafe.Add(ref first, 19);
+        nuint e20 = Unsafe.Add(ref first, 20);
+        nuint e21 = Unsafe.Add(ref first, 21);
+        nuint e22 = Unsafe.Add(ref first, 22);
+        nuint e23 = Unsafe.Add(ref first, 23);
+        nuint e24 = Unsafe.Add(ref first, 24);
+        nuint e25 = Unsafe.Add(ref first, 25);
+        nuint e26 = Unsafe.Add(ref first, 26);
+        nuint e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { nuint temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { nuint temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { nuint temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { nuint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { nuint temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { nuint temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { nuint temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { nuint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nuint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { nuint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { nuint temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { nuint temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { nuint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { nuint temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { nuint temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { nuint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nuint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nuint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nuint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { nuint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nuint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nuint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nuint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { nuint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nuint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nuint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nuint temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { nuint temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { nuint temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { nuint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { nuint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { nuint temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { nuint temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { nuint temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { nuint temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { nuint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { nuint temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { nuint temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { nuint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { nuint temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { nuint temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { nuint temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { nuint temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { nuint temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { nuint temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { nuint temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { nuint temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { nuint temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { nuint temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { nuint temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { nuint temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { nuint temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { nuint temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { nuint temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { nuint temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { nuint temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { nuint temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { nuint temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { nuint temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { nuint temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { nuint temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { nuint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nuint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { nuint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nuint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { nuint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nuint temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { nuint temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { nuint temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { nuint temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { nuint temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { nuint temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { nuint temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { nuint temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { nuint temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { nuint temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { nuint temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { nuint temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { nuint temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { nuint temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { nuint temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { nuint temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { nuint temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { nuint temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { nuint temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { nuint temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { nuint temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { nuint temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { nuint temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { nuint temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { nuint temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { nuint temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { nuint temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { nuint temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { nuint temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { nuint temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { nuint temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { nuint temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { nuint temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { nuint temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { nuint temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { nuint temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { nuint temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { nuint temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { nuint temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { nuint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nuint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { nuint temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { nuint temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { nuint temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { nuint temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { nuint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nuint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { nuint temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { nuint temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { nuint temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { nuint temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { nuint temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { nuint temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { nuint temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { nuint temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { nuint temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { nuint temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { nuint temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { nuint temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { nuint temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { nuint temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { nuint temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { nuint temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { nuint temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { nuint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { nuint temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { nuint temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { nuint temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { nuint temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { nuint temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { nuint temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { nuint temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { nuint temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { nuint temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { nuint temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { nuint temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { nuint temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { nuint temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { nuint temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { nuint temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { nuint temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { nuint temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { nuint temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { nuint temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { nuint temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { nuint temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { nuint temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { nuint temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { nuint temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { nuint temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { nuint temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { nuint temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { nuint temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref char first)
+    {
+        char e0 = first;
+        char e1 = Unsafe.Add(ref first, 1);
+        char e2 = Unsafe.Add(ref first, 2);
+        char e3 = Unsafe.Add(ref first, 3);
+        char e4 = Unsafe.Add(ref first, 4);
+        char e5 = Unsafe.Add(ref first, 5);
+        char e6 = Unsafe.Add(ref first, 6);
+        char e7 = Unsafe.Add(ref first, 7);
+        char e8 = Unsafe.Add(ref first, 8);
+        char e9 = Unsafe.Add(ref first, 9);
+        char e10 = Unsafe.Add(ref first, 10);
+        char e11 = Unsafe.Add(ref first, 11);
+        char e12 = Unsafe.Add(ref first, 12);
+        char e13 = Unsafe.Add(ref first, 13);
+        char e14 = Unsafe.Add(ref first, 14);
+        char e15 = Unsafe.Add(ref first, 15);
+        char e16 = Unsafe.Add(ref first, 16);
+        char e17 = Unsafe.Add(ref first, 17);
+        char e18 = Unsafe.Add(ref first, 18);
+        char e19 = Unsafe.Add(ref first, 19);
+        char e20 = Unsafe.Add(ref first, 20);
+        char e21 = Unsafe.Add(ref first, 21);
+        char e22 = Unsafe.Add(ref first, 22);
+        char e23 = Unsafe.Add(ref first, 23);
+        char e24 = Unsafe.Add(ref first, 24);
+        char e25 = Unsafe.Add(ref first, 25);
+        char e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { char temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { char temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { char temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { char temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { char temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { char temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { char temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { char temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { char temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { char temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { char temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { char temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { char temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { char temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { char temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { char temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { char temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { char temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { char temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { char temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { char temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { char temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { char temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { char temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { char temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { char temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { char temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { char temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { char temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { char temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { char temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { char temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { char temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { char temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { char temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { char temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { char temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { char temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { char temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { char temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { char temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { char temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { char temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { char temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { char temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { char temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { char temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { char temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { char temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { char temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { char temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { char temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { char temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { char temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { char temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { char temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { char temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { char temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { char temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { char temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { char temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { char temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { char temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { char temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { char temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { char temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { char temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { char temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { char temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { char temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { char temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { char temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { char temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { char temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { char temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { char temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { char temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { char temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { char temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { char temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { char temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { char temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { char temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { char temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { char temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { char temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { char temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { char temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { char temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { char temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { char temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { char temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { char temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { char temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { char temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { char temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { char temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { char temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { char temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { char temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { char temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { char temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { char temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { char temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { char temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { char temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { char temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { char temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { char temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { char temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { char temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { char temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { char temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { char temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { char temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { char temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { char temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { char temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { char temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { char temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { char temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { char temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { char temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { char temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { char temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { char temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { char temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { char temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { char temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { char temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { char temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { char temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { char temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { char temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { char temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { char temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { char temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { char temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { char temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { char temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { char temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { char temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { char temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { char temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { char temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { char temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { char temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { char temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { char temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { char temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { char temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { char temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { char temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { char temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref char first)
+    {
+        char e0 = first;
+        char e1 = Unsafe.Add(ref first, 1);
+        char e2 = Unsafe.Add(ref first, 2);
+        char e3 = Unsafe.Add(ref first, 3);
+        char e4 = Unsafe.Add(ref first, 4);
+        char e5 = Unsafe.Add(ref first, 5);
+        char e6 = Unsafe.Add(ref first, 6);
+        char e7 = Unsafe.Add(ref first, 7);
+        char e8 = Unsafe.Add(ref first, 8);
+        char e9 = Unsafe.Add(ref first, 9);
+        char e10 = Unsafe.Add(ref first, 10);
+        char e11 = Unsafe.Add(ref first, 11);
+        char e12 = Unsafe.Add(ref first, 12);
+        char e13 = Unsafe.Add(ref first, 13);
+        char e14 = Unsafe.Add(ref first, 14);
+        char e15 = Unsafe.Add(ref first, 15);
+        char e16 = Unsafe.Add(ref first, 16);
+        char e17 = Unsafe.Add(ref first, 17);
+        char e18 = Unsafe.Add(ref first, 18);
+        char e19 = Unsafe.Add(ref first, 19);
+        char e20 = Unsafe.Add(ref first, 20);
+        char e21 = Unsafe.Add(ref first, 21);
+        char e22 = Unsafe.Add(ref first, 22);
+        char e23 = Unsafe.Add(ref first, 23);
+        char e24 = Unsafe.Add(ref first, 24);
+        char e25 = Unsafe.Add(ref first, 25);
+        char e26 = Unsafe.Add(ref first, 26);
+        char e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { char temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { char temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { char temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { char temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { char temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { char temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { char temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { char temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { char temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { char temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { char temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { char temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { char temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { char temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { char temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { char temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { char temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { char temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { char temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { char temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { char temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { char temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { char temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { char temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { char temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { char temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { char temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { char temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { char temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { char temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { char temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { char temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { char temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { char temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { char temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { char temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { char temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { char temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { char temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { char temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { char temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { char temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { char temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { char temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { char temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { char temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { char temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { char temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { char temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { char temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { char temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { char temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { char temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { char temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { char temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { char temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { char temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { char temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { char temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { char temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { char temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { char temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { char temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { char temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { char temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { char temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { char temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { char temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { char temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { char temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { char temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { char temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { char temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { char temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { char temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { char temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { char temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { char temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { char temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { char temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { char temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { char temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { char temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { char temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { char temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { char temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { char temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { char temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { char temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { char temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { char temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { char temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { char temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { char temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { char temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { char temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { char temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { char temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { char temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { char temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { char temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { char temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { char temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { char temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { char temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { char temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { char temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { char temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { char temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { char temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { char temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { char temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { char temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { char temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { char temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { char temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { char temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { char temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { char temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { char temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { char temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { char temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { char temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { char temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { char temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { char temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { char temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { char temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { char temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { char temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { char temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { char temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { char temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { char temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { char temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { char temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { char temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { char temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { char temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { char temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { char temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { char temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { char temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { char temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { char temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { char temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { char temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { char temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { char temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { char temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { char temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { char temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { char temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { char temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { char temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { char temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { char temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { char temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { char temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref float first)
+    {
+        float e0 = first;
+        float e1 = Unsafe.Add(ref first, 1);
+        float e2 = Unsafe.Add(ref first, 2);
+        float e3 = Unsafe.Add(ref first, 3);
+        float e4 = Unsafe.Add(ref first, 4);
+        float e5 = Unsafe.Add(ref first, 5);
+        float e6 = Unsafe.Add(ref first, 6);
+        float e7 = Unsafe.Add(ref first, 7);
+        float e8 = Unsafe.Add(ref first, 8);
+        float e9 = Unsafe.Add(ref first, 9);
+        float e10 = Unsafe.Add(ref first, 10);
+        float e11 = Unsafe.Add(ref first, 11);
+        float e12 = Unsafe.Add(ref first, 12);
+        float e13 = Unsafe.Add(ref first, 13);
+        float e14 = Unsafe.Add(ref first, 14);
+        float e15 = Unsafe.Add(ref first, 15);
+        float e16 = Unsafe.Add(ref first, 16);
+        float e17 = Unsafe.Add(ref first, 17);
+        float e18 = Unsafe.Add(ref first, 18);
+        float e19 = Unsafe.Add(ref first, 19);
+        float e20 = Unsafe.Add(ref first, 20);
+        float e21 = Unsafe.Add(ref first, 21);
+        float e22 = Unsafe.Add(ref first, 22);
+        float e23 = Unsafe.Add(ref first, 23);
+        float e24 = Unsafe.Add(ref first, 24);
+        float e25 = Unsafe.Add(ref first, 25);
+        float e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { float temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { float temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { float temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { float temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { float temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { float temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { float temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { float temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { float temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { float temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { float temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { float temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { float temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { float temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { float temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { float temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { float temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { float temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { float temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { float temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { float temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { float temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { float temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { float temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { float temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { float temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { float temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { float temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { float temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { float temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { float temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { float temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { float temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { float temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { float temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { float temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { float temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { float temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { float temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { float temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { float temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { float temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { float temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { float temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { float temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { float temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { float temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { float temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { float temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { float temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { float temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { float temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { float temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { float temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { float temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { float temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { float temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { float temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { float temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { float temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { float temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { float temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { float temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { float temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { float temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { float temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { float temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { float temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { float temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { float temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { float temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { float temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { float temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { float temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { float temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { float temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { float temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { float temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { float temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { float temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { float temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { float temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { float temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { float temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { float temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { float temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { float temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { float temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { float temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { float temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { float temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { float temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { float temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { float temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { float temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { float temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { float temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { float temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { float temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { float temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { float temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { float temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { float temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { float temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { float temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { float temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { float temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { float temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { float temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { float temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { float temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { float temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { float temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { float temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { float temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { float temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { float temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { float temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { float temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { float temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { float temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { float temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { float temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { float temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { float temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { float temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { float temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { float temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { float temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { float temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { float temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { float temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { float temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { float temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { float temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { float temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { float temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { float temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { float temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { float temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { float temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { float temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { float temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { float temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { float temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { float temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { float temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { float temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { float temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { float temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { float temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { float temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { float temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { float temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref float first)
+    {
+        float e0 = first;
+        float e1 = Unsafe.Add(ref first, 1);
+        float e2 = Unsafe.Add(ref first, 2);
+        float e3 = Unsafe.Add(ref first, 3);
+        float e4 = Unsafe.Add(ref first, 4);
+        float e5 = Unsafe.Add(ref first, 5);
+        float e6 = Unsafe.Add(ref first, 6);
+        float e7 = Unsafe.Add(ref first, 7);
+        float e8 = Unsafe.Add(ref first, 8);
+        float e9 = Unsafe.Add(ref first, 9);
+        float e10 = Unsafe.Add(ref first, 10);
+        float e11 = Unsafe.Add(ref first, 11);
+        float e12 = Unsafe.Add(ref first, 12);
+        float e13 = Unsafe.Add(ref first, 13);
+        float e14 = Unsafe.Add(ref first, 14);
+        float e15 = Unsafe.Add(ref first, 15);
+        float e16 = Unsafe.Add(ref first, 16);
+        float e17 = Unsafe.Add(ref first, 17);
+        float e18 = Unsafe.Add(ref first, 18);
+        float e19 = Unsafe.Add(ref first, 19);
+        float e20 = Unsafe.Add(ref first, 20);
+        float e21 = Unsafe.Add(ref first, 21);
+        float e22 = Unsafe.Add(ref first, 22);
+        float e23 = Unsafe.Add(ref first, 23);
+        float e24 = Unsafe.Add(ref first, 24);
+        float e25 = Unsafe.Add(ref first, 25);
+        float e26 = Unsafe.Add(ref first, 26);
+        float e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { float temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { float temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { float temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { float temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { float temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { float temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { float temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { float temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { float temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { float temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { float temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { float temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { float temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { float temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { float temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { float temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { float temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { float temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { float temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { float temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { float temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { float temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { float temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { float temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { float temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { float temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { float temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { float temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { float temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { float temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { float temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { float temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { float temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { float temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { float temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { float temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { float temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { float temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { float temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { float temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { float temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { float temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { float temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { float temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { float temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { float temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { float temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { float temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { float temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { float temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { float temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { float temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { float temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { float temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { float temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { float temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { float temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { float temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { float temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { float temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { float temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { float temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { float temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { float temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { float temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { float temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { float temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { float temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { float temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { float temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { float temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { float temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { float temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { float temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { float temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { float temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { float temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { float temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { float temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { float temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { float temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { float temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { float temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { float temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { float temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { float temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { float temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { float temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { float temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { float temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { float temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { float temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { float temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { float temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { float temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { float temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { float temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { float temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { float temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { float temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { float temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { float temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { float temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { float temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { float temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { float temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { float temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { float temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { float temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { float temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { float temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { float temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { float temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { float temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { float temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { float temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { float temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { float temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { float temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { float temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { float temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { float temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { float temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { float temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { float temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { float temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { float temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { float temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { float temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { float temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { float temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { float temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { float temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { float temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { float temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { float temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { float temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { float temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { float temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { float temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { float temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { float temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { float temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { float temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { float temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { float temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { float temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { float temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { float temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { float temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { float temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { float temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { float temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { float temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { float temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { float temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { float temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { float temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { float temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
+    }
+
+    private static void Sort27(ref double first)
+    {
+        double e0 = first;
+        double e1 = Unsafe.Add(ref first, 1);
+        double e2 = Unsafe.Add(ref first, 2);
+        double e3 = Unsafe.Add(ref first, 3);
+        double e4 = Unsafe.Add(ref first, 4);
+        double e5 = Unsafe.Add(ref first, 5);
+        double e6 = Unsafe.Add(ref first, 6);
+        double e7 = Unsafe.Add(ref first, 7);
+        double e8 = Unsafe.Add(ref first, 8);
+        double e9 = Unsafe.Add(ref first, 9);
+        double e10 = Unsafe.Add(ref first, 10);
+        double e11 = Unsafe.Add(ref first, 11);
+        double e12 = Unsafe.Add(ref first, 12);
+        double e13 = Unsafe.Add(ref first, 13);
+        double e14 = Unsafe.Add(ref first, 14);
+        double e15 = Unsafe.Add(ref first, 15);
+        double e16 = Unsafe.Add(ref first, 16);
+        double e17 = Unsafe.Add(ref first, 17);
+        double e18 = Unsafe.Add(ref first, 18);
+        double e19 = Unsafe.Add(ref first, 19);
+        double e20 = Unsafe.Add(ref first, 20);
+        double e21 = Unsafe.Add(ref first, 21);
+        double e22 = Unsafe.Add(ref first, 22);
+        double e23 = Unsafe.Add(ref first, 23);
+        double e24 = Unsafe.Add(ref first, 24);
+        double e25 = Unsafe.Add(ref first, 25);
+        double e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { double temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { double temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { double temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { double temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { double temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { double temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { double temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { double temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { double temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { double temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { double temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { double temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { double temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { double temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { double temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { double temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { double temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { double temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { double temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { double temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { double temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { double temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { double temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { double temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { double temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { double temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { double temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { double temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { double temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { double temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { double temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { double temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { double temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { double temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { double temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { double temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { double temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { double temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { double temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { double temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { double temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { double temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { double temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { double temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { double temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { double temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { double temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { double temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { double temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { double temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { double temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { double temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { double temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { double temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { double temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { double temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { double temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { double temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { double temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { double temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { double temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { double temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { double temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { double temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { double temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { double temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { double temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { double temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { double temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { double temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { double temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { double temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { double temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { double temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { double temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { double temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { double temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { double temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { double temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { double temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { double temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { double temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { double temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { double temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { double temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { double temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { double temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { double temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { double temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { double temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { double temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { double temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { double temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { double temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { double temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { double temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { double temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { double temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { double temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { double temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { double temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { double temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { double temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { double temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { double temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { double temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { double temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { double temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { double temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { double temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { double temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { double temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { double temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { double temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { double temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { double temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { double temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { double temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { double temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { double temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { double temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { double temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { double temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { double temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { double temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { double temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { double temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { double temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { double temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { double temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { double temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { double temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { double temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { double temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { double temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { double temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { double temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { double temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { double temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { double temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { double temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { double temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { double temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { double temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { double temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { double temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { double temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { double temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { double temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { double temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { double temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { double temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { double temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { double temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+    }
+
+    private static void Sort28(ref double first)
+    {
+        double e0 = first;
+        double e1 = Unsafe.Add(ref first, 1);
+        double e2 = Unsafe.Add(ref first, 2);
+        double e3 = Unsafe.Add(ref first, 3);
+        double e4 = Unsafe.Add(ref first, 4);
+        double e5 = Unsafe.Add(ref first, 5);
+        double e6 = Unsafe.Add(ref first, 6);
+        double e7 = Unsafe.Add(ref first, 7);
+        double e8 = Unsafe.Add(ref first, 8);
+        double e9 = Unsafe.Add(ref first, 9);
+        double e10 = Unsafe.Add(ref first, 10);
+        double e11 = Unsafe.Add(ref first, 11);
+        double e12 = Unsafe.Add(ref first, 12);
+        double e13 = Unsafe.Add(ref first, 13);
+        double e14 = Unsafe.Add(ref first, 14);
+        double e15 = Unsafe.Add(ref first, 15);
+        double e16 = Unsafe.Add(ref first, 16);
+        double e17 = Unsafe.Add(ref first, 17);
+        double e18 = Unsafe.Add(ref first, 18);
+        double e19 = Unsafe.Add(ref first, 19);
+        double e20 = Unsafe.Add(ref first, 20);
+        double e21 = Unsafe.Add(ref first, 21);
+        double e22 = Unsafe.Add(ref first, 22);
+        double e23 = Unsafe.Add(ref first, 23);
+        double e24 = Unsafe.Add(ref first, 24);
+        double e25 = Unsafe.Add(ref first, 25);
+        double e26 = Unsafe.Add(ref first, 26);
+        double e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { double temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { double temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { double temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { double temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { double temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { double temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { double temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { double temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { double temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { double temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { double temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { double temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { double temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { double temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { double temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { double temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { double temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { double temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { double temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { double temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { double temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { double temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { double temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { double temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { double temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { double temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { double temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { double temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { double temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { double temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { double temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { double temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { double temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { double temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { double temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { double temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { double temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { double temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { double temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { double temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { double temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { double temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { double temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { double temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { double temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { double temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { double temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { double temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { double temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { double temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { double temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { double temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { double temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { double temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { double temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { double temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { double temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { double temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { double temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { double temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { double temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { double temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { double temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { double temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { double temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { double temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { double temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { double temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { double temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { double temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { double temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { double temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { double temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { double temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { double temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { double temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { double temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { double temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { double temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { double temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { double temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { double temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { double temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { double temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { double temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { double temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { double temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { double temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { double temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { double temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { double temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { double temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { double temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { double temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { double temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { double temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { double temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { double temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { double temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { double temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { double temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { double temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { double temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { double temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { double temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { double temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { double temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { double temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { double temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { double temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { double temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { double temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { double temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { double temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { double temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { double temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { double temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { double temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { double temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { double temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { double temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { double temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { double temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { double temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { double temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { double temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { double temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { double temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { double temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { double temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { double temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { double temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { double temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { double temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { double temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { double temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { double temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { double temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { double temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { double temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { double temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { double temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { double temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { double temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { double temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { double temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { double temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { double temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { double temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { double temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { double temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { double temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { double temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { double temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { double temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { double temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { double temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { double temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { double temp = e23; e23 = e24; e24 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
