@@ -542,5 +542,413 @@ public class NetworkSortTests
         Assert.Equal(expected, input);
     }
 
+    // --- Gap #2: Edge-case patterns for more types ---
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_AlreadySorted_Bytes(int length)
+    {
+        var input = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
+        var expected = (byte[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseSorted_Bytes(int length)
+    {
+        var input = Enumerable.Range(0, length).Reverse().Select(i => (byte)i).ToArray();
+        var expected = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Duplicates_Bytes(int length)
+    {
+        var input = Enumerable.Repeat((byte)42, length).ToArray();
+        var expected = (byte[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_DuplicateHeavy_Bytes(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (byte)rng.Next(0, 3)).ToArray();
+        var expected = (byte[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_AlreadySorted_Floats(int length)
+    {
+        var input = Enumerable.Range(0, length).Select(i => (float)i).ToArray();
+        var expected = (float[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseSorted_Floats(int length)
+    {
+        var input = Enumerable.Range(0, length).Reverse().Select(i => (float)i).ToArray();
+        var expected = Enumerable.Range(0, length).Select(i => (float)i).ToArray();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Duplicates_Floats(int length)
+    {
+        var input = Enumerable.Repeat(7.5f, length).ToArray();
+        var expected = (float[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_DuplicateHeavy_Floats(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (float)rng.Next(0, 3)).ToArray();
+        var expected = (float[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_AlreadySorted_Doubles(int length)
+    {
+        var input = Enumerable.Range(0, length).Select(i => (double)i).ToArray();
+        var expected = (double[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseSorted_Doubles(int length)
+    {
+        var input = Enumerable.Range(0, length).Reverse().Select(i => (double)i).ToArray();
+        var expected = Enumerable.Range(0, length).Select(i => (double)i).ToArray();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Duplicates_Doubles(int length)
+    {
+        var input = Enumerable.Repeat(7.5, length).ToArray();
+        var expected = (double[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_DuplicateHeavy_Doubles(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (double)rng.Next(0, 3)).ToArray();
+        var expected = (double[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_AlreadySorted_Strings(int length)
+    {
+        var input = Enumerable.Range(0, length).Select(i => i.ToString("D4")).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseSorted_Strings(int length)
+    {
+        var input = Enumerable.Range(0, length).Reverse().Select(i => i.ToString("D4")).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Duplicates_Strings(int length)
+    {
+        var input = Enumerable.Repeat("hello", length).ToArray();
+        var expected = (string[])input.Clone();
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_DuplicateHeavy_Strings(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 3).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    // --- Gap #3: Generic Sort<T>(T[], IComparer<T>) overload ---
+
+    [Fact]
+    public void Sort_Generic_27Elements_Int()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort<int>(input, Comparer<int>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_Generic_28Elements_Int()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 28).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort<int>(input, Comparer<int>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_Generic_FallsBackForLargeArrays()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 100).Select(_ => rng.Next()).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort<int>(input, Comparer<int>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_Generic_NullArray_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort<int>((int[])null!, Comparer<int>.Default));
+    }
+
+    [Fact]
+    public void Sort_Generic_Strings_WithOrdinalComparer()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort<string>(input, StringComparer.Ordinal);
+
+        Assert.Equal(expected, input);
+    }
+
+    // --- Gap #4: Span+comparer for more types ---
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Span_WithComparer_Bytes(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (byte)rng.Next(0, 256)).ToArray();
+        var expected = (byte[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort(input.AsSpan(), Comparer<byte>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Span_WithComparer_Doubles(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.NextDouble() * 2000 - 1000).ToArray();
+        var expected = (double[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort(input.AsSpan(), Comparer<double>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Span_WithComparer_Longs(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (long)rng.Next(-10000, 10000)).ToArray();
+        var expected = (long[])input.Clone();
+        Array.Sort(expected);
+
+        NetworkSort.Sort(input.AsSpan(), Comparer<long>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Span_WithComparer_Strings(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort(input.AsSpan(), StringComparer.Ordinal);
+
+        Assert.Equal(expected, input);
+    }
+
+    // --- Gap #5: Custom comparer correctness (reverse comparer) ---
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseComparer_Int(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+        Array.Reverse(expected);
+
+        var comparer = Comparer<int>.Create((a, b) => b.CompareTo(a));
+        NetworkSort.Sort(input, comparer);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseComparer_Span_Int(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+        Array.Reverse(expected);
+
+        var comparer = Comparer<int>.Create((a, b) => b.CompareTo(a));
+        NetworkSort.Sort(input.AsSpan(), comparer);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseComparer_String(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+        Array.Reverse(expected);
+
+        var comparer = Comparer<string>.Create((a, b) => string.Compare(b, a, StringComparison.Ordinal));
+        NetworkSort.Sort(input, comparer);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseComparer_Generic(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+        Array.Reverse(expected);
+
+        var comparer = Comparer<int>.Create((a, b) => b.CompareTo(a));
+        NetworkSort.Sort<int>(input, comparer);
+
+        Assert.Equal(expected, input);
+    }
+
+    // --- Gap #6: nint/nuint in null-comparer test ---
+
+    [Fact]
+    public void Sort_NullComparer_UsesDefault_NIntNUInt()
+    {
+        var rng = new Random(42);
+
+        var nints = Enumerable.Range(0, 27).Select(_ => (nint)rng.Next(-1000, 1000)).ToArray();
+        var nintsExpected = (nint[])nints.Clone();
+        Array.Sort(nintsExpected);
+        NetworkSort.Sort(nints, null);
+        Assert.Equal(nintsExpected, nints);
+
+        var nuints = Enumerable.Range(0, 27).Select(_ => (nuint)rng.Next(0, 2000)).ToArray();
+        var nuintsExpected = (nuint[])nuints.Clone();
+        Array.Sort(nuintsExpected);
+        NetworkSort.Sort(nuints, null);
+        Assert.Equal(nuintsExpected, nuints);
+    }
+
     public static TheoryData<int> Lengths => new() { 27, 28 };
 }
