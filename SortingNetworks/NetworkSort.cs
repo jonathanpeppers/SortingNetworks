@@ -395,6 +395,15 @@ public static partial class NetworkSort
                 return;
             }
 
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_int(span);
+                else
+                    SortSimdArm28_int(span);
+                return;
+            }
+
             ref int first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -473,6 +482,15 @@ public static partial class NetworkSort
                     SortSimd27_uint(span);
                 else
                     SortSimd28_uint(span);
+                return;
+            }
+
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_uint(span);
+                else
+                    SortSimdArm28_uint(span);
                 return;
             }
 
@@ -926,6 +944,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_float(span);
+                else
+                    SortSimdArm28_float(span);
+                return;
+            }
+
             ref float first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);

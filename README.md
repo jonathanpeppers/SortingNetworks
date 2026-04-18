@@ -80,6 +80,14 @@ ARM64, four `Vector128<byte>` vectors with `VectorTableLookup` (TBL4) provide
 cross-vector shuffles for the same 16-bit types. On platforms without SIMD
 support, this falls back to the scalar unrolled sort.
 
+For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is used when
+available. The 27-28 elements require seven `Vector128` registers — exceeding
+TBL4's 4-register table limit. This is solved with a two-stage TBL/TBX lookup:
+elements 0-15 are in Table A and elements 16-27 are in Table B, with
+`VectorTableLookupExtension` (TBX) chaining the results. On x86, `int` and
+`uint` use AVX2 SIMD (see above), while `float` falls back to the scalar
+unrolled sort.
+
 ## Benchmarks
 
 ### x86 (Intel Core i9-9900K, AVX2)
@@ -144,7 +152,7 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 ### ARM64 (Apple M1, AdvSimd/NEON)
 
 On ARM64, the library uses AdvSimd (NEON) intrinsics for `byte`, `sbyte`,
-`short`, `ushort`, and `char`:
+`short`, `ushort`, `char`, `int`, `uint`, and `float`:
 
 #### SIMD-accelerated types
 
@@ -154,19 +162,31 @@ cross-vector shuffles are used:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,212 ns | 29 ns | **42x** |
+| byte | 1,211 ns | 26 ns | **47x** |
 | sbyte | 1,358 ns | 31 ns | **44x** |
 | short | 1,382 ns | 53 ns | **26x** |
 | ushort | 1,242 ns | 55 ns | **23x** |
 
+For `int`, `uint`, and `float`, seven `Vector128` registers with two-stage
+TBL/TBX cross-vector shuffles are used:
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| float | 1,504 ns | 85 ns | **18x** |
+
+> **Note:** `float` benefits enormously because .NET's `Array.Sort` does not
+> have a SIMD-accelerated path for `float` on ARM64.
+
 #### Types where Array.Sort is already SIMD-optimized
 
-.NET 10 has SIMD-accelerated sort for `char` on ARM64. NetworkSort's NEON
-path still provides a ~2x improvement:
+.NET 10 has SIMD-accelerated sort for `char`, `int`, and `uint` on ARM64.
+NetworkSort's NEON path still provides improvements:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
 | char | 102 ns | 51 ns | **2x** |
+| int | 102 ns | 86 ns | **1.2x** |
+| uint | 114 ns | 81 ns | **1.4x** |
 
 #### Other types (scalar unrolled network)
 
@@ -175,8 +195,7 @@ speedup over `Array.Sort` as on x86:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,568 ns | 102 ns | **15x** |
-| float | 1,496 ns | 100 ns | **15x** |
+| double | 1,478 ns | 110 ns | **13x** |
 | long | 1,472 ns | 100 ns | **15x** |
 
 ### int detailed results (AVX2 SIMD)
@@ -192,7 +211,20 @@ speedup over `Array.Sort` as on x86:
 | 28 | Reversed | 58 ns | **0.66x** (34% faster) |
 | 28 | Duplicates | 58 ns | **0.52x** (48% faster) |
 
-> With AVX2 SIMD, NetworkSort is now consistently faster than Array.Sort for `int` across all input patterns. Sorting networks execute a fixed comparison sequence regardless of input order, providing predictable performance.
+### int detailed results (ARM64)
+
+| Size | Kind | NetworkSort | Ratio vs ArraySort |
+|---|---|---|---|
+| 27 | Random | 82 ns | **0.81x** (19% faster) |
+| 27 | Sorted | 81 ns | 1.41x |
+| 27 | Reversed | 80 ns | 1.27x |
+| 27 | Duplicates | 82 ns | **0.80x** (20% faster) |
+| 28 | Random | 79 ns | **0.66x** (34% faster) |
+| 28 | Sorted | 79 ns | 1.33x |
+| 28 | Reversed | 79 ns | 1.21x |
+| 28 | Duplicates | 80 ns | **0.74x** (26% faster) |
+
+> With AVX2 SIMD, NetworkSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the SIMD path wins for random and duplicate-heavy inputs, while sorted/reversed inputs are slightly slower for size 27 (the fixed comparison sequence can't exploit pre-sorted data). Size 28 is faster across the board on both platforms.
 
 ## Building
 
@@ -217,7 +249,7 @@ dotnet run scripts/generate_unrolled.cs
 - **SortingNetworks** -- class library (future NuGet package)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 27-28
   across all 13 primitive types, plus string via the specialized `Sort(string[])`
-  overload, with stress tests using 100 random seeds (81 tests)
+  overload, with stress tests using 100 random seeds (135 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   `NetworkSort.Sort` vs `Array.Sort` for sizes 27 and 28 across all primitive
   types
