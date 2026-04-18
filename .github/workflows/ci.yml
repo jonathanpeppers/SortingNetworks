@@ -69,9 +69,11 @@ jobs:
 
       - name: Upload benchmark summary
         uses: actions/upload-artifact@v7
+        if: always()
         with:
           name: benchmark-summary-${{ matrix.os }}
           path: benchmark-summary.md
+          if-no-files-found: ignore
 
   summarize:
     needs: [benchmark]
@@ -85,12 +87,22 @@ jobs:
           pattern: benchmark-summary-*
 
       - name: Merge summaries
+        shell: bash
         run: |
-          for dir in benchmark-summary-*/; do
+          shopt -s nullglob
+          dirs=(benchmark-summary-*/)
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo "No benchmark summary artifacts found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          for dir in "${dirs[@]}"; do
+            if [ ! -f "${dir}/benchmark-summary.md" ]; then
+              continue
+            fi
             os="${dir#benchmark-summary-}"
             os="${os%/}"
-            echo "# ${os}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            cat "${dir}/benchmark-summary.md" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "# ${os}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat "${dir}/benchmark-summary.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
           done
