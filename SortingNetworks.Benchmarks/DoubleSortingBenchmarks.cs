@@ -12,6 +12,9 @@ public class DoubleSortingBenchmarks
     [Params(27, 28)]
     public int Length { get; set; }
 
+    [Params(InputKind.Random)]
+    public InputKind Kind { get; set; }
+
     private double[] _source = null!;
     private double[][] _batch = null!;
 
