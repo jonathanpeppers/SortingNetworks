@@ -4,7 +4,7 @@ using SortingNetworks;
 namespace SortingNetworks.Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
+[SimpleJob(warmupCount: 5, iterationCount: 15)]
 public class NIntSortingBenchmarks
 {
     private const int OpsPerInvoke = 1000;
