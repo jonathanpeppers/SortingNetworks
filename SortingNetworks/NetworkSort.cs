@@ -873,4 +873,29 @@ public static partial class NetworkSort
             }
         }
     }
+
+    /// <summary>
+    /// Sorts an array of <typeparamref name="T"/> using a sorting network when possible.
+    /// </summary>
+    public static void Sort<T>(T[] array, IComparer<T> comparer)
+    {
+        int n = array.Length;
+        if (n == 27 || n == 28)
+        {
+            int[] network = NetworkData.GetNetwork(n);
+            for (int i = 0; i < network.Length; i += 2)
+            {
+                int ai = network[i], bi = network[i + 1];
+                if (comparer.Compare(array[ai], array[bi]) > 0)
+                {
+                    T temp = array[ai];
+                    array[ai] = array[bi];
+                    array[bi] = temp;
+                }
+            }
+            return;
+        }
+
+        Array.Sort(array, comparer);
+    }
 }

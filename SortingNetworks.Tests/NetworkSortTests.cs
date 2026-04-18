@@ -336,6 +336,55 @@ public class NetworkSortTests
     [Fact]
     public void Sort_28Elements_Double() => StressSort(28, rng => rng.NextDouble() * 20000 - 10000, NetworkSort.Sort);
 
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Strings(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 100).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        var actual = (string[])input.Clone();
+        NetworkSort.Sort(actual, StringComparer.Ordinal);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Sort_27Elements_String()
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+            var expected = (string[])input.Clone();
+            Array.Sort(expected, StringComparer.Ordinal);
+
+            var actual = (string[])input.Clone();
+            NetworkSort.Sort(actual, StringComparer.Ordinal);
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort_28Elements_String()
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 28).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+            var expected = (string[])input.Clone();
+            Array.Sort(expected, StringComparer.Ordinal);
+
+            var actual = (string[])input.Clone();
+            NetworkSort.Sort(actual, StringComparer.Ordinal);
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
 
     public static TheoryData<int> Lengths
     {
