@@ -132,10 +132,10 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
 ## Code generation
 
 The `NetworkSort.cs` and `NetworkSort.Unrolled.cs` files are auto-generated
-by `generate_unrolled.py`. To regenerate after changing the script:
+by `generate_unrolled.cs`. To regenerate after changing the script:
 
 ```
-python generate_unrolled.py
+dotnet run generate_unrolled.cs
 ```
 
 ## Projects
