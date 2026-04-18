@@ -2769,4 +2769,2094 @@ public static partial class NetworkSort
         v1.AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 32));
         v0.AsByte().StoreUnsafe(ref first);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd27_long(Span<long> span)
+    {
+        ref byte first = ref Unsafe.As<long, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector512<long>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 64));
+        var v2 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 128));
+        var v3 = Avx512F.PermuteVar8x64(
+            Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 152)),
+            Vector512.Create(5L, 6L, 7L, 0L, 0L, 0L, 0L, 0L));
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 8L, 7L, 6L, 5L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(1L, 0L, 3L, 2L, 7L, 6L, 5L, 4L));
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 6L, 5L, 4L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 3L, 2L, 0L, 0L, 0L, 0L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 2L, 1L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(1L, 0L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var shuffled2 = Avx512F.PermuteVar8x64(v2, Vector512.Create(2L, 3L, 0L, 1L, 5L, 4L, 7L, 6L));
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 12L, 14L, 0L, 9L, 0L, 10L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(3L, 0L, 0L, 0L, 0L, 1L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 13L, 15L, 8L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 6L, 7L, 4L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 5L, 0L, 0L, 0L, 1L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 4L, 5L, 0L, 0L, 8L, 9L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(13L, 11L, 0L, 9L, 15L, 8L, 0L, 12L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 1L, 0L, 0L, 0L, 3L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 0L, 14L, 2L, 3L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 0L, 0L, 0L, 0L, 0L, 10L, 7L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(6L, 7L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 6L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 2L, 1L, 0L, 6L, 0L, 4L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 8L, 0L, 6L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 13L, 10L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 15L, 0L, 0L, 7L, 0L, 5L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 0L, 7L, 0L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, -1L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(8L, 4L, 6L, 9L, 1L, 7L, 2L, 5L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 3L, 11L, 10L, 13L, 12L, 15L, 14L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 8L, 3L, 6L, 9L, 4L, 10L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 7L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 13L, 3L, 8L, 12L, 9L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 6L, 1L, 11L, 5L, 2L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 9L, 6L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 0L, 15L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 5L, 7L, 0L, 2L, 0L, 3L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 14L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 0L, 1L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 5L, 14L, 11L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 7L, 0L, 0L, 6L, 8L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 2L, 0L, 3L, 5L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 9L, 10L, 12L, 0L, 13L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(4L, 0L, 0L, 0L, 0L, 0L, 6L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 4L, 3L, 2L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 13L, 10L, 15L, 0L, 9L, 0L, 11L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 2L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(12L, 0L, 14L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 0L, 4L, 3L, 6L, 5L, 9L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 7L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 7L, 3L, 8L, 5L, 10L, 2L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 11L, 6L, 9L, 14L, 15L, 12L, 13L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 0L, 7L, 9L, 1L, 6L, 3L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 4L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 3L, 2L, 1L, 7L, 6L, 5L, 4L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 0L, 10L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 15L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 7L, 6L, 5L, 4L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 1L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(10L, 12L, 8L, 13L, 9L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 0L, 15L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 3L, 0L, 1L, 5L, 4L, 7L, 6L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 10L, 9L, 12L, 11L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 2L, 1L, 4L, 3L, 6L, 5L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 152),
+            Avx512F.PermuteVar8x64(v3, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 1L, 2L)));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd28_long(Span<long> span)
+    {
+        ref byte first = ref Unsafe.As<long, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector512<long>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 64));
+        var v2 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 128));
+        var v3 = Avx512F.PermuteVar8x64(
+            Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 160)),
+            Vector512.Create(4L, 5L, 6L, 7L, 0L, 0L, 0L, 0L));
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(11L, 10L, 9L, 8L, 7L, 6L, 5L, 4L), v3);
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(1L, 0L, 3L, 2L, 7L, 6L, 5L, 4L));
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 6L, 5L, 4L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 3L, 2L, 0L, 0L, 0L, 0L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 2L, 1L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(1L, 0L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var shuffled2 = Avx512F.PermuteVar8x64(v2, Vector512.Create(2L, 3L, 0L, 1L, 5L, 4L, 7L, 6L));
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 3L, 2L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 12L, 14L, 0L, 9L, 0L, 10L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(3L, 0L, 0L, 0L, 0L, 1L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 13L, 15L, 8L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 6L, 7L, 4L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 3L, 0L, 1L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 5L, 0L, 0L, 0L, 1L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 4L, 5L, 0L, 0L, 8L, 9L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(13L, 11L, 0L, 9L, 15L, 8L, 0L, 12L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 1L, 0L, 0L, 0L, 3L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 0L, 14L, 2L, 3L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 0L, 0L, 0L, 0L, 0L, 10L, 11L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(6L, 7L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 6L, 7L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 2L, 1L, 0L, 6L, 0L, 4L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 8L, 0L, 6L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 13L, 10L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 15L, 0L, 0L, 7L, 0L, 5L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 0L, 7L, 0L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, -1L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(8L, 4L, 6L, 9L, 1L, 7L, 2L, 5L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 3L, 11L, 10L, 13L, 12L, 15L, 14L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 8L, 11L, 6L, 9L, 4L, 10L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 7L, 3L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 13L, 3L, 8L, 12L, 9L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 6L, 1L, 11L, 5L, 2L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 9L, 6L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 0L, 15L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 5L, 7L, 0L, 2L, 0L, 3L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 14L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 0L, 1L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 5L, 14L, 11L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 7L, 0L, 0L, 6L, 8L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 2L, 0L, 3L, 5L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 9L, 10L, 12L, 0L, 13L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(4L, 0L, 0L, 0L, 0L, 0L, 6L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 4L, 3L, 2L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 13L, 10L, 15L, 0L, 9L, 0L, 11L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 2L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(12L, 0L, 14L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 0L, 4L, 3L, 6L, 5L, 9L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 7L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 7L, 3L, 8L, 5L, 10L, 2L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 11L, 6L, 9L, 14L, 15L, 12L, 13L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 0L, 7L, 9L, 1L, 6L, 3L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 4L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 3L, 2L, 1L, 7L, 6L, 5L, 4L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 0L, 10L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 15L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 7L, 6L, 5L, 4L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 1L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(10L, 12L, 8L, 13L, 9L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 0L, 15L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 3L, 0L, 1L, 5L, 4L, 7L, 6L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 10L, 9L, 12L, 11L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 2L, 1L, 4L, 3L, 6L, 5L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0, shuffled0);
+            var maxs0 = Avx512F.Max(v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1, shuffled1);
+            var maxs1 = Avx512F.Max(v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2, shuffled2);
+            var maxs2 = Avx512F.Max(v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3, shuffled3);
+            var maxs3 = Avx512F.Max(v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 160),
+            Avx512F.PermuteVar8x64(v3, Vector512.Create(0L, 0L, 0L, 0L, 0L, 1L, 2L, 3L)));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd27_ulong(Span<ulong> span)
+    {
+        ref byte first = ref Unsafe.As<ulong, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector512<long>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 64));
+        var v2 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 128));
+        var v3 = Avx512F.PermuteVar8x64(
+            Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 152)),
+            Vector512.Create(5L, 6L, 7L, 0L, 0L, 0L, 0L, 0L));
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 8L, 7L, 6L, 5L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(1L, 0L, 3L, 2L, 7L, 6L, 5L, 4L));
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 6L, 5L, 4L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 3L, 2L, 0L, 0L, 0L, 0L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 2L, 1L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(1L, 0L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var shuffled2 = Avx512F.PermuteVar8x64(v2, Vector512.Create(2L, 3L, 0L, 1L, 5L, 4L, 7L, 6L));
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 12L, 14L, 0L, 9L, 0L, 10L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(3L, 0L, 0L, 0L, 0L, 1L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 13L, 15L, 8L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 6L, 7L, 4L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 5L, 0L, 0L, 0L, 1L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 4L, 5L, 0L, 0L, 8L, 9L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(13L, 11L, 0L, 9L, 15L, 8L, 0L, 12L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 1L, 0L, 0L, 0L, 3L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 0L, 14L, 2L, 3L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 0L, 0L, 0L, 0L, 0L, 10L, 7L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(6L, 7L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 6L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 2L, 1L, 0L, 6L, 0L, 4L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 8L, 0L, 6L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 13L, 10L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 15L, 0L, 0L, 7L, 0L, 5L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 0L, 7L, 0L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, -1L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(8L, 4L, 6L, 9L, 1L, 7L, 2L, 5L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 3L, 11L, 10L, 13L, 12L, 15L, 14L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 8L, 3L, 6L, 9L, 4L, 10L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 7L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 13L, 3L, 8L, 12L, 9L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 6L, 1L, 11L, 5L, 2L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 9L, 6L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 0L, 15L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 5L, 7L, 0L, 2L, 0L, 3L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 14L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 0L, 1L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 5L, 14L, 11L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 7L, 0L, 0L, 6L, 8L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 2L, 0L, 3L, 5L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 9L, 10L, 12L, 0L, 13L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(4L, 0L, 0L, 0L, 0L, 0L, 6L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 4L, 3L, 2L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 13L, 10L, 15L, 0L, 9L, 0L, 11L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 2L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(12L, 0L, 14L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 0L, 4L, 3L, 6L, 5L, 9L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 7L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 7L, 3L, 8L, 5L, 10L, 2L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 11L, 6L, 9L, 14L, 15L, 12L, 13L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 0L, 7L, 9L, 1L, 6L, 3L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 4L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 3L, 2L, 1L, 7L, 6L, 5L, 4L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 0L, 10L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 15L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 7L, 6L, 5L, 4L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 1L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(10L, 12L, 8L, 13L, 9L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 0L, 15L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 3L, 0L, 1L, 5L, 4L, 7L, 6L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 10L, 9L, 12L, 11L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 2L, 1L, 4L, 3L, 6L, 5L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 152),
+            Avx512F.PermuteVar8x64(v3, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 1L, 2L)));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd28_ulong(Span<ulong> span)
+    {
+        ref byte first = ref Unsafe.As<ulong, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector512<long>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 64));
+        var v2 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 128));
+        var v3 = Avx512F.PermuteVar8x64(
+            Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 160)),
+            Vector512.Create(4L, 5L, 6L, 7L, 0L, 0L, 0L, 0L));
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(11L, 10L, 9L, 8L, 7L, 6L, 5L, 4L), v3);
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(1L, 0L, 3L, 2L, 7L, 6L, 5L, 4L));
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 6L, 5L, 4L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 3L, 2L, 0L, 0L, 0L, 0L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 2L, 1L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(1L, 0L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var shuffled2 = Avx512F.PermuteVar8x64(v2, Vector512.Create(2L, 3L, 0L, 1L, 5L, 4L, 7L, 6L));
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 3L, 2L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 12L, 14L, 0L, 9L, 0L, 10L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(3L, 0L, 0L, 0L, 0L, 1L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 13L, 15L, 8L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 6L, 7L, 4L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 3L, 0L, 1L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 5L, 0L, 0L, 0L, 1L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 4L, 5L, 0L, 0L, 8L, 9L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(13L, 11L, 0L, 9L, 15L, 8L, 0L, 12L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 1L, 0L, 0L, 0L, 3L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 0L, 14L, 2L, 3L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 0L, 0L, 0L, 0L, 0L, 10L, 11L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(6L, 7L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 6L, 7L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 2L, 1L, 0L, 6L, 0L, 4L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 8L, 0L, 6L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 13L, 10L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 15L, 0L, 0L, 7L, 0L, 5L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 0L, 7L, 0L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, -1L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(8L, 4L, 6L, 9L, 1L, 7L, 2L, 5L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 3L, 11L, 10L, 13L, 12L, 15L, 14L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 8L, 11L, 6L, 9L, 4L, 10L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 7L, 3L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 13L, 3L, 8L, 12L, 9L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 6L, 1L, 11L, 5L, 2L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 9L, 6L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 0L, 15L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 5L, 7L, 0L, 2L, 0L, 3L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 14L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 0L, 1L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 5L, 14L, 11L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 7L, 0L, 0L, 6L, 8L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 2L, 0L, 3L, 5L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 9L, 10L, 12L, 0L, 13L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(4L, 0L, 0L, 0L, 0L, 0L, 6L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, 0L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 4L, 3L, 2L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 13L, 10L, 15L, 0L, 9L, 0L, 11L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 2L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(12L, 0L, 14L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 0L, 4L, 3L, 6L, 5L, 9L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 7L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 7L, 3L, 8L, 5L, 10L, 2L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 11L, 6L, 9L, 14L, 15L, 12L, 13L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 0L, 7L, 9L, 1L, 6L, 3L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 4L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 3L, 2L, 1L, 7L, 6L, 5L, 4L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 0L, 10L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 15L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 7L, 6L, 5L, 4L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 1L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(10L, 12L, 8L, 13L, 9L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 0L, 15L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 3L, 0L, 1L, 5L, 4L, 7L, 6L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 10L, 9L, 12L, 11L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 2L, 1L, 4L, 3L, 6L, 5L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var mins0 = Avx512F.Min(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            var maxs0 = Avx512F.Max(v0.AsUInt64(), shuffled0.AsUInt64()).AsInt64();
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var mins1 = Avx512F.Min(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            var maxs1 = Avx512F.Max(v1.AsUInt64(), shuffled1.AsUInt64()).AsInt64();
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var mins2 = Avx512F.Min(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            var maxs2 = Avx512F.Max(v2.AsUInt64(), shuffled2.AsUInt64()).AsInt64();
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var mins3 = Avx512F.Min(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            var maxs3 = Avx512F.Max(v3.AsUInt64(), shuffled3.AsUInt64()).AsInt64();
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 160),
+            Avx512F.PermuteVar8x64(v3, Vector512.Create(0L, 0L, 0L, 0L, 0L, 1L, 2L, 3L)));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd27_double(Span<double> span)
+    {
+        ref byte first = ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector512<long>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 64));
+        var v2 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 128));
+        var v3 = Avx512F.PermuteVar8x64(
+            Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 152)),
+            Vector512.Create(5L, 6L, 7L, 0L, 0L, 0L, 0L, 0L));
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 8L, 7L, 6L, 5L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(1L, 0L, 3L, 2L, 7L, 6L, 5L, 4L));
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 6L, 5L, 4L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 3L, 2L, 0L, 0L, 0L, 0L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 2L, 1L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(1L, 0L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var shuffled2 = Avx512F.PermuteVar8x64(v2, Vector512.Create(2L, 3L, 0L, 1L, 5L, 4L, 7L, 6L));
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 12L, 14L, 0L, 9L, 0L, 10L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(3L, 0L, 0L, 0L, 0L, 1L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 13L, 15L, 8L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 6L, 7L, 4L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 5L, 0L, 0L, 0L, 1L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 4L, 5L, 0L, 0L, 8L, 9L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(13L, 11L, 0L, 9L, 15L, 8L, 0L, 12L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 1L, 0L, 0L, 0L, 3L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 0L, 14L, 2L, 3L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 0L, 0L, 0L, 0L, 0L, 10L, 7L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(6L, 7L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 6L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 2L, 1L, 0L, 6L, 0L, 4L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 8L, 0L, 6L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 13L, 10L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 15L, 0L, 0L, 7L, 0L, 5L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 0L, 7L, 0L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, -1L, 0L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(8L, 4L, 6L, 9L, 1L, 7L, 2L, 5L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 3L, 11L, 10L, 13L, 12L, 15L, 14L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 8L, 3L, 6L, 9L, 4L, 10L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 7L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, -1L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 13L, 3L, 8L, 12L, 9L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 6L, 1L, 11L, 5L, 2L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 9L, 6L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 0L, 15L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 5L, 7L, 0L, 2L, 0L, 3L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 14L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 0L, 1L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 5L, 14L, 11L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 7L, 0L, 0L, 6L, 8L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 2L, 0L, 3L, 5L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 9L, 10L, 12L, 0L, 13L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(4L, 0L, 0L, 0L, 0L, 0L, 6L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 4L, 3L, 2L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 13L, 10L, 15L, 0L, 9L, 0L, 11L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 2L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(12L, 0L, 14L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 0L, 4L, 3L, 6L, 5L, 9L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 7L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 7L, 3L, 8L, 5L, 10L, 2L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 11L, 6L, 9L, 14L, 15L, 12L, 13L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 0L, 7L, 9L, 1L, 6L, 3L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 4L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 3L, 2L, 1L, 7L, 6L, 5L, 4L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 0L, 10L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 15L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 7L, 6L, 5L, 4L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 1L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(10L, 12L, 8L, 13L, 9L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 0L, 15L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 3L, 0L, 1L, 5L, 4L, 7L, 6L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 10L, 9L, 12L, 11L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 2L, 1L, 4L, 3L, 6L, 5L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 152),
+            Avx512F.PermuteVar8x64(v3, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 1L, 2L)));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd28_double(Span<double> span)
+    {
+        ref byte first = ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector512<long>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 64));
+        var v2 = Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 128));
+        var v3 = Avx512F.PermuteVar8x64(
+            Unsafe.ReadUnaligned<Vector512<long>>(ref Unsafe.Add(ref first, 160)),
+            Vector512.Create(4L, 5L, 6L, 7L, 0L, 0L, 0L, 0L));
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(11L, 10L, 9L, 8L, 7L, 6L, 5L, 4L), v3);
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(1L, 0L, 3L, 2L, 7L, 6L, 5L, 4L));
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 6L, 5L, 4L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 3L, 2L, 0L, 0L, 0L, 0L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 2L, 1L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(1L, 0L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var shuffled1 = Avx512F.PermuteVar8x64(v1, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var shuffled2 = Avx512F.PermuteVar8x64(v2, Vector512.Create(2L, 3L, 0L, 1L, 5L, 4L, 7L, 6L));
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 3L, 2L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(2L, 3L, 0L, 1L, 6L, 7L, 4L, 5L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 12L, 14L, 0L, 9L, 0L, 10L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(3L, 0L, 0L, 0L, 0L, 1L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 13L, 15L, 8L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 6L, 7L, 4L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 3L, 0L, 1L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 5L, 0L, 0L, 0L, 1L, 0L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 4L, 5L, 0L, 0L, 8L, 9L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(13L, 11L, 0L, 9L, 15L, 8L, 0L, 12L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 1L, 0L, 0L, 0L, 3L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 0L, 14L, 2L, 3L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 0L, 0L, 0L, 0L, 0L, 10L, 11L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(6L, 7L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 6L, 7L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 2L, 1L, 0L, 6L, 0L, 4L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 8L, 0L, 6L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 13L, 10L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 15L, 0L, 0L, 7L, 0L, 5L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 0L, 7L, 0L, 5L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(3L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 9L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, -1L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, -1L, 0L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(8L, 4L, 6L, 9L, 1L, 7L, 2L, 5L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 3L, 11L, 10L, 13L, 12L, 15L, 14L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(1L, 0L, 8L, 11L, 6L, 9L, 4L, 10L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 7L, 3L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, -1L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var fromPair01_0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 10L, 13L, 3L, 8L, 12L, 9L, 0L), v1);
+            var fromPair23_0 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 4L), v3);
+            var shuffled0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_0, fromPair01_0);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 6L, 1L, 11L, 5L, 2L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 9L, 6L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 0L, 0L, 0L, 7L, 0L, 15L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 10L, 5L, 7L, 0L, 2L, 0L, 3L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, -1L, 0L, -1L, 0L, -1L), fromPair23_2, fromPair01_2);
+            var fromPair01_3 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 14L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 0L, 1L, 11L, 12L, 13L, 14L, 15L), v3);
+            var shuffled3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_3, fromPair01_3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, -1L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 5L, 14L, 11L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 7L, 0L, 0L, 6L, 8L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 2L, 0L, 3L, 5L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, 0L, -1L, -1L, 0L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 9L, 10L, 12L, 0L, 13L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(4L, 0L, 0L, 0L, 0L, 0L, 6L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, -1L, 0L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, 0L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, 0L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 4L, 3L, 2L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 13L, 10L, 15L, 0L, 9L, 0L, 11L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 2L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(12L, 0L, 14L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 1L, 0L, 4L, 3L, 6L, 5L, 9L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 7L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, -1L, 0L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 7L, 3L, 8L, 5L, 10L, 2L), v1);
+            var shuffled1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(4L, 11L, 6L, 9L, 14L, 15L, 12L, 13L), v1);
+            var shuffled2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(2L, 5L, 0L, 7L, 9L, 1L, 6L, 3L), v3);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(8L, 4L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, 0L, -1L, -1L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 3L, 2L, 1L, 7L, 6L, 5L, 4L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(9L, 8L, 12L, 0L, 10L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 1L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(11L, 15L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 3L, 2L, 7L, 6L, 5L, 4L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(2L, 1L, 0L, 3L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, 0L, -1L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, -1L, 0L, -1L, 0L, 0L, -1L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64(v0, Vector512.Create(0L, 1L, 3L, 2L, 5L, 4L, 7L, 6L));
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(10L, 12L, 8L, 13L, 9L, 11L, 0L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 2L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, -1L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(14L, 0L, 15L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 3L, 0L, 1L, 5L, 4L, 7L, 6L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64(v3, Vector512.Create(1L, 0L, 2L, 3L, 4L, 5L, 6L, 7L));
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, -1L, 0L, -1L, 0L, -1L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, -1L, 0L, -1L, -1L, 0L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, -1L, 0L, -1L, 0L, -1L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var shuffled0 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(0L, 1L, 2L, 4L, 3L, 6L, 5L, 8L), v1);
+            var fromPair01_1 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(7L, 10L, 9L, 12L, 11L, 14L, 13L, 0L), v1);
+            var fromPair23_1 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v3);
+            var shuffled1 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, 0L, 0L, 0L, -1L), fromPair23_1, fromPair01_1);
+            var fromPair01_2 = Avx512F.PermuteVar8x64x2(v0, Vector512.Create(15L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), v1);
+            var fromPair23_2 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(0L, 2L, 1L, 4L, 3L, 6L, 5L, 8L), v3);
+            var shuffled2 = Vector512.ConditionalSelect(Vector512.Create(0L, -1L, -1L, -1L, -1L, -1L, -1L, -1L), fromPair23_2, fromPair01_2);
+            var shuffled3 = Avx512F.PermuteVar8x64x2(v2, Vector512.Create(7L, 9L, 10L, 11L, 12L, 13L, 14L, 15L), v3);
+            var gt0 = Avx512F.CompareGreaterThan(v0.AsDouble(), shuffled0.AsDouble()).AsInt64();
+            var mins0 = Vector512.ConditionalSelect(gt0, shuffled0, v0);
+            var maxs0 = Vector512.ConditionalSelect(gt0, v0, shuffled0);
+            v0 = Vector512.ConditionalSelect(Vector512.Create(0L, 0L, 0L, 0L, -1L, 0L, -1L, 0L), maxs0, mins0);
+            var gt1 = Avx512F.CompareGreaterThan(v1.AsDouble(), shuffled1.AsDouble()).AsInt64();
+            var mins1 = Vector512.ConditionalSelect(gt1, shuffled1, v1);
+            var maxs1 = Vector512.ConditionalSelect(gt1, v1, shuffled1);
+            v1 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs1, mins1);
+            var gt2 = Avx512F.CompareGreaterThan(v2.AsDouble(), shuffled2.AsDouble()).AsInt64();
+            var mins2 = Vector512.ConditionalSelect(gt2, shuffled2, v2);
+            var maxs2 = Vector512.ConditionalSelect(gt2, v2, shuffled2);
+            v2 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, -1L, 0L, -1L, 0L, -1L, 0L), maxs2, mins2);
+            var gt3 = Avx512F.CompareGreaterThan(v3.AsDouble(), shuffled3.AsDouble()).AsInt64();
+            var mins3 = Vector512.ConditionalSelect(gt3, shuffled3, v3);
+            var maxs3 = Vector512.ConditionalSelect(gt3, v3, shuffled3);
+            v3 = Vector512.ConditionalSelect(Vector512.Create(-1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), maxs3, mins3);
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 160),
+            Avx512F.PermuteVar8x64(v3, Vector512.Create(0L, 0L, 0L, 0L, 0L, 1L, 2L, 3L)));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
 }
