@@ -104,9 +104,9 @@ provides a smaller benefit:
 The specialized `Sort(string[])` overload uses `string.CompareOrdinal` in the
 unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
-| Type | ArraySort (27) | NetworkSort (27) | Ratio |
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| string | 927 ns | 3,342 ns | 0.28x (slower) |
+| string | 943 ns | 527 ns | **1.8x** |
 
 ### int detailed results (SIMD-optimized baseline)
 
