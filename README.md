@@ -70,6 +70,10 @@ fit in a single vector register, allowing each of the 13 network steps to
 execute as a vectorized shuffle + min/max + blend operation instead of
 individual scalar compare-and-swap branches.
 
+For `int` and `uint`, AVX2 SIMD is used on x86 with four `Vector256<int>`
+registers (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
+`Blend` composition, and `Min`/`Max` handles signed and unsigned comparisons.
+
 For `short`, `ushort`, and `char` (16-bit types), AVX-512 SIMD is used on x86
 when available, packing all elements into a single `Vector512<ushort>`. On
 ARM64, four `Vector128<byte>` vectors with `VectorTableLookup` (TBL4) provide
@@ -90,36 +94,41 @@ to execute as a vectorized min/max/blend operation:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,298 ns | 41 ns | **32x** |
-| sbyte | 1,426 ns | 43 ns | **33x** |
+| byte | 1,327 ns | 42 ns | **32x** |
+| sbyte | 1,441 ns | 45 ns | **32x** |
+
+For `int` and `uint`, AVX2 SIMD uses four `Vector256<int>` registers with
+cross-vector shuffles via `PermuteVar8x32`:
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| int | 102 ns | 57 ns | **1.8x** |
+| uint | 110 ns | 54 ns | **2.0x** |
 
 For other types without a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| short | 1,388 ns | 101 ns | **14x** |
-| ushort | 1,329 ns | 100 ns | **13x** |
-| float | 1,629 ns | 108 ns | **15x** |
-| double | 1,694 ns | 112 ns | **15x** |
-| long | 1,407 ns | 104 ns | **14x** |
-| nint | 1,430 ns | 106 ns | **14x** |
-| nuint | 1,393 ns | 105 ns | **13x** |
+| short | 1,405 ns | 101 ns | **14x** |
+| ushort | 1,278 ns | 100 ns | **13x** |
+| float | 1,594 ns | 108 ns | **15x** |
+| double | 1,785 ns | 112 ns | **16x** |
+| long | 1,407 ns | 103 ns | **14x** |
+| nint | 1,409 ns | 103 ns | **14x** |
+| nuint | 1,414 ns | 103 ns | **14x** |
 
 > **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512 SIMD (packing all 27-28 elements into a single `Vector512<ushort>`) for even greater speedups.
 
 #### Types where Array.Sort is already SIMD-optimized
 
-.NET 10 has SIMD-accelerated sort paths for `int`, `uint`, `char`, and
-`ulong`. For these types the BCL is already very fast and NetworkSort
-provides a smaller benefit:
+.NET 10 has SIMD-accelerated sort paths for `char` and `ulong`. For these
+types the BCL is already very fast and NetworkSort provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| int | 107 ns | 101 ns | ~1x |
-| uint | 107 ns | 99 ns | ~1x |
 | char | 94 ns | 97 ns | ~1x |
-| ulong | 118 ns | 100 ns | ~1.2x |
+| ulong | 117 ns | 102 ns | ~1.1x |
 
 > **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and NetworkSort may be slower for these types.
 
@@ -130,7 +139,7 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| string | 964 ns | 525 ns | **1.8x** |
+| string | 974 ns | 529 ns | **1.8x** |
 
 ### ARM64 (Apple M1, AdvSimd/NEON)
 
@@ -170,20 +179,20 @@ speedup over `Array.Sort` as on x86:
 | float | 1,496 ns | 100 ns | **15x** |
 | long | 1,472 ns | 100 ns | **15x** |
 
-### int detailed results (SIMD-optimized baseline)
+### int detailed results (AVX2 SIMD)
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 101 ns | **0.95x** (tied) |
-| 27 | Sorted | 74 ns | 1.04x |
-| 27 | Reversed | 102 ns | 1.20x |
-| 27 | Duplicates | 84 ns | **0.77x** (23% faster) |
-| 28 | Random | 104 ns | **0.86x** (14% faster) |
-| 28 | Sorted | 77 ns | 1.06x |
-| 28 | Reversed | 93 ns | 1.03x |
-| 28 | Duplicates | 85 ns | **0.76x** (24% faster) |
+| 27 | Random | 57 ns | **0.56x** (44% faster) |
+| 27 | Sorted | 56 ns | **0.81x** (19% faster) |
+| 27 | Reversed | 57 ns | **0.66x** (34% faster) |
+| 27 | Duplicates | 56 ns | **0.53x** (47% faster) |
+| 28 | Random | 59 ns | **0.49x** (51% faster) |
+| 28 | Sorted | 56 ns | **0.78x** (22% faster) |
+| 28 | Reversed | 58 ns | **0.66x** (34% faster) |
+| 28 | Duplicates | 58 ns | **0.52x** (48% faster) |
 
-> Results vary by hardware and run. Sorting networks execute a fixed comparison sequence regardless of input order, so they don't benefit from already-sorted or reversed patterns the way adaptive sorts can.
+> With AVX2 SIMD, NetworkSort is now consistently faster than Array.Sort for `int` across all input patterns. Sorting networks execute a fixed comparison sequence regardless of input order, providing predictable performance.
 
 ## Building
 
