@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
+using System.Runtime.Intrinsics.Arm;
 
 namespace SortingNetworks;
 
@@ -31,6 +32,15 @@ public static partial class NetworkSort
                     SortSimd27(span);
                 else
                     SortSimd28(span);
+                return;
+            }
+
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27(span);
+                else
+                    SortSimdArm28(span);
                 return;
             }
 
@@ -112,6 +122,15 @@ public static partial class NetworkSort
                     SortSimd27_sbyte(span);
                 else
                     SortSimd28_sbyte(span);
+                return;
+            }
+
+            if (AdvSimd.Arm64.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdArm27_sbyte(span);
+                else
+                    SortSimdArm28_sbyte(span);
                 return;
             }
 
