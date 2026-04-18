@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Pack
-        run: dotnet pack -bl:pack.binlog
+        run: dotnet pack -c Release -bl:pack.binlog
 
       - name: Test
-        run: dotnet test --no-build
+        run: dotnet test -c Release --no-build
 
       - name: Benchmarks
         run: |
