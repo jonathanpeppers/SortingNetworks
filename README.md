@@ -72,15 +72,15 @@ sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,356 ns | 98 ns | **14x** |
-| sbyte | 1,524 ns | 97 ns | **16x** |
-| short | 1,462 ns | 97 ns | **15x** |
-| ushort | 1,562 ns | 97 ns | **16x** |
-| float | 1,646 ns | 105 ns | **16x** |
-| double | 1,726 ns | 109 ns | **16x** |
-| long | 1,523 ns | 99 ns | **15x** |
-| nint | 1,481 ns | 104 ns | **14x** |
-| nuint | 1,505 ns | 102 ns | **15x** |
+| byte | 1,385 ns | 94 ns | **15x** |
+| sbyte | 1,409 ns | 98 ns | **14x** |
+| short | 1,527 ns | 104 ns | **15x** |
+| ushort | 1,394 ns | 97 ns | **14x** |
+| float | 1,601 ns | 105 ns | **15x** |
+| double | 1,719 ns | 108 ns | **16x** |
+| long | 1,460 ns | 102 ns | **14x** |
+| nint | 1,474 ns | 102 ns | **14x** |
+| nuint | 1,525 ns | 96 ns | **16x** |
 
 ### Types where Array.Sort is already SIMD-optimized
 
@@ -90,10 +90,10 @@ provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| int | 105 ns | 100 ns | ~1x |
-| uint | 100 ns | 97 ns | ~1x |
-| char | 97 ns | 94 ns | ~1x |
-| ulong | 119 ns | 96 ns | ~1.2x |
+| int | 103 ns | 98 ns | ~1x |
+| uint | 103 ns | 95 ns | ~1x |
+| char | 93 ns | 94 ns | ~1x |
+| ulong | 114 ns | 101 ns | ~1.1x |
 
 ### string (generic `Sort<T>` path)
 
@@ -102,20 +102,20 @@ network (not unrolled), which is slower than `Array.Sort` for reference types:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| string | 918 ns | 3,626 ns | 0.25x (slower) |
+| string | 951 ns | 3,606 ns | 0.26x (slower) |
 
 ### int detailed results (SIMD-optimized baseline)
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 100 ns | **0.95x** (tied) |
-| 27 | Sorted | 92 ns | 1.31x |
-| 27 | Reversed | 101 ns | 1.19x |
-| 27 | Duplicates | 92 ns | **0.89x** (11% faster) |
-| 28 | Random | 102 ns | **0.84x** (16% faster) |
-| 28 | Sorted | 73 ns | **1.01x** (tied) |
-| 28 | Reversed | 87 ns | **0.99x** (tied) |
-| 28 | Duplicates | 82 ns | **0.77x** (23% faster) |
+| 27 | Random | 98 ns | **0.95x** (tied) |
+| 27 | Sorted | 74 ns | 1.13x |
+| 27 | Reversed | 99 ns | 1.20x |
+| 27 | Duplicates | 79 ns | **0.76x** (24% faster) |
+| 28 | Random | 103 ns | **0.80x** (20% faster) |
+| 28 | Sorted | 73 ns | **1.05x** (tied) |
+| 28 | Reversed | 88 ns | **0.97x** (tied) |
+| 28 | Duplicates | 82 ns | **0.75x** (25% faster) |
 
 ## Building
 
