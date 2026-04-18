@@ -93,7 +93,10 @@ def generate_unrolled_method(n, pairs, type_name):
         lines.append(f"        {type_name} e{i} = Unsafe.Add(ref first, {i});")
     lines.append(f"")
     for a, b in pairs:
-        lines.append(f"        if (e{a} > e{b}) {{ {type_name} temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
+        if type_name == "string":
+            lines.append(f"        if (string.CompareOrdinal(e{a}, e{b}) > 0) {{ {type_name} temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
+        else:
+            lines.append(f"        if (e{a} > e{b}) {{ {type_name} temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
     lines.append(f"")
     lines.append(f"        first = e0;")
     for i in range(1, n):
@@ -181,6 +184,88 @@ def generate_public_api(type_name):
     lines.append(f"    }}")
     return "\n".join(lines)
 
+def generate_string_api():
+    lines = []
+    # Sort(Span<string>) — uses ordinal comparison via unrolled network
+    lines.append("    /// <summary>")
+    lines.append("    /// Sorts a span of string using a sorting network when possible.")
+    lines.append("    /// Uses ordinal comparison for maximum performance.")
+    lines.append("    /// </summary>")
+    lines.append("    public static void Sort(Span<string> span)")
+    lines.append("    {")
+    lines.append("        int n = span.Length;")
+    lines.append("        if (n == 27 || n == 28)")
+    lines.append("        {")
+    lines.append("            ref string first = ref MemoryMarshal.GetReference(span);")
+    lines.append("            if (n == 27)")
+    lines.append("                Sort27(ref first);")
+    lines.append("            else")
+    lines.append("                Sort28(ref first);")
+    lines.append("            return;")
+    lines.append("        }")
+    lines.append("")
+    lines.append("        span.Sort(StringComparer.Ordinal);")
+    lines.append("    }")
+    lines.append("")
+    # Sort(string[])
+    lines.append("    /// <summary>")
+    lines.append("    /// Sorts an array of string using a sorting network when possible.")
+    lines.append("    /// Uses ordinal comparison for maximum performance.")
+    lines.append("    /// </summary>")
+    lines.append("    public static void Sort(string[] array)")
+    lines.append("    {")
+    lines.append("        ArgumentNullException.ThrowIfNull(array);")
+    lines.append("        Sort(array.AsSpan());")
+    lines.append("    }")
+    lines.append("")
+    # Sort(Span<string>, IComparer<string>?)
+    lines.append("    /// <summary>")
+    lines.append("    /// Sorts a span of string using a sorting network when possible,")
+    lines.append("    /// with a custom comparer.")
+    lines.append("    /// </summary>")
+    lines.append("    public static void Sort(Span<string> span, IComparer<string>? comparer)")
+    lines.append("    {")
+    lines.append("        comparer ??= Comparer<string>.Default;")
+    lines.append("        int n = span.Length;")
+    lines.append("        if (n == 27 || n == 28)")
+    lines.append("        {")
+    lines.append("            ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);")
+    lines.append("            return;")
+    lines.append("        }")
+    lines.append("")
+    lines.append("        span.Sort(comparer);")
+    lines.append("    }")
+    lines.append("")
+    # Sort(string[], IComparer<string>?)
+    lines.append("    /// <summary>")
+    lines.append("    /// Sorts an array of string using a sorting network when possible,")
+    lines.append("    /// with a custom comparer.")
+    lines.append("    /// </summary>")
+    lines.append("    public static void Sort(string[] array, IComparer<string>? comparer)")
+    lines.append("    {")
+    lines.append("        ArgumentNullException.ThrowIfNull(array);")
+    lines.append("        Sort(array.AsSpan(), comparer);")
+    lines.append("    }")
+    lines.append("")
+    # ApplyNetworkWithComparer for string
+    lines.append("    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
+    lines.append("    private static void ApplyNetworkWithComparer(Span<string> span, int[] network, IComparer<string> comparer)")
+    lines.append("    {")
+    lines.append("        ref string first = ref MemoryMarshal.GetReference(span);")
+    lines.append("        for (int i = 0; i < network.Length; i += 2)")
+    lines.append("        {")
+    lines.append("            ref string a = ref Unsafe.Add(ref first, network[i]);")
+    lines.append("            ref string b = ref Unsafe.Add(ref first, network[i + 1]);")
+    lines.append("            if (comparer.Compare(a, b) > 0)")
+    lines.append("            {")
+    lines.append("                string temp = a;")
+    lines.append("                a = b;")
+    lines.append("                b = temp;")
+    lines.append("            }")
+    lines.append("        }")
+    lines.append("    }")
+    return "\n".join(lines)
+
 def generate_api_file():
     lines = []
     lines.append("using System.Runtime.CompilerServices;")
@@ -206,6 +291,9 @@ def generate_api_file():
         if i > 0:
             lines.append("")
         lines.append(generate_public_api(type_name))
+
+    lines.append("")
+    lines.append(generate_string_api())
 
     lines.append("")
     lines.append("    /// <summary>")
@@ -255,7 +343,7 @@ def generate_unrolled_file():
     lines.append("{")
 
     first_method = True
-    for type_name in PRIMITIVE_TYPES:
+    for type_name in PRIMITIVE_TYPES + ["string"]:
         for n in [27, 28]:
             pairs = get_network(n)
             if not first_method:

@@ -346,7 +346,37 @@ public class NetworkSortTests
         Array.Sort(expected, StringComparer.Ordinal);
 
         var actual = (string[])input.Clone();
+        NetworkSort.Sort(actual);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Strings_WithComparer(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 100).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        var actual = (string[])input.Clone();
         NetworkSort.Sort(actual, StringComparer.Ordinal);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Span_Strings(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => rng.Next(0, 100).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        var actual = (string[])input.Clone();
+        NetworkSort.Sort(actual.AsSpan());
 
         Assert.Equal(expected, actual);
     }
@@ -362,7 +392,7 @@ public class NetworkSortTests
             Array.Sort(expected, StringComparer.Ordinal);
 
             var actual = (string[])input.Clone();
-            NetworkSort.Sort(actual, StringComparer.Ordinal);
+            NetworkSort.Sort(actual);
 
             Assert.Equal(expected, actual);
         }
@@ -379,7 +409,7 @@ public class NetworkSortTests
             Array.Sort(expected, StringComparer.Ordinal);
 
             var actual = (string[])input.Clone();
-            NetworkSort.Sort(actual, StringComparer.Ordinal);
+            NetworkSort.Sort(actual);
 
             Assert.Equal(expected, actual);
         }
@@ -399,14 +429,22 @@ public class NetworkSortTests
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((float[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((double[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((char[])null!));
-        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((string[])null!, StringComparer.Ordinal));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((string[])null!));
     }
 
     [Fact]
     public void Sort_NullComparer_Throws_Generic()
     {
         var array = new string[] { "a", "b" };
-        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort(array, (IComparer<string>)null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort<string>(array, (IComparer<string>)null!));
+    }
+
+    [Fact]
+    public void Sort_NullComparer_UsesDefault_String()
+    {
+        var array = new string[] { "c", "a", "b" };
+        NetworkSort.Sort(array, (IComparer<string>?)null);
+        Assert.Equal(["a", "b", "c"], array);
     }
 
     [Fact]

@@ -38,9 +38,13 @@ NetworkSort.Sort(doubles);
 byte[] bytes = { 0xFF, 0x01, 0x80 };
 NetworkSort.Sort(bytes);
 
-// Generic Sort<T> for non-primitive types like string
+// Specialized string overload using ordinal comparison
 string[] names = { "Charlie", "Alice", "Bob" };
-NetworkSort.Sort(names, StringComparer.Ordinal);
+NetworkSort.Sort(names);
+NetworkSort.Sort(names, StringComparer.OrdinalIgnoreCase);  // custom comparer
+
+// Generic Sort<T> for other non-primitive types
+NetworkSort.Sort(myArray, myComparer);
 ```
 
 ## Design
@@ -95,10 +99,10 @@ provides a smaller benefit:
 | char | 93 ns | 94 ns | ~1x |
 | ulong | 114 ns | 101 ns | ~1.1x |
 
-### string (generic `Sort<T>` path)
+### string (specialized `Sort(string[])` path)
 
-The generic `Sort<T>(T[], IComparer<T>)` path uses the comparer-based
-network (not unrolled), which is slower than `Array.Sort` for reference types:
+The specialized `Sort(string[])` overload uses `string.CompareOrdinal` in the
+unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
@@ -138,8 +142,8 @@ python generate_unrolled.py
 
 - **SortingNetworks** -- class library (future NuGet package)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 0-64
-  across all 13 primitive types, plus string via the generic `Sort<T>`
-  overload (1,332 tests)
+  across all 13 primitive types, plus string via the specialized `Sort(string[])`
+  overload (1,466 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   `NetworkSort.Sort` vs `Array.Sort` for sizes 27 and 28 across all primitive
   types
