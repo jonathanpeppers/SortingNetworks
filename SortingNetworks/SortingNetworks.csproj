@@ -8,6 +8,11 @@
     <PackageProjectUrl>https://github.com/jonathanpeppers/SortingNetworks</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jonathanpeppers/SortingNetworks</RepositoryUrl>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
