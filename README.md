@@ -14,11 +14,21 @@ Overloads are provided for every primitive .NET type: `byte`, `sbyte`,
 ```csharp
 using SortingNetworks;
 
-int[] data = { 5, 3, 1, 4, 2 };
+// Length 27 uses a depth-13 sorting network
+int[] data = {
+    27, 26, 25, 24, 23, 22, 21, 20, 19,
+    18, 17, 16, 15, 14, 13, 12, 11, 10,
+     9,  8,  7,  6,  5,  4,  3,  2,  1,
+};
 NetworkSort.Sort(data);
 NetworkSort.Sort(data, comparer);  // IComparer<int> path
 
-Span<int> span = stackalloc int[] { 5, 3, 1, 4, 2 };
+// Length 27 uses a depth-13 sorting network
+Span<int> span = stackalloc int[] {
+    27, 26, 25, 24, 23, 22, 21, 20, 19,
+    18, 17, 16, 15, 14, 13, 12, 11, 10,
+     9,  8,  7,  6,  5,  4,  3,  2,  1,
+};
 NetworkSort.Sort(span);
 
 // Works with any primitive type

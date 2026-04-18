@@ -1,4 +1,3 @@
-using Xunit;
 using SortingNetworks;
 
 namespace SortingNetworks.Tests;
