@@ -80,6 +80,167 @@ def get_network(n):
     else:
         return generate_batcher_network(n)
 
+# --- SIMD code generation helpers ---
+
+# Step sizes from the depth-13 network for 28 channels (arXiv:2511.04107).
+# These define the number of compare-swap pairs per step in NETWORK_28_FLAT.
+NETWORK_28_STEP_SIZES = [14, 14, 14, 14, 13, 14, 11, 10, 10, 10, 12, 12, 11]
+
+def get_network28_steps():
+    """Get the 28-element network organized into its original steps."""
+    pairs = get_network28()
+    steps = []
+    idx = 0
+    for size in NETWORK_28_STEP_SIZES:
+        steps.append(pairs[idx:idx + size])
+        idx += size
+    assert idx == len(pairs), f"Step sizes don't sum to pair count: {idx} != {len(pairs)}"
+    return steps
+
+def get_network27_steps():
+    """Derive 27-element network steps from 28-element network steps."""
+    steps = []
+    for step in get_network28_steps():
+        filtered = [(a, b) for a, b in step if a < 27 and b < 27]
+        if filtered:
+            steps.append(filtered)
+    return steps
+
+def get_network_steps(n):
+    """Get the network steps for size n, preserving original step structure."""
+    if n == 28:
+        return get_network28_steps()
+    elif n == 27:
+        return get_network27_steps()
+    else:
+        raise ValueError(f"SIMD steps only supported for n=27 and n=28, got n={n}")
+
+def step_needs_cross_lane(step):
+    """Check if any pair crosses the 128-bit lane boundary (byte 0-15 vs 16-31)."""
+    for a, b in step:
+        if (a < 16) != (b < 16):
+            return True
+    return False
+
+def compute_shuffle_perm(step):
+    """Build a 32-element permutation: paired elements swap, others identity."""
+    perm = list(range(32))
+    for a, b in step:
+        perm[a] = b
+        perm[b] = a
+    return perm
+
+def compute_blend_mask(step):
+    """Build blend mask: 0xFF at 'right' (larger index) positions, 0x00 elsewhere."""
+    blend = [0] * 32
+    for a, b in step:
+        right = max(a, b)
+        blend[right] = 0xFF
+    return blend
+
+def compute_cross_lane_masks(perm):
+    """Split permutation into maskLo/maskHi for the cross-lane shuffle trick."""
+    maskLo = []
+    maskHi = []
+    for i in range(32):
+        src = perm[i]
+        if src < 16:
+            maskLo.append(src)
+            maskHi.append(0x80)
+        else:
+            maskLo.append(0x80)
+            maskHi.append(src - 16)
+    return maskLo, maskHi
+
+def compute_intra_lane_mask(perm):
+    """Convert permutation to lane-relative indices for Avx2.Shuffle."""
+    mask = list(perm)
+    for i in range(16, 32):
+        if mask[i] >= 16:
+            mask[i] -= 16
+    return mask
+
+def fmt_vec256(values):
+    """Format a Vector256.Create<byte>(...) call."""
+    parts = ", ".join(f"0x{v:02X}" for v in values)
+    return f"Vector256.Create((byte){parts})"
+
+def generate_simd_sort_method(n, steps):
+    """Generate a SortSimdN method for byte using AVX2."""
+    lines = []
+    lines.append(f"    private static void SortSimd{n}(Span<byte> span)")
+    lines.append(f"    {{")
+    lines.append(f"        Span<byte> buffer = stackalloc byte[32];")
+    lines.append(f"        span.CopyTo(buffer);")
+    lines.append(f"")
+    lines.append(f"        ref byte bufRef = ref MemoryMarshal.GetReference(buffer);")
+    lines.append(f"        var vec = Unsafe.ReadUnaligned<Vector256<byte>>(ref bufRef);")
+
+    for si, step in enumerate(steps):
+        perm = compute_shuffle_perm(step)
+        blend = compute_blend_mask(step)
+        cross = step_needs_cross_lane(step)
+
+        pair_str = ", ".join(f"({a},{b})" for a, b in step)
+        lines.append(f"")
+        lines.append(f"        // Step {si}: {pair_str}")
+
+        if cross:
+            maskLo, maskHi = compute_cross_lane_masks(perm)
+            lines.append(f"        {{")
+            lines.append(f"            var loLo = Avx2.Permute2x128(vec, vec, 0x00);")
+            lines.append(f"            var hiHi = Avx2.Permute2x128(vec, vec, 0x11);")
+            lines.append(f"            var fromLo = Avx2.Shuffle(loLo, {fmt_vec256(maskLo)});")
+            lines.append(f"            var fromHi = Avx2.Shuffle(hiHi, {fmt_vec256(maskHi)});")
+            lines.append(f"            var shuffled = Avx2.Or(fromLo, fromHi);")
+            lines.append(f"            var mins = Avx2.Min(vec, shuffled);")
+            lines.append(f"            var maxs = Avx2.Max(vec, shuffled);")
+            lines.append(f"            vec = Avx2.BlendVariable(mins, maxs, {fmt_vec256(blend)});")
+            lines.append(f"        }}")
+        else:
+            mask = compute_intra_lane_mask(perm)
+            lines.append(f"        {{")
+            lines.append(f"            var shuffled = Avx2.Shuffle(vec, {fmt_vec256(mask)});")
+            lines.append(f"            var mins = Avx2.Min(vec, shuffled);")
+            lines.append(f"            var maxs = Avx2.Max(vec, shuffled);")
+            lines.append(f"            vec = Avx2.BlendVariable(mins, maxs, {fmt_vec256(blend)});")
+            lines.append(f"        }}")
+
+    lines.append(f"")
+    lines.append(f"        Unsafe.WriteUnaligned(ref bufRef, vec);")
+    lines.append(f"        buffer.Slice(0, {n}).CopyTo(span);")
+    lines.append(f"    }}")
+    return "\n".join(lines)
+
+def generate_simd_file():
+    """Generate NetworkSort.Simd.cs with AVX2 byte sorting methods."""
+    lines = []
+    lines.append("using System.Runtime.CompilerServices;")
+    lines.append("using System.Runtime.InteropServices;")
+    lines.append("using System.Runtime.Intrinsics;")
+    lines.append("using System.Runtime.Intrinsics.X86;")
+    lines.append("")
+    lines.append("namespace SortingNetworks;")
+    lines.append("")
+    lines.append("// <auto-generated>")
+    lines.append("// This file was generated by generate_unrolled.py")
+    lines.append("// Do not edit manually.")
+    lines.append("// </auto-generated>")
+    lines.append("")
+    lines.append("public static partial class NetworkSort")
+    lines.append("{")
+
+    for n in [27, 28]:
+        pairs = get_network(n)
+        steps = get_network_steps(n)
+        if n == 28:
+            lines.append("")
+        lines.append(generate_simd_sort_method(n, steps))
+
+    lines.append("}")
+    lines.append("")
+    return "\n".join(lines)
+
 # --- Code generation ---
 
 def generate_unrolled_method(n, pairs, type_name):
@@ -112,6 +273,16 @@ def generate_public_api(type_name):
     lines.append(f"        int n = span.Length;")
     lines.append(f"        if (n == 27 || n == 28)")
     lines.append(f"        {{")
+    if type_name == "byte":
+        lines.append(f"            if (Avx2.IsSupported)")
+        lines.append(f"            {{")
+        lines.append(f"                if (n == 27)")
+        lines.append(f"                    SortSimd27(span);")
+        lines.append(f"                else")
+        lines.append(f"                    SortSimd28(span);")
+        lines.append(f"                return;")
+        lines.append(f"            }}")
+        lines.append(f"")
     lines.append(f"            ref {type_name} first = ref MemoryMarshal.GetReference(span);")
     lines.append(f"            if (n == 27)")
     lines.append(f"                Sort27(ref first);")
@@ -185,6 +356,7 @@ def generate_api_file():
     lines = []
     lines.append("using System.Runtime.CompilerServices;")
     lines.append("using System.Runtime.InteropServices;")
+    lines.append("using System.Runtime.Intrinsics.X86;")
     lines.append("")
     lines.append("namespace SortingNetworks;")
     lines.append("")
@@ -282,8 +454,15 @@ if __name__ == "__main__":
         f.write(unrolled_output)
     print(f"Generated {unrolled_path}")
 
+    simd_path = os.path.join(base_dir, "NetworkSort.Simd.cs")
+    simd_output = generate_simd_file()
+    with open(simd_path, "w", encoding="utf-8") as f:
+        f.write(simd_output)
+    print(f"Generated {simd_path}")
+
     # Print stats
     for n in [27, 28]:
         pairs = get_network(n)
-        print(f"  Sort{n}: {len(pairs)} compare-swaps")
+        steps = get_network_steps(n)
+        print(f"  Sort{n}: {len(pairs)} compare-swaps, {len(steps)} SIMD steps")
     print(f"  Types: {', '.join(PRIMITIVE_TYPES)}")
