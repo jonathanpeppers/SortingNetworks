@@ -13,44 +13,60 @@ public static partial class NetworkSort
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort2<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort3<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
         if (e1.CompareTo(e2) > 0) { T temp = e1; e1 = e2; e2 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort4<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
         if (e1.CompareTo(e3) > 0) { T temp = e1; e1 = e3; e3 = temp; }
         if (e1.CompareTo(e2) > 0) { T temp = e1; e1 = e2; e2 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort5<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -60,17 +76,24 @@ public static partial class NetworkSort
         if (e2.CompareTo(e4) > 0) { T temp = e2; e2 = e4; e4 = temp; }
         if (e1.CompareTo(e2) > 0) { T temp = e1; e1 = e2; e2 = temp; }
         if (e3.CompareTo(e4) > 0) { T temp = e3; e3 = e4; e4 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort6<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -83,18 +106,26 @@ public static partial class NetworkSort
         if (e3.CompareTo(e5) > 0) { T temp = e3; e3 = e5; e5 = temp; }
         if (e1.CompareTo(e2) > 0) { T temp = e1; e1 = e2; e2 = temp; }
         if (e3.CompareTo(e4) > 0) { T temp = e3; e3 = e4; e4 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort7<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -111,19 +142,28 @@ public static partial class NetworkSort
         if (e1.CompareTo(e2) > 0) { T temp = e1; e1 = e2; e2 = temp; }
         if (e3.CompareTo(e4) > 0) { T temp = e3; e3 = e4; e4 = temp; }
         if (e5.CompareTo(e6) > 0) { T temp = e5; e5 = e6; e6 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort8<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -143,20 +183,29 @@ public static partial class NetworkSort
         if (e1.CompareTo(e2) > 0) { T temp = e1; e1 = e2; e2 = temp; }
         if (e3.CompareTo(e4) > 0) { T temp = e3; e3 = e4; e4 = temp; }
         if (e5.CompareTo(e6) > 0) { T temp = e5; e5 = e6; e6 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort9<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -185,21 +234,31 @@ public static partial class NetworkSort
         if (e3.CompareTo(e4) > 0) { T temp = e3; e3 = e4; e4 = temp; }
         if (e5.CompareTo(e6) > 0) { T temp = e5; e5 = e6; e6 = temp; }
         if (e7.CompareTo(e8) > 0) { T temp = e7; e7 = e8; e8 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort10<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -232,22 +291,33 @@ public static partial class NetworkSort
         if (e3.CompareTo(e4) > 0) { T temp = e3; e3 = e4; e4 = temp; }
         if (e5.CompareTo(e6) > 0) { T temp = e5; e5 = e6; e6 = temp; }
         if (e7.CompareTo(e8) > 0) { T temp = e7; e7 = e8; e8 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort11<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -286,23 +356,35 @@ public static partial class NetworkSort
         if (e5.CompareTo(e6) > 0) { T temp = e5; e5 = e6; e6 = temp; }
         if (e7.CompareTo(e8) > 0) { T temp = e7; e7 = e8; e8 = temp; }
         if (e9.CompareTo(e10) > 0) { T temp = e9; e9 = e10; e10 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort12<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -345,24 +427,37 @@ public static partial class NetworkSort
         if (e5.CompareTo(e6) > 0) { T temp = e5; e5 = e6; e6 = temp; }
         if (e7.CompareTo(e8) > 0) { T temp = e7; e7 = e8; e8 = temp; }
         if (e9.CompareTo(e10) > 0) { T temp = e9; e9 = e10; e10 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort13<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -411,25 +506,39 @@ public static partial class NetworkSort
         if (e7.CompareTo(e8) > 0) { T temp = e7; e7 = e8; e8 = temp; }
         if (e9.CompareTo(e10) > 0) { T temp = e9; e9 = e10; e10 = temp; }
         if (e11.CompareTo(e12) > 0) { T temp = e11; e11 = e12; e12 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort14<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -483,26 +592,41 @@ public static partial class NetworkSort
         if (e7.CompareTo(e8) > 0) { T temp = e7; e7 = e8; e8 = temp; }
         if (e9.CompareTo(e10) > 0) { T temp = e9; e9 = e10; e10 = temp; }
         if (e11.CompareTo(e12) > 0) { T temp = e11; e11 = e12; e12 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort15<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -562,27 +686,43 @@ public static partial class NetworkSort
         if (e9.CompareTo(e10) > 0) { T temp = e9; e9 = e10; e10 = temp; }
         if (e11.CompareTo(e12) > 0) { T temp = e11; e11 = e12; e12 = temp; }
         if (e13.CompareTo(e14) > 0) { T temp = e13; e13 = e14; e14 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort16<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -646,28 +786,45 @@ public static partial class NetworkSort
         if (e9.CompareTo(e10) > 0) { T temp = e9; e9 = e10; e10 = temp; }
         if (e11.CompareTo(e12) > 0) { T temp = e11; e11 = e12; e12 = temp; }
         if (e13.CompareTo(e14) > 0) { T temp = e13; e13 = e14; e14 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort17<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -753,29 +910,47 @@ public static partial class NetworkSort
         if (e11.CompareTo(e12) > 0) { T temp = e11; e11 = e12; e12 = temp; }
         if (e13.CompareTo(e14) > 0) { T temp = e13; e13 = e14; e14 = temp; }
         if (e15.CompareTo(e16) > 0) { T temp = e15; e15 = e16; e16 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort18<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -866,30 +1041,49 @@ public static partial class NetworkSort
         if (e11.CompareTo(e12) > 0) { T temp = e11; e11 = e12; e12 = temp; }
         if (e13.CompareTo(e14) > 0) { T temp = e13; e13 = e14; e14 = temp; }
         if (e15.CompareTo(e16) > 0) { T temp = e15; e15 = e16; e16 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort19<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -988,31 +1182,51 @@ public static partial class NetworkSort
         if (e13.CompareTo(e14) > 0) { T temp = e13; e13 = e14; e14 = temp; }
         if (e15.CompareTo(e16) > 0) { T temp = e15; e15 = e16; e16 = temp; }
         if (e17.CompareTo(e18) > 0) { T temp = e17; e17 = e18; e18 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort20<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -1116,32 +1330,53 @@ public static partial class NetworkSort
         if (e13.CompareTo(e14) > 0) { T temp = e13; e13 = e14; e14 = temp; }
         if (e15.CompareTo(e16) > 0) { T temp = e15; e15 = e16; e16 = temp; }
         if (e17.CompareTo(e18) > 0) { T temp = e17; e17 = e18; e18 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort21<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -1254,33 +1489,55 @@ public static partial class NetworkSort
         if (e15.CompareTo(e16) > 0) { T temp = e15; e15 = e16; e16 = temp; }
         if (e17.CompareTo(e18) > 0) { T temp = e17; e17 = e18; e18 = temp; }
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort22<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -1400,34 +1657,57 @@ public static partial class NetworkSort
         if (e15.CompareTo(e16) > 0) { T temp = e15; e15 = e16; e16 = temp; }
         if (e17.CompareTo(e18) > 0) { T temp = e17; e17 = e18; e18 = temp; }
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort23<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
-        ref T e22 = ref Unsafe.Add(ref first, 22);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+        T e22 = Unsafe.Add(ref first, 22);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -1555,35 +1835,59 @@ public static partial class NetworkSort
         if (e17.CompareTo(e18) > 0) { T temp = e17; e17 = e18; e18 = temp; }
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
         if (e21.CompareTo(e22) > 0) { T temp = e21; e21 = e22; e22 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort24<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
-        ref T e22 = ref Unsafe.Add(ref first, 22);
-        ref T e23 = ref Unsafe.Add(ref first, 23);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+        T e22 = Unsafe.Add(ref first, 22);
+        T e23 = Unsafe.Add(ref first, 23);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -1716,36 +2020,61 @@ public static partial class NetworkSort
         if (e17.CompareTo(e18) > 0) { T temp = e17; e17 = e18; e18 = temp; }
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
         if (e21.CompareTo(e22) > 0) { T temp = e21; e21 = e22; e22 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort25<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
-        ref T e22 = ref Unsafe.Add(ref first, 22);
-        ref T e23 = ref Unsafe.Add(ref first, 23);
-        ref T e24 = ref Unsafe.Add(ref first, 24);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+        T e22 = Unsafe.Add(ref first, 22);
+        T e23 = Unsafe.Add(ref first, 23);
+        T e24 = Unsafe.Add(ref first, 24);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -1886,37 +2215,63 @@ public static partial class NetworkSort
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
         if (e21.CompareTo(e22) > 0) { T temp = e21; e21 = e22; e22 = temp; }
         if (e23.CompareTo(e24) > 0) { T temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort26<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
-        ref T e22 = ref Unsafe.Add(ref first, 22);
-        ref T e23 = ref Unsafe.Add(ref first, 23);
-        ref T e24 = ref Unsafe.Add(ref first, 24);
-        ref T e25 = ref Unsafe.Add(ref first, 25);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+        T e22 = Unsafe.Add(ref first, 22);
+        T e23 = Unsafe.Add(ref first, 23);
+        T e24 = Unsafe.Add(ref first, 24);
+        T e25 = Unsafe.Add(ref first, 25);
+
         if (e0.CompareTo(e1) > 0) { T temp = e0; e0 = e1; e1 = temp; }
         if (e2.CompareTo(e3) > 0) { T temp = e2; e2 = e3; e3 = temp; }
         if (e0.CompareTo(e2) > 0) { T temp = e0; e0 = e2; e2 = temp; }
@@ -2064,38 +2419,65 @@ public static partial class NetworkSort
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
         if (e21.CompareTo(e22) > 0) { T temp = e21; e21 = e22; e22 = temp; }
         if (e23.CompareTo(e24) > 0) { T temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort27<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
-        ref T e22 = ref Unsafe.Add(ref first, 22);
-        ref T e23 = ref Unsafe.Add(ref first, 23);
-        ref T e24 = ref Unsafe.Add(ref first, 24);
-        ref T e25 = ref Unsafe.Add(ref first, 25);
-        ref T e26 = ref Unsafe.Add(ref first, 26);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+        T e22 = Unsafe.Add(ref first, 22);
+        T e23 = Unsafe.Add(ref first, 23);
+        T e24 = Unsafe.Add(ref first, 24);
+        T e25 = Unsafe.Add(ref first, 25);
+        T e26 = Unsafe.Add(ref first, 26);
+
         if (e1.CompareTo(e26) > 0) { T temp = e1; e1 = e26; e26 = temp; }
         if (e2.CompareTo(e25) > 0) { T temp = e2; e2 = e25; e25 = temp; }
         if (e3.CompareTo(e24) > 0) { T temp = e3; e3 = e24; e24 = temp; }
@@ -2250,39 +2632,67 @@ public static partial class NetworkSort
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
         if (e21.CompareTo(e22) > 0) { T temp = e21; e21 = e22; e22 = temp; }
         if (e23.CompareTo(e24) > 0) { T temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Sort28<T>(ref T first) where T : IComparable<T>
     {
-        ref T e0 = ref first;
-        ref T e1 = ref Unsafe.Add(ref first, 1);
-        ref T e2 = ref Unsafe.Add(ref first, 2);
-        ref T e3 = ref Unsafe.Add(ref first, 3);
-        ref T e4 = ref Unsafe.Add(ref first, 4);
-        ref T e5 = ref Unsafe.Add(ref first, 5);
-        ref T e6 = ref Unsafe.Add(ref first, 6);
-        ref T e7 = ref Unsafe.Add(ref first, 7);
-        ref T e8 = ref Unsafe.Add(ref first, 8);
-        ref T e9 = ref Unsafe.Add(ref first, 9);
-        ref T e10 = ref Unsafe.Add(ref first, 10);
-        ref T e11 = ref Unsafe.Add(ref first, 11);
-        ref T e12 = ref Unsafe.Add(ref first, 12);
-        ref T e13 = ref Unsafe.Add(ref first, 13);
-        ref T e14 = ref Unsafe.Add(ref first, 14);
-        ref T e15 = ref Unsafe.Add(ref first, 15);
-        ref T e16 = ref Unsafe.Add(ref first, 16);
-        ref T e17 = ref Unsafe.Add(ref first, 17);
-        ref T e18 = ref Unsafe.Add(ref first, 18);
-        ref T e19 = ref Unsafe.Add(ref first, 19);
-        ref T e20 = ref Unsafe.Add(ref first, 20);
-        ref T e21 = ref Unsafe.Add(ref first, 21);
-        ref T e22 = ref Unsafe.Add(ref first, 22);
-        ref T e23 = ref Unsafe.Add(ref first, 23);
-        ref T e24 = ref Unsafe.Add(ref first, 24);
-        ref T e25 = ref Unsafe.Add(ref first, 25);
-        ref T e26 = ref Unsafe.Add(ref first, 26);
-        ref T e27 = ref Unsafe.Add(ref first, 27);
+        T e0 = first;
+        T e1 = Unsafe.Add(ref first, 1);
+        T e2 = Unsafe.Add(ref first, 2);
+        T e3 = Unsafe.Add(ref first, 3);
+        T e4 = Unsafe.Add(ref first, 4);
+        T e5 = Unsafe.Add(ref first, 5);
+        T e6 = Unsafe.Add(ref first, 6);
+        T e7 = Unsafe.Add(ref first, 7);
+        T e8 = Unsafe.Add(ref first, 8);
+        T e9 = Unsafe.Add(ref first, 9);
+        T e10 = Unsafe.Add(ref first, 10);
+        T e11 = Unsafe.Add(ref first, 11);
+        T e12 = Unsafe.Add(ref first, 12);
+        T e13 = Unsafe.Add(ref first, 13);
+        T e14 = Unsafe.Add(ref first, 14);
+        T e15 = Unsafe.Add(ref first, 15);
+        T e16 = Unsafe.Add(ref first, 16);
+        T e17 = Unsafe.Add(ref first, 17);
+        T e18 = Unsafe.Add(ref first, 18);
+        T e19 = Unsafe.Add(ref first, 19);
+        T e20 = Unsafe.Add(ref first, 20);
+        T e21 = Unsafe.Add(ref first, 21);
+        T e22 = Unsafe.Add(ref first, 22);
+        T e23 = Unsafe.Add(ref first, 23);
+        T e24 = Unsafe.Add(ref first, 24);
+        T e25 = Unsafe.Add(ref first, 25);
+        T e26 = Unsafe.Add(ref first, 26);
+        T e27 = Unsafe.Add(ref first, 27);
+
         if (e0.CompareTo(e27) > 0) { T temp = e0; e0 = e27; e27 = temp; }
         if (e1.CompareTo(e26) > 0) { T temp = e1; e1 = e26; e26 = temp; }
         if (e2.CompareTo(e25) > 0) { T temp = e2; e2 = e25; e25 = temp; }
@@ -2442,5 +2852,34 @@ public static partial class NetworkSort
         if (e19.CompareTo(e20) > 0) { T temp = e19; e19 = e20; e20 = temp; }
         if (e21.CompareTo(e22) > 0) { T temp = e21; e21 = e22; e22 = temp; }
         if (e23.CompareTo(e24) > 0) { T temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
     }
 }
