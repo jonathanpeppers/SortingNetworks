@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Pack
+        run: dotnet pack -bl:pack.binlog
+
+      - name: Test
+        run: dotnet test --no-build
+
+      - name: Benchmarks
+        run: |
+          dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*'
+          cat BenchmarkDotNet.Artifacts/results/*-report-github.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: packages
+          path: |
+            **/*.nupkg
+            **/*.binlog
