@@ -12,22 +12,16 @@ namespace SortingNetworks;
 public static partial class NetworkSort
 {
     /// <summary>
-    /// Sorts the elements of a span using a sorting network when possible.
+    /// Sorts a span of int using a sorting network when possible.
     /// </summary>
-    public static void Sort<T>(Span<T> span) where T : IComparable<T>
+    public static void Sort(Span<int> span)
     {
         int n = span.Length;
         if (n <= 1) return;
 
         if (n <= NetworkData.MaxNetworkSize)
         {
-            ref T first = ref MemoryMarshal.GetReference(span);
-
-            // For larger networks, an O(n) sorted check avoids running
-            // all comparators on already-sorted input.
-            if (n >= 9 && IsSorted(ref first, n))
-                return;
-
+            ref int first = ref MemoryMarshal.GetReference(span);
             switch (n)
             {
                 case 2: Sort2(ref first); return;
@@ -64,12 +58,18 @@ public static partial class NetworkSort
     }
 
     /// <summary>
-    /// Sorts the elements of a span using a sorting network when possible,
+    /// Sorts an array of int using a sorting network when possible.
+    /// </summary>
+    public static void Sort(int[] array)
+        => Sort(array.AsSpan());
+
+    /// <summary>
+    /// Sorts a span of int using a sorting network when possible,
     /// with a custom comparer.
     /// </summary>
-    public static void Sort<T>(Span<T> span, IComparer<T>? comparer)
+    public static void Sort(Span<int> span, IComparer<int>? comparer)
     {
-        comparer ??= Comparer<T>.Default;
+        comparer ??= Comparer<int>.Default;
         int n = span.Length;
         if (n <= 1) return;
 
@@ -83,102 +83,26 @@ public static partial class NetworkSort
     }
 
     /// <summary>
-    /// Sorts an array using a sorting network when possible.
-    /// </summary>
-    public static void Sort<T>(T[] array) where T : IComparable<T>
-        => Sort(array.AsSpan());
-
-    /// <summary>
-    /// Sorts an array using a sorting network when possible,
+    /// Sorts an array of int using a sorting network when possible,
     /// with a custom comparer.
     /// </summary>
-    public static void Sort<T>(T[] array, IComparer<T>? comparer)
+    public static void Sort(int[] array, IComparer<int>? comparer)
         => Sort(array.AsSpan(), comparer);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void ApplyNetwork<T>(Span<T> span, int[] network) where T : IComparable<T>
+    private static void ApplyNetworkWithComparer(Span<int> span, int[] network, IComparer<int> comparer)
     {
-        ref T first = ref MemoryMarshal.GetReference(span);
+        ref int first = ref MemoryMarshal.GetReference(span);
         for (int i = 0; i < network.Length; i += 2)
         {
-            ref T a = ref Unsafe.Add(ref first, network[i]);
-            ref T b = ref Unsafe.Add(ref first, network[i + 1]);
-            if (a.CompareTo(b) > 0)
-            {
-                T temp = a;
-                a = b;
-                b = temp;
-            }
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void ApplyNetworkWithComparer<T>(Span<T> span, int[] network, IComparer<T> comparer)
-    {
-        ref T first = ref MemoryMarshal.GetReference(span);
-        for (int i = 0; i < network.Length; i += 2)
-        {
-            ref T a = ref Unsafe.Add(ref first, network[i]);
-            ref T b = ref Unsafe.Add(ref first, network[i + 1]);
+            ref int a = ref Unsafe.Add(ref first, network[i]);
+            ref int b = ref Unsafe.Add(ref first, network[i + 1]);
             if (comparer.Compare(a, b) > 0)
             {
-                T temp = a;
+                int temp = a;
                 a = b;
                 b = temp;
             }
         }
-    }
-
-    /// <summary>
-    /// Fast comparison that bypasses CompareTo for primitive types.
-    /// The JIT constant-folds typeof checks and eliminates boxing,
-    /// compiling to a single comparison instruction for primitives.
-    /// Same pattern used by the BCL in ArraySortHelper.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool GreaterThan<T>(T left, T right) where T : IComparable<T>
-    {
-        if (typeof(T) == typeof(byte)) return (byte)(object)left! > (byte)(object)right!;
-        if (typeof(T) == typeof(sbyte)) return (sbyte)(object)left! > (sbyte)(object)right!;
-        if (typeof(T) == typeof(ushort)) return (ushort)(object)left! > (ushort)(object)right!;
-        if (typeof(T) == typeof(short)) return (short)(object)left! > (short)(object)right!;
-        if (typeof(T) == typeof(uint)) return (uint)(object)left! > (uint)(object)right!;
-        if (typeof(T) == typeof(int)) return (int)(object)left! > (int)(object)right!;
-        if (typeof(T) == typeof(ulong)) return (ulong)(object)left! > (ulong)(object)right!;
-        if (typeof(T) == typeof(long)) return (long)(object)left! > (long)(object)right!;
-        if (typeof(T) == typeof(nuint)) return (nuint)(object)left! > (nuint)(object)right!;
-        if (typeof(T) == typeof(nint)) return (nint)(object)left! > (nint)(object)right!;
-        if (typeof(T) == typeof(float)) return (float)(object)left! > (float)(object)right!;
-        if (typeof(T) == typeof(double)) return (double)(object)left! > (double)(object)right!;
-        return left.CompareTo(right) > 0;
-    }
-
-    /// <summary>
-    /// Compare-and-swap two elements in-place using their offsets from a base reference.
-    /// Used by larger sorting networks (17+ elements) to avoid loading all
-    /// values into locals, which causes register spills at those sizes.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void SwapIfGreater<T>(ref T first, int i, int j) where T : IComparable<T>
-    {
-        ref T a = ref Unsafe.Add(ref first, i);
-        ref T b = ref Unsafe.Add(ref first, j);
-        if (GreaterThan(a, b))
-        {
-            T temp = a;
-            a = b;
-            b = temp;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsSorted<T>(ref T first, int n) where T : IComparable<T>
-    {
-        for (int i = 0; i < n - 1; i++)
-        {
-            if (GreaterThan(Unsafe.Add(ref first, i), Unsafe.Add(ref first, i + 1)))
-                return false;
-        }
-        return true;
     }
 }

@@ -11,27 +11,27 @@ namespace SortingNetworks;
 public static partial class NetworkSort
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort2<T>(ref T first) where T : IComparable<T>
+    private static void Sort2(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort3<T>(ref T first) where T : IComparable<T>
+    private static void Sort3(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -39,18 +39,18 @@ public static partial class NetworkSort
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort4<T>(ref T first) where T : IComparable<T>
+    private static void Sort4(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -59,23 +59,23 @@ public static partial class NetworkSort
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort5<T>(ref T first) where T : IComparable<T>
+    private static void Sort5(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -85,27 +85,27 @@ public static partial class NetworkSort
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort6<T>(ref T first) where T : IComparable<T>
+    private static void Sort6(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -116,32 +116,32 @@ public static partial class NetworkSort
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort7<T>(ref T first) where T : IComparable<T>
+    private static void Sort7(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -153,36 +153,36 @@ public static partial class NetworkSort
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sort8<T>(ref T first) where T : IComparable<T>
+    private static void Sort8(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -194,46 +194,46 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 7) = e7;
     }
 
-    private static void Sort9<T>(ref T first) where T : IComparable<T>
+    private static void Sort9(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -246,51 +246,51 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 8) = e8;
     }
 
-    private static void Sort10<T>(ref T first) where T : IComparable<T>
+    private static void Sort10(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -304,58 +304,58 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 9) = e9;
     }
 
-    private static void Sort11<T>(ref T first) where T : IComparable<T>
+    private static void Sort11(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
-        T e10 = Unsafe.Add(ref first, 10);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e8, e10)) { T temp = e8; e8 = e10; e10 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e10)) { T temp = e2; e2 = e10; e10 = temp; }
-        if (GreaterThan(e6, e10)) { T temp = e6; e6 = e10; e10 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -370,63 +370,63 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 10) = e10;
     }
 
-    private static void Sort12<T>(ref T first) where T : IComparable<T>
+    private static void Sort12(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
-        T e10 = Unsafe.Add(ref first, 10);
-        T e11 = Unsafe.Add(ref first, 11);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e10, e11)) { T temp = e10; e10 = e11; e11 = temp; }
-        if (GreaterThan(e8, e10)) { T temp = e8; e8 = e10; e10 = temp; }
-        if (GreaterThan(e9, e11)) { T temp = e9; e9 = e11; e11 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e10)) { T temp = e2; e2 = e10; e10 = temp; }
-        if (GreaterThan(e6, e10)) { T temp = e6; e6 = e10; e10 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e11)) { T temp = e3; e3 = e11; e11 = temp; }
-        if (GreaterThan(e7, e11)) { T temp = e7; e7 = e11; e11 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -442,70 +442,70 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 11) = e11;
     }
 
-    private static void Sort13<T>(ref T first) where T : IComparable<T>
+    private static void Sort13(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
-        T e10 = Unsafe.Add(ref first, 10);
-        T e11 = Unsafe.Add(ref first, 11);
-        T e12 = Unsafe.Add(ref first, 12);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e10, e11)) { T temp = e10; e10 = e11; e11 = temp; }
-        if (GreaterThan(e8, e10)) { T temp = e8; e8 = e10; e10 = temp; }
-        if (GreaterThan(e9, e11)) { T temp = e9; e9 = e11; e11 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e8, e12)) { T temp = e8; e8 = e12; e12 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e12)) { T temp = e4; e4 = e12; e12 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e10)) { T temp = e2; e2 = e10; e10 = temp; }
-        if (GreaterThan(e6, e10)) { T temp = e6; e6 = e10; e10 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e11)) { T temp = e3; e3 = e11; e11 = temp; }
-        if (GreaterThan(e7, e11)) { T temp = e7; e7 = e11; e11 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -522,76 +522,76 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 12) = e12;
     }
 
-    private static void Sort14<T>(ref T first) where T : IComparable<T>
+    private static void Sort14(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
-        T e10 = Unsafe.Add(ref first, 10);
-        T e11 = Unsafe.Add(ref first, 11);
-        T e12 = Unsafe.Add(ref first, 12);
-        T e13 = Unsafe.Add(ref first, 13);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e10, e11)) { T temp = e10; e10 = e11; e11 = temp; }
-        if (GreaterThan(e8, e10)) { T temp = e8; e8 = e10; e10 = temp; }
-        if (GreaterThan(e9, e11)) { T temp = e9; e9 = e11; e11 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e12, e13)) { T temp = e12; e12 = e13; e13 = temp; }
-        if (GreaterThan(e8, e12)) { T temp = e8; e8 = e12; e12 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e9, e13)) { T temp = e9; e9 = e13; e13 = temp; }
-        if (GreaterThan(e11, e13)) { T temp = e11; e11 = e13; e13 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e12)) { T temp = e4; e4 = e12; e12 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e10)) { T temp = e2; e2 = e10; e10 = temp; }
-        if (GreaterThan(e6, e10)) { T temp = e6; e6 = e10; e10 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e13)) { T temp = e5; e5 = e13; e13 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e11)) { T temp = e3; e3 = e11; e11 = temp; }
-        if (GreaterThan(e7, e11)) { T temp = e7; e7 = e11; e11 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e11, e13)) { T temp = e11; e11 = e13; e13 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -609,83 +609,83 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 13) = e13;
     }
 
-    private static void Sort15<T>(ref T first) where T : IComparable<T>
+    private static void Sort15(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
-        T e10 = Unsafe.Add(ref first, 10);
-        T e11 = Unsafe.Add(ref first, 11);
-        T e12 = Unsafe.Add(ref first, 12);
-        T e13 = Unsafe.Add(ref first, 13);
-        T e14 = Unsafe.Add(ref first, 14);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e10, e11)) { T temp = e10; e10 = e11; e11 = temp; }
-        if (GreaterThan(e8, e10)) { T temp = e8; e8 = e10; e10 = temp; }
-        if (GreaterThan(e9, e11)) { T temp = e9; e9 = e11; e11 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e12, e13)) { T temp = e12; e12 = e13; e13 = temp; }
-        if (GreaterThan(e12, e14)) { T temp = e12; e12 = e14; e14 = temp; }
-        if (GreaterThan(e13, e14)) { T temp = e13; e13 = e14; e14 = temp; }
-        if (GreaterThan(e8, e12)) { T temp = e8; e8 = e12; e12 = temp; }
-        if (GreaterThan(e10, e14)) { T temp = e10; e10 = e14; e14 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e9, e13)) { T temp = e9; e9 = e13; e13 = temp; }
-        if (GreaterThan(e11, e13)) { T temp = e11; e11 = e13; e13 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
-        if (GreaterThan(e13, e14)) { T temp = e13; e13 = e14; e14 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e12)) { T temp = e4; e4 = e12; e12 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e10)) { T temp = e2; e2 = e10; e10 = temp; }
-        if (GreaterThan(e6, e14)) { T temp = e6; e6 = e14; e14 = temp; }
-        if (GreaterThan(e6, e10)) { T temp = e6; e6 = e10; e10 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e13)) { T temp = e5; e5 = e13; e13 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e11)) { T temp = e3; e3 = e11; e11 = temp; }
-        if (GreaterThan(e7, e11)) { T temp = e7; e7 = e11; e11 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e11, e13)) { T temp = e11; e11 = e13; e13 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
-        if (GreaterThan(e13, e14)) { T temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -704,88 +704,88 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 14) = e14;
     }
 
-    private static void Sort16<T>(ref T first) where T : IComparable<T>
+    private static void Sort16(ref int first)
     {
-        T e0 = first;
-        T e1 = Unsafe.Add(ref first, 1);
-        T e2 = Unsafe.Add(ref first, 2);
-        T e3 = Unsafe.Add(ref first, 3);
-        T e4 = Unsafe.Add(ref first, 4);
-        T e5 = Unsafe.Add(ref first, 5);
-        T e6 = Unsafe.Add(ref first, 6);
-        T e7 = Unsafe.Add(ref first, 7);
-        T e8 = Unsafe.Add(ref first, 8);
-        T e9 = Unsafe.Add(ref first, 9);
-        T e10 = Unsafe.Add(ref first, 10);
-        T e11 = Unsafe.Add(ref first, 11);
-        T e12 = Unsafe.Add(ref first, 12);
-        T e13 = Unsafe.Add(ref first, 13);
-        T e14 = Unsafe.Add(ref first, 14);
-        T e15 = Unsafe.Add(ref first, 15);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
 
-        if (GreaterThan(e0, e1)) { T temp = e0; e0 = e1; e1 = temp; }
-        if (GreaterThan(e2, e3)) { T temp = e2; e2 = e3; e3 = temp; }
-        if (GreaterThan(e0, e2)) { T temp = e0; e0 = e2; e2 = temp; }
-        if (GreaterThan(e1, e3)) { T temp = e1; e1 = e3; e3 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e4, e5)) { T temp = e4; e4 = e5; e5 = temp; }
-        if (GreaterThan(e6, e7)) { T temp = e6; e6 = e7; e7 = temp; }
-        if (GreaterThan(e4, e6)) { T temp = e4; e4 = e6; e6 = temp; }
-        if (GreaterThan(e5, e7)) { T temp = e5; e5 = e7; e7 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e0, e4)) { T temp = e0; e0 = e4; e4 = temp; }
-        if (GreaterThan(e2, e6)) { T temp = e2; e2 = e6; e6 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e1, e5)) { T temp = e1; e1 = e5; e5 = temp; }
-        if (GreaterThan(e3, e7)) { T temp = e3; e3 = e7; e7 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e8, e9)) { T temp = e8; e8 = e9; e9 = temp; }
-        if (GreaterThan(e10, e11)) { T temp = e10; e10 = e11; e11 = temp; }
-        if (GreaterThan(e8, e10)) { T temp = e8; e8 = e10; e10 = temp; }
-        if (GreaterThan(e9, e11)) { T temp = e9; e9 = e11; e11 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e12, e13)) { T temp = e12; e12 = e13; e13 = temp; }
-        if (GreaterThan(e14, e15)) { T temp = e14; e14 = e15; e15 = temp; }
-        if (GreaterThan(e12, e14)) { T temp = e12; e12 = e14; e14 = temp; }
-        if (GreaterThan(e13, e15)) { T temp = e13; e13 = e15; e15 = temp; }
-        if (GreaterThan(e13, e14)) { T temp = e13; e13 = e14; e14 = temp; }
-        if (GreaterThan(e8, e12)) { T temp = e8; e8 = e12; e12 = temp; }
-        if (GreaterThan(e10, e14)) { T temp = e10; e10 = e14; e14 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e9, e13)) { T temp = e9; e9 = e13; e13 = temp; }
-        if (GreaterThan(e11, e15)) { T temp = e11; e11 = e15; e15 = temp; }
-        if (GreaterThan(e11, e13)) { T temp = e11; e11 = e13; e13 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
-        if (GreaterThan(e13, e14)) { T temp = e13; e13 = e14; e14 = temp; }
-        if (GreaterThan(e0, e8)) { T temp = e0; e0 = e8; e8 = temp; }
-        if (GreaterThan(e4, e12)) { T temp = e4; e4 = e12; e12 = temp; }
-        if (GreaterThan(e4, e8)) { T temp = e4; e4 = e8; e8 = temp; }
-        if (GreaterThan(e2, e10)) { T temp = e2; e2 = e10; e10 = temp; }
-        if (GreaterThan(e6, e14)) { T temp = e6; e6 = e14; e14 = temp; }
-        if (GreaterThan(e6, e10)) { T temp = e6; e6 = e10; e10 = temp; }
-        if (GreaterThan(e2, e4)) { T temp = e2; e2 = e4; e4 = temp; }
-        if (GreaterThan(e6, e8)) { T temp = e6; e6 = e8; e8 = temp; }
-        if (GreaterThan(e10, e12)) { T temp = e10; e10 = e12; e12 = temp; }
-        if (GreaterThan(e1, e9)) { T temp = e1; e1 = e9; e9 = temp; }
-        if (GreaterThan(e5, e13)) { T temp = e5; e5 = e13; e13 = temp; }
-        if (GreaterThan(e5, e9)) { T temp = e5; e5 = e9; e9 = temp; }
-        if (GreaterThan(e3, e11)) { T temp = e3; e3 = e11; e11 = temp; }
-        if (GreaterThan(e7, e15)) { T temp = e7; e7 = e15; e15 = temp; }
-        if (GreaterThan(e7, e11)) { T temp = e7; e7 = e11; e11 = temp; }
-        if (GreaterThan(e3, e5)) { T temp = e3; e3 = e5; e5 = temp; }
-        if (GreaterThan(e7, e9)) { T temp = e7; e7 = e9; e9 = temp; }
-        if (GreaterThan(e11, e13)) { T temp = e11; e11 = e13; e13 = temp; }
-        if (GreaterThan(e1, e2)) { T temp = e1; e1 = e2; e2 = temp; }
-        if (GreaterThan(e3, e4)) { T temp = e3; e3 = e4; e4 = temp; }
-        if (GreaterThan(e5, e6)) { T temp = e5; e5 = e6; e6 = temp; }
-        if (GreaterThan(e7, e8)) { T temp = e7; e7 = e8; e8 = temp; }
-        if (GreaterThan(e9, e10)) { T temp = e9; e9 = e10; e10 = temp; }
-        if (GreaterThan(e11, e12)) { T temp = e11; e11 = e12; e12 = temp; }
-        if (GreaterThan(e13, e14)) { T temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
 
         first = e0;
         Unsafe.Add(ref first, 1) = e1;
@@ -805,1517 +805,2081 @@ public static partial class NetworkSort
         Unsafe.Add(ref first, 15) = e15;
     }
 
-    private static void Sort17<T>(ref T first) where T : IComparable<T>
+    private static void Sort17(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
     }
 
-    private static void Sort18<T>(ref T first) where T : IComparable<T>
+    private static void Sort18(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
     }
 
-    private static void Sort19<T>(ref T first) where T : IComparable<T>
+    private static void Sort19(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
     }
 
-    private static void Sort20<T>(ref T first) where T : IComparable<T>
+    private static void Sort20(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
     }
 
-    private static void Sort21<T>(ref T first) where T : IComparable<T>
+    private static void Sort21(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 20);
-        SwapIfGreater(ref first, 12, 20);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e20) { int temp = e4; e4 = e20; e20 = temp; }
+        if (e12 > e20) { int temp = e12; e12 = e20; e20 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
     }
 
-    private static void Sort22<T>(ref T first) where T : IComparable<T>
+    private static void Sort22(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 20);
-        SwapIfGreater(ref first, 12, 20);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 21);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e20) { int temp = e4; e4 = e20; e20 = temp; }
+        if (e12 > e20) { int temp = e12; e12 = e20; e20 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e21) { int temp = e5; e5 = e21; e21 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
     }
 
-    private static void Sort23<T>(ref T first) where T : IComparable<T>
+    private static void Sort23(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 18, 22);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 20);
-        SwapIfGreater(ref first, 12, 20);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 22);
-        SwapIfGreater(ref first, 14, 22);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 21);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+        int e22 = Unsafe.Add(ref first, 22);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e18 > e22) { int temp = e18; e18 = e22; e22 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e20) { int temp = e4; e4 = e20; e20 = temp; }
+        if (e12 > e20) { int temp = e12; e12 = e20; e20 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e22) { int temp = e6; e6 = e22; e22 = temp; }
+        if (e14 > e22) { int temp = e14; e14 = e22; e22 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e21) { int temp = e5; e5 = e21; e21 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
     }
 
-    private static void Sort24<T>(ref T first) where T : IComparable<T>
+    private static void Sort24(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 18, 22);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 20);
-        SwapIfGreater(ref first, 12, 20);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 22);
-        SwapIfGreater(ref first, 14, 22);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 21);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 23);
-        SwapIfGreater(ref first, 15, 23);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+        int e22 = Unsafe.Add(ref first, 22);
+        int e23 = Unsafe.Add(ref first, 23);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e18 > e22) { int temp = e18; e18 = e22; e22 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e20) { int temp = e4; e4 = e20; e20 = temp; }
+        if (e12 > e20) { int temp = e12; e12 = e20; e20 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e22) { int temp = e6; e6 = e22; e22 = temp; }
+        if (e14 > e22) { int temp = e14; e14 = e22; e22 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e21) { int temp = e5; e5 = e21; e21 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e23) { int temp = e7; e7 = e23; e23 = temp; }
+        if (e15 > e23) { int temp = e15; e15 = e23; e23 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
     }
 
-    private static void Sort25<T>(ref T first) where T : IComparable<T>
+    private static void Sort25(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 18, 22);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 16, 24);
-        SwapIfGreater(ref first, 20, 24);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 22, 24);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 24);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 24);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 20);
-        SwapIfGreater(ref first, 12, 20);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 20, 24);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 22);
-        SwapIfGreater(ref first, 14, 22);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 22, 24);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 21);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 23);
-        SwapIfGreater(ref first, 15, 23);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 24);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+        int e22 = Unsafe.Add(ref first, 22);
+        int e23 = Unsafe.Add(ref first, 23);
+        int e24 = Unsafe.Add(ref first, 24);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e18 > e22) { int temp = e18; e18 = e22; e22 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e16 > e24) { int temp = e16; e16 = e24; e24 = temp; }
+        if (e20 > e24) { int temp = e20; e20 = e24; e24 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e22 > e24) { int temp = e22; e22 = e24; e24 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e24) { int temp = e8; e8 = e24; e24 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e20) { int temp = e4; e4 = e20; e20 = temp; }
+        if (e12 > e20) { int temp = e12; e12 = e20; e20 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e20 > e24) { int temp = e20; e20 = e24; e24 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e22) { int temp = e6; e6 = e22; e22 = temp; }
+        if (e14 > e22) { int temp = e14; e14 = e22; e22 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e22 > e24) { int temp = e22; e22 = e24; e24 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e21) { int temp = e5; e5 = e21; e21 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e23) { int temp = e7; e7 = e23; e23 = temp; }
+        if (e15 > e23) { int temp = e15; e15 = e23; e23 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
     }
 
-    private static void Sort26<T>(ref T first) where T : IComparable<T>
+    private static void Sort26(ref int first)
     {
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 3, 7);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 8, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 4, 12);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 2, 10);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 1, 9);
-        SwapIfGreater(ref first, 5, 13);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 3, 11);
-        SwapIfGreater(ref first, 7, 15);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 18, 22);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 24, 25);
-        SwapIfGreater(ref first, 16, 24);
-        SwapIfGreater(ref first, 20, 24);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 22, 24);
-        SwapIfGreater(ref first, 17, 25);
-        SwapIfGreater(ref first, 21, 25);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 23, 25);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 24);
-        SwapIfGreater(ref first, 0, 16);
-        SwapIfGreater(ref first, 8, 24);
-        SwapIfGreater(ref first, 8, 16);
-        SwapIfGreater(ref first, 4, 20);
-        SwapIfGreater(ref first, 12, 20);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 20, 24);
-        SwapIfGreater(ref first, 2, 18);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 6, 22);
-        SwapIfGreater(ref first, 14, 22);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 6, 8);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 18, 20);
-        SwapIfGreater(ref first, 22, 24);
-        SwapIfGreater(ref first, 1, 17);
-        SwapIfGreater(ref first, 9, 25);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 5, 21);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 5, 9);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 21, 25);
-        SwapIfGreater(ref first, 3, 19);
-        SwapIfGreater(ref first, 11, 19);
-        SwapIfGreater(ref first, 7, 23);
-        SwapIfGreater(ref first, 15, 23);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 15, 19);
-        SwapIfGreater(ref first, 3, 5);
-        SwapIfGreater(ref first, 7, 9);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 19, 21);
-        SwapIfGreater(ref first, 23, 25);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 24);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+        int e22 = Unsafe.Add(ref first, 22);
+        int e23 = Unsafe.Add(ref first, 23);
+        int e24 = Unsafe.Add(ref first, 24);
+        int e25 = Unsafe.Add(ref first, 25);
+
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e3 > e7) { int temp = e3; e3 = e7; e7 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e8 > e12) { int temp = e8; e8 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e4 > e12) { int temp = e4; e4 = e12; e12 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e2 > e10) { int temp = e2; e2 = e10; e10 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e1 > e9) { int temp = e1; e1 = e9; e9 = temp; }
+        if (e5 > e13) { int temp = e5; e5 = e13; e13 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e3 > e11) { int temp = e3; e3 = e11; e11 = temp; }
+        if (e7 > e15) { int temp = e7; e7 = e15; e15 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e18 > e22) { int temp = e18; e18 = e22; e22 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e25) { int temp = e24; e24 = e25; e25 = temp; }
+        if (e16 > e24) { int temp = e16; e16 = e24; e24 = temp; }
+        if (e20 > e24) { int temp = e20; e20 = e24; e24 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e22 > e24) { int temp = e22; e22 = e24; e24 = temp; }
+        if (e17 > e25) { int temp = e17; e17 = e25; e25 = temp; }
+        if (e21 > e25) { int temp = e21; e21 = e25; e25 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e23 > e25) { int temp = e23; e23 = e25; e25 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+        if (e0 > e16) { int temp = e0; e0 = e16; e16 = temp; }
+        if (e8 > e24) { int temp = e8; e8 = e24; e24 = temp; }
+        if (e8 > e16) { int temp = e8; e8 = e16; e16 = temp; }
+        if (e4 > e20) { int temp = e4; e4 = e20; e20 = temp; }
+        if (e12 > e20) { int temp = e12; e12 = e20; e20 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e20 > e24) { int temp = e20; e20 = e24; e24 = temp; }
+        if (e2 > e18) { int temp = e2; e2 = e18; e18 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e6 > e22) { int temp = e6; e6 = e22; e22 = temp; }
+        if (e14 > e22) { int temp = e14; e14 = e22; e22 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e6 > e8) { int temp = e6; e6 = e8; e8 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e18 > e20) { int temp = e18; e18 = e20; e20 = temp; }
+        if (e22 > e24) { int temp = e22; e22 = e24; e24 = temp; }
+        if (e1 > e17) { int temp = e1; e1 = e17; e17 = temp; }
+        if (e9 > e25) { int temp = e9; e9 = e25; e25 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e5 > e21) { int temp = e5; e5 = e21; e21 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e5 > e9) { int temp = e5; e5 = e9; e9 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e21 > e25) { int temp = e21; e21 = e25; e25 = temp; }
+        if (e3 > e19) { int temp = e3; e3 = e19; e19 = temp; }
+        if (e11 > e19) { int temp = e11; e11 = e19; e19 = temp; }
+        if (e7 > e23) { int temp = e7; e7 = e23; e23 = temp; }
+        if (e15 > e23) { int temp = e15; e15 = e23; e23 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e15 > e19) { int temp = e15; e15 = e19; e19 = temp; }
+        if (e3 > e5) { int temp = e3; e3 = e5; e5 = temp; }
+        if (e7 > e9) { int temp = e7; e7 = e9; e9 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e19 > e21) { int temp = e19; e19 = e21; e21 = temp; }
+        if (e23 > e25) { int temp = e23; e23 = e25; e25 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
     }
 
-    private static void Sort27<T>(ref T first) where T : IComparable<T>
+    private static void Sort27(ref int first)
     {
-        SwapIfGreater(ref first, 1, 26);
-        SwapIfGreater(ref first, 2, 25);
-        SwapIfGreater(ref first, 3, 24);
-        SwapIfGreater(ref first, 4, 23);
-        SwapIfGreater(ref first, 5, 22);
-        SwapIfGreater(ref first, 6, 21);
-        SwapIfGreater(ref first, 7, 20);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 12, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 24, 25);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 8, 19);
-        SwapIfGreater(ref first, 9, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 11, 16);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 15, 18);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 24, 26);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 2, 20);
-        SwapIfGreater(ref first, 3, 21);
-        SwapIfGreater(ref first, 6, 24);
-        SwapIfGreater(ref first, 7, 25);
-        SwapIfGreater(ref first, 8, 13);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 10, 17);
-        SwapIfGreater(ref first, 12, 15);
-        SwapIfGreater(ref first, 14, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 22, 26);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 24);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 22);
-        SwapIfGreater(ref first, 7, 20);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 25, 26);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 1, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 3, 9);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 24);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 25);
-        SwapIfGreater(ref first, 23, 26);
-        SwapIfGreater(ref first, 1, 10);
-        SwapIfGreater(ref first, 2, 13);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 5, 12);
-        SwapIfGreater(ref first, 6, 9);
-        SwapIfGreater(ref first, 7, 20);
-        SwapIfGreater(ref first, 14, 25);
-        SwapIfGreater(ref first, 15, 22);
-        SwapIfGreater(ref first, 17, 26);
-        SwapIfGreater(ref first, 18, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 8, 15);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 12, 19);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 23, 24);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 25);
-        SwapIfGreater(ref first, 2, 7);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 20, 25);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 4, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 11, 16);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 20, 23);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 24, 26);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 12);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 15, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 24, 25);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 24);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+        int e22 = Unsafe.Add(ref first, 22);
+        int e23 = Unsafe.Add(ref first, 23);
+        int e24 = Unsafe.Add(ref first, 24);
+        int e25 = Unsafe.Add(ref first, 25);
+        int e26 = Unsafe.Add(ref first, 26);
+
+        if (e1 > e26) { int temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { int temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { int temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { int temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { int temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { int temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { int temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { int temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { int temp = e24; e24 = e25; e25 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { int temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { int temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { int temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { int temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { int temp = e24; e24 = e26; e26 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { int temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { int temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { int temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { int temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { int temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { int temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { int temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { int temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { int temp = e22; e22 = e26; e26 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { int temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { int temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { int temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { int temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { int temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { int temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { int temp = e18; e18 = e24; e24 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { int temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { int temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { int temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { int temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { int temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { int temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { int temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { int temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { int temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { int temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { int temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { int temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { int temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { int temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { int temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { int temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { int temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { int temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { int temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { int temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { int temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { int temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { int temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
     }
 
-    private static void Sort28<T>(ref T first) where T : IComparable<T>
+    private static void Sort28(ref int first)
     {
-        SwapIfGreater(ref first, 0, 27);
-        SwapIfGreater(ref first, 1, 26);
-        SwapIfGreater(ref first, 2, 25);
-        SwapIfGreater(ref first, 3, 24);
-        SwapIfGreater(ref first, 4, 23);
-        SwapIfGreater(ref first, 5, 22);
-        SwapIfGreater(ref first, 6, 21);
-        SwapIfGreater(ref first, 7, 20);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 12, 15);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 0, 1);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 24, 25);
-        SwapIfGreater(ref first, 26, 27);
-        SwapIfGreater(ref first, 0, 2);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 8, 19);
-        SwapIfGreater(ref first, 9, 12);
-        SwapIfGreater(ref first, 10, 14);
-        SwapIfGreater(ref first, 11, 16);
-        SwapIfGreater(ref first, 13, 17);
-        SwapIfGreater(ref first, 15, 18);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 24, 26);
-        SwapIfGreater(ref first, 25, 27);
-        SwapIfGreater(ref first, 0, 4);
-        SwapIfGreater(ref first, 1, 5);
-        SwapIfGreater(ref first, 2, 20);
-        SwapIfGreater(ref first, 3, 21);
-        SwapIfGreater(ref first, 6, 24);
-        SwapIfGreater(ref first, 7, 25);
-        SwapIfGreater(ref first, 8, 13);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 10, 17);
-        SwapIfGreater(ref first, 12, 15);
-        SwapIfGreater(ref first, 14, 19);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 22, 26);
-        SwapIfGreater(ref first, 23, 27);
-        SwapIfGreater(ref first, 1, 2);
-        SwapIfGreater(ref first, 3, 24);
-        SwapIfGreater(ref first, 4, 6);
-        SwapIfGreater(ref first, 5, 22);
-        SwapIfGreater(ref first, 7, 20);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 21, 23);
-        SwapIfGreater(ref first, 25, 26);
-        SwapIfGreater(ref first, 0, 8);
-        SwapIfGreater(ref first, 1, 4);
-        SwapIfGreater(ref first, 2, 6);
-        SwapIfGreater(ref first, 3, 9);
-        SwapIfGreater(ref first, 5, 7);
-        SwapIfGreater(ref first, 10, 11);
-        SwapIfGreater(ref first, 12, 13);
-        SwapIfGreater(ref first, 14, 15);
-        SwapIfGreater(ref first, 16, 17);
-        SwapIfGreater(ref first, 18, 24);
-        SwapIfGreater(ref first, 19, 27);
-        SwapIfGreater(ref first, 20, 22);
-        SwapIfGreater(ref first, 21, 25);
-        SwapIfGreater(ref first, 23, 26);
-        SwapIfGreater(ref first, 1, 10);
-        SwapIfGreater(ref first, 2, 13);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 5, 12);
-        SwapIfGreater(ref first, 6, 9);
-        SwapIfGreater(ref first, 7, 20);
-        SwapIfGreater(ref first, 14, 25);
-        SwapIfGreater(ref first, 15, 22);
-        SwapIfGreater(ref first, 17, 26);
-        SwapIfGreater(ref first, 18, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 6, 14);
-        SwapIfGreater(ref first, 7, 11);
-        SwapIfGreater(ref first, 8, 15);
-        SwapIfGreater(ref first, 9, 17);
-        SwapIfGreater(ref first, 10, 18);
-        SwapIfGreater(ref first, 12, 19);
-        SwapIfGreater(ref first, 13, 21);
-        SwapIfGreater(ref first, 16, 20);
-        SwapIfGreater(ref first, 23, 24);
-        SwapIfGreater(ref first, 2, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 13);
-        SwapIfGreater(ref first, 11, 15);
-        SwapIfGreater(ref first, 12, 16);
-        SwapIfGreater(ref first, 14, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 25);
-        SwapIfGreater(ref first, 2, 7);
-        SwapIfGreater(ref first, 4, 8);
-        SwapIfGreater(ref first, 6, 10);
-        SwapIfGreater(ref first, 9, 11);
-        SwapIfGreater(ref first, 12, 14);
-        SwapIfGreater(ref first, 13, 15);
-        SwapIfGreater(ref first, 16, 18);
-        SwapIfGreater(ref first, 17, 21);
-        SwapIfGreater(ref first, 19, 23);
-        SwapIfGreater(ref first, 20, 25);
-        SwapIfGreater(ref first, 1, 3);
-        SwapIfGreater(ref first, 4, 7);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 8, 9);
-        SwapIfGreater(ref first, 10, 12);
-        SwapIfGreater(ref first, 11, 16);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 17);
-        SwapIfGreater(ref first, 18, 19);
-        SwapIfGreater(ref first, 20, 23);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 24, 26);
-        SwapIfGreater(ref first, 2, 3);
-        SwapIfGreater(ref first, 4, 5);
-        SwapIfGreater(ref first, 6, 7);
-        SwapIfGreater(ref first, 8, 10);
-        SwapIfGreater(ref first, 9, 12);
-        SwapIfGreater(ref first, 11, 13);
-        SwapIfGreater(ref first, 14, 16);
-        SwapIfGreater(ref first, 15, 18);
-        SwapIfGreater(ref first, 17, 19);
-        SwapIfGreater(ref first, 20, 21);
-        SwapIfGreater(ref first, 22, 23);
-        SwapIfGreater(ref first, 24, 25);
-        SwapIfGreater(ref first, 3, 4);
-        SwapIfGreater(ref first, 5, 6);
-        SwapIfGreater(ref first, 7, 8);
-        SwapIfGreater(ref first, 9, 10);
-        SwapIfGreater(ref first, 11, 12);
-        SwapIfGreater(ref first, 13, 14);
-        SwapIfGreater(ref first, 15, 16);
-        SwapIfGreater(ref first, 17, 18);
-        SwapIfGreater(ref first, 19, 20);
-        SwapIfGreater(ref first, 21, 22);
-        SwapIfGreater(ref first, 23, 24);
+        int e0 = first;
+        int e1 = Unsafe.Add(ref first, 1);
+        int e2 = Unsafe.Add(ref first, 2);
+        int e3 = Unsafe.Add(ref first, 3);
+        int e4 = Unsafe.Add(ref first, 4);
+        int e5 = Unsafe.Add(ref first, 5);
+        int e6 = Unsafe.Add(ref first, 6);
+        int e7 = Unsafe.Add(ref first, 7);
+        int e8 = Unsafe.Add(ref first, 8);
+        int e9 = Unsafe.Add(ref first, 9);
+        int e10 = Unsafe.Add(ref first, 10);
+        int e11 = Unsafe.Add(ref first, 11);
+        int e12 = Unsafe.Add(ref first, 12);
+        int e13 = Unsafe.Add(ref first, 13);
+        int e14 = Unsafe.Add(ref first, 14);
+        int e15 = Unsafe.Add(ref first, 15);
+        int e16 = Unsafe.Add(ref first, 16);
+        int e17 = Unsafe.Add(ref first, 17);
+        int e18 = Unsafe.Add(ref first, 18);
+        int e19 = Unsafe.Add(ref first, 19);
+        int e20 = Unsafe.Add(ref first, 20);
+        int e21 = Unsafe.Add(ref first, 21);
+        int e22 = Unsafe.Add(ref first, 22);
+        int e23 = Unsafe.Add(ref first, 23);
+        int e24 = Unsafe.Add(ref first, 24);
+        int e25 = Unsafe.Add(ref first, 25);
+        int e26 = Unsafe.Add(ref first, 26);
+        int e27 = Unsafe.Add(ref first, 27);
+
+        if (e0 > e27) { int temp = e0; e0 = e27; e27 = temp; }
+        if (e1 > e26) { int temp = e1; e1 = e26; e26 = temp; }
+        if (e2 > e25) { int temp = e2; e2 = e25; e25 = temp; }
+        if (e3 > e24) { int temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e23) { int temp = e4; e4 = e23; e23 = temp; }
+        if (e5 > e22) { int temp = e5; e5 = e22; e22 = temp; }
+        if (e6 > e21) { int temp = e6; e6 = e21; e21 = temp; }
+        if (e7 > e20) { int temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e15) { int temp = e12; e12 = e15; e15 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e0 > e1) { int temp = e0; e0 = e1; e1 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { int temp = e24; e24 = e25; e25 = temp; }
+        if (e26 > e27) { int temp = e26; e26 = e27; e27 = temp; }
+        if (e0 > e2) { int temp = e0; e0 = e2; e2 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e8 > e19) { int temp = e8; e8 = e19; e19 = temp; }
+        if (e9 > e12) { int temp = e9; e9 = e12; e12 = temp; }
+        if (e10 > e14) { int temp = e10; e10 = e14; e14 = temp; }
+        if (e11 > e16) { int temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e17) { int temp = e13; e13 = e17; e17 = temp; }
+        if (e15 > e18) { int temp = e15; e15 = e18; e18 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e24 > e26) { int temp = e24; e24 = e26; e26 = temp; }
+        if (e25 > e27) { int temp = e25; e25 = e27; e27 = temp; }
+        if (e0 > e4) { int temp = e0; e0 = e4; e4 = temp; }
+        if (e1 > e5) { int temp = e1; e1 = e5; e5 = temp; }
+        if (e2 > e20) { int temp = e2; e2 = e20; e20 = temp; }
+        if (e3 > e21) { int temp = e3; e3 = e21; e21 = temp; }
+        if (e6 > e24) { int temp = e6; e6 = e24; e24 = temp; }
+        if (e7 > e25) { int temp = e7; e7 = e25; e25 = temp; }
+        if (e8 > e13) { int temp = e8; e8 = e13; e13 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e10 > e17) { int temp = e10; e10 = e17; e17 = temp; }
+        if (e12 > e15) { int temp = e12; e12 = e15; e15 = temp; }
+        if (e14 > e19) { int temp = e14; e14 = e19; e19 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e22 > e26) { int temp = e22; e22 = e26; e26 = temp; }
+        if (e23 > e27) { int temp = e23; e23 = e27; e27 = temp; }
+        if (e1 > e2) { int temp = e1; e1 = e2; e2 = temp; }
+        if (e3 > e24) { int temp = e3; e3 = e24; e24 = temp; }
+        if (e4 > e6) { int temp = e4; e4 = e6; e6 = temp; }
+        if (e5 > e22) { int temp = e5; e5 = e22; e22 = temp; }
+        if (e7 > e20) { int temp = e7; e7 = e20; e20 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e21 > e23) { int temp = e21; e21 = e23; e23 = temp; }
+        if (e25 > e26) { int temp = e25; e25 = e26; e26 = temp; }
+        if (e0 > e8) { int temp = e0; e0 = e8; e8 = temp; }
+        if (e1 > e4) { int temp = e1; e1 = e4; e4 = temp; }
+        if (e2 > e6) { int temp = e2; e2 = e6; e6 = temp; }
+        if (e3 > e9) { int temp = e3; e3 = e9; e9 = temp; }
+        if (e5 > e7) { int temp = e5; e5 = e7; e7 = temp; }
+        if (e10 > e11) { int temp = e10; e10 = e11; e11 = temp; }
+        if (e12 > e13) { int temp = e12; e12 = e13; e13 = temp; }
+        if (e14 > e15) { int temp = e14; e14 = e15; e15 = temp; }
+        if (e16 > e17) { int temp = e16; e16 = e17; e17 = temp; }
+        if (e18 > e24) { int temp = e18; e18 = e24; e24 = temp; }
+        if (e19 > e27) { int temp = e19; e19 = e27; e27 = temp; }
+        if (e20 > e22) { int temp = e20; e20 = e22; e22 = temp; }
+        if (e21 > e25) { int temp = e21; e21 = e25; e25 = temp; }
+        if (e23 > e26) { int temp = e23; e23 = e26; e26 = temp; }
+        if (e1 > e10) { int temp = e1; e1 = e10; e10 = temp; }
+        if (e2 > e13) { int temp = e2; e2 = e13; e13 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e5 > e12) { int temp = e5; e5 = e12; e12 = temp; }
+        if (e6 > e9) { int temp = e6; e6 = e9; e9 = temp; }
+        if (e7 > e20) { int temp = e7; e7 = e20; e20 = temp; }
+        if (e14 > e25) { int temp = e14; e14 = e25; e25 = temp; }
+        if (e15 > e22) { int temp = e15; e15 = e22; e22 = temp; }
+        if (e17 > e26) { int temp = e17; e17 = e26; e26 = temp; }
+        if (e18 > e21) { int temp = e18; e18 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e6 > e14) { int temp = e6; e6 = e14; e14 = temp; }
+        if (e7 > e11) { int temp = e7; e7 = e11; e11 = temp; }
+        if (e8 > e15) { int temp = e8; e8 = e15; e15 = temp; }
+        if (e9 > e17) { int temp = e9; e9 = e17; e17 = temp; }
+        if (e10 > e18) { int temp = e10; e10 = e18; e18 = temp; }
+        if (e12 > e19) { int temp = e12; e12 = e19; e19 = temp; }
+        if (e13 > e21) { int temp = e13; e13 = e21; e21 = temp; }
+        if (e16 > e20) { int temp = e16; e16 = e20; e20 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+        if (e2 > e4) { int temp = e2; e2 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e13) { int temp = e9; e9 = e13; e13 = temp; }
+        if (e11 > e15) { int temp = e11; e11 = e15; e15 = temp; }
+        if (e12 > e16) { int temp = e12; e12 = e16; e16 = temp; }
+        if (e14 > e18) { int temp = e14; e14 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e25) { int temp = e23; e23 = e25; e25 = temp; }
+        if (e2 > e7) { int temp = e2; e2 = e7; e7 = temp; }
+        if (e4 > e8) { int temp = e4; e4 = e8; e8 = temp; }
+        if (e6 > e10) { int temp = e6; e6 = e10; e10 = temp; }
+        if (e9 > e11) { int temp = e9; e9 = e11; e11 = temp; }
+        if (e12 > e14) { int temp = e12; e12 = e14; e14 = temp; }
+        if (e13 > e15) { int temp = e13; e13 = e15; e15 = temp; }
+        if (e16 > e18) { int temp = e16; e16 = e18; e18 = temp; }
+        if (e17 > e21) { int temp = e17; e17 = e21; e21 = temp; }
+        if (e19 > e23) { int temp = e19; e19 = e23; e23 = temp; }
+        if (e20 > e25) { int temp = e20; e20 = e25; e25 = temp; }
+        if (e1 > e3) { int temp = e1; e1 = e3; e3 = temp; }
+        if (e4 > e7) { int temp = e4; e4 = e7; e7 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e8 > e9) { int temp = e8; e8 = e9; e9 = temp; }
+        if (e10 > e12) { int temp = e10; e10 = e12; e12 = temp; }
+        if (e11 > e16) { int temp = e11; e11 = e16; e16 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e17) { int temp = e15; e15 = e17; e17 = temp; }
+        if (e18 > e19) { int temp = e18; e18 = e19; e19 = temp; }
+        if (e20 > e23) { int temp = e20; e20 = e23; e23 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e24 > e26) { int temp = e24; e24 = e26; e26 = temp; }
+        if (e2 > e3) { int temp = e2; e2 = e3; e3 = temp; }
+        if (e4 > e5) { int temp = e4; e4 = e5; e5 = temp; }
+        if (e6 > e7) { int temp = e6; e6 = e7; e7 = temp; }
+        if (e8 > e10) { int temp = e8; e8 = e10; e10 = temp; }
+        if (e9 > e12) { int temp = e9; e9 = e12; e12 = temp; }
+        if (e11 > e13) { int temp = e11; e11 = e13; e13 = temp; }
+        if (e14 > e16) { int temp = e14; e14 = e16; e16 = temp; }
+        if (e15 > e18) { int temp = e15; e15 = e18; e18 = temp; }
+        if (e17 > e19) { int temp = e17; e17 = e19; e19 = temp; }
+        if (e20 > e21) { int temp = e20; e20 = e21; e21 = temp; }
+        if (e22 > e23) { int temp = e22; e22 = e23; e23 = temp; }
+        if (e24 > e25) { int temp = e24; e24 = e25; e25 = temp; }
+        if (e3 > e4) { int temp = e3; e3 = e4; e4 = temp; }
+        if (e5 > e6) { int temp = e5; e5 = e6; e6 = temp; }
+        if (e7 > e8) { int temp = e7; e7 = e8; e8 = temp; }
+        if (e9 > e10) { int temp = e9; e9 = e10; e10 = temp; }
+        if (e11 > e12) { int temp = e11; e11 = e12; e12 = temp; }
+        if (e13 > e14) { int temp = e13; e13 = e14; e14 = temp; }
+        if (e15 > e16) { int temp = e15; e15 = e16; e16 = temp; }
+        if (e17 > e18) { int temp = e17; e17 = e18; e18 = temp; }
+        if (e19 > e20) { int temp = e19; e19 = e20; e20 = temp; }
+        if (e21 > e22) { int temp = e21; e21 = e22; e22 = temp; }
+        if (e23 > e24) { int temp = e23; e23 = e24; e24 = temp; }
+
+        first = e0;
+        Unsafe.Add(ref first, 1) = e1;
+        Unsafe.Add(ref first, 2) = e2;
+        Unsafe.Add(ref first, 3) = e3;
+        Unsafe.Add(ref first, 4) = e4;
+        Unsafe.Add(ref first, 5) = e5;
+        Unsafe.Add(ref first, 6) = e6;
+        Unsafe.Add(ref first, 7) = e7;
+        Unsafe.Add(ref first, 8) = e8;
+        Unsafe.Add(ref first, 9) = e9;
+        Unsafe.Add(ref first, 10) = e10;
+        Unsafe.Add(ref first, 11) = e11;
+        Unsafe.Add(ref first, 12) = e12;
+        Unsafe.Add(ref first, 13) = e13;
+        Unsafe.Add(ref first, 14) = e14;
+        Unsafe.Add(ref first, 15) = e15;
+        Unsafe.Add(ref first, 16) = e16;
+        Unsafe.Add(ref first, 17) = e17;
+        Unsafe.Add(ref first, 18) = e18;
+        Unsafe.Add(ref first, 19) = e19;
+        Unsafe.Add(ref first, 20) = e20;
+        Unsafe.Add(ref first, 21) = e21;
+        Unsafe.Add(ref first, 22) = e22;
+        Unsafe.Add(ref first, 23) = e23;
+        Unsafe.Add(ref first, 24) = e24;
+        Unsafe.Add(ref first, 25) = e25;
+        Unsafe.Add(ref first, 26) = e26;
+        Unsafe.Add(ref first, 27) = e27;
     }
 }
