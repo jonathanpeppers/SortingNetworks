@@ -1,6 +1,14 @@
 """Generate unrolled sorting network methods for SortingNetworks."""
 
 import sys
+import os
+
+# Primitive .NET types to specialize (all sortable primitives)
+PRIMITIVE_TYPES = [
+    "byte", "sbyte", "short", "ushort",
+    "int", "uint", "long", "ulong",
+    "nint", "nuint", "char", "float", "double",
+]
 
 # --- Batcher's odd-even merge sort network generator ---
 
@@ -74,19 +82,18 @@ def get_network(n):
 
 # --- Code generation ---
 
-def generate_unrolled_method(n, pairs):
+def generate_unrolled_method(n, pairs, type_name):
     lines = []
-    # Only inline small methods; larger ones can't be inlined anyway
     if n <= 8:
         lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
-    lines.append(f"    private static void Sort{n}(ref int first)")
+    lines.append(f"    private static void Sort{n}(ref {type_name} first)")
     lines.append(f"    {{")
-    lines.append(f"        int e0 = first;")
+    lines.append(f"        {type_name} e0 = first;")
     for i in range(1, n):
-        lines.append(f"        int e{i} = Unsafe.Add(ref first, {i});")
+        lines.append(f"        {type_name} e{i} = Unsafe.Add(ref first, {i});")
     lines.append(f"")
     for a, b in pairs:
-        lines.append(f"        if (e{a} > e{b}) {{ int temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
+        lines.append(f"        if (e{a} > e{b}) {{ {type_name} temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
     lines.append(f"")
     lines.append(f"        first = e0;")
     for i in range(1, n):
@@ -94,7 +101,145 @@ def generate_unrolled_method(n, pairs):
     lines.append(f"    }}")
     return "\n".join(lines)
 
-def generate_file():
+def generate_public_api(type_name):
+    lines = []
+    # Sort(Span<T>)
+    lines.append(f"    /// <summary>")
+    lines.append(f"    /// Sorts a span of {type_name} using a sorting network when possible.")
+    lines.append(f"    /// </summary>")
+    lines.append(f"    public static void Sort(Span<{type_name}> span)")
+    lines.append(f"    {{")
+    lines.append(f"        int n = span.Length;")
+    lines.append(f"        if (n == 27 || n == 28)")
+    lines.append(f"        {{")
+    lines.append(f"            ref {type_name} first = ref MemoryMarshal.GetReference(span);")
+    lines.append(f"            if (n == 27)")
+    lines.append(f"                Sort27(ref first);")
+    lines.append(f"            else")
+    lines.append(f"                Sort28(ref first);")
+    lines.append(f"            return;")
+    lines.append(f"        }}")
+    lines.append(f"")
+    lines.append(f"        span.Sort();")
+    lines.append(f"    }}")
+    lines.append(f"")
+    # Sort(T[])
+    lines.append(f"    /// <summary>")
+    lines.append(f"    /// Sorts an array of {type_name} using a sorting network when possible.")
+    lines.append(f"    /// </summary>")
+    lines.append(f"    public static void Sort({type_name}[] array)")
+    lines.append(f"    {{")
+    lines.append(f"        ArgumentNullException.ThrowIfNull(array);")
+    lines.append(f"        Sort(array.AsSpan());")
+    lines.append(f"    }}")
+    lines.append(f"")
+    # Sort(Span<T>, IComparer<T>?)
+    lines.append(f"    /// <summary>")
+    lines.append(f"    /// Sorts a span of {type_name} using a sorting network when possible,")
+    lines.append(f"    /// with a custom comparer.")
+    lines.append(f"    /// </summary>")
+    lines.append(f"    public static void Sort(Span<{type_name}> span, IComparer<{type_name}>? comparer)")
+    lines.append(f"    {{")
+    lines.append(f"        comparer ??= Comparer<{type_name}>.Default;")
+    lines.append(f"        int n = span.Length;")
+    lines.append(f"        if (n == 27 || n == 28)")
+    lines.append(f"        {{")
+    lines.append(f"            ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);")
+    lines.append(f"            return;")
+    lines.append(f"        }}")
+    lines.append(f"")
+    lines.append(f"        span.Sort(comparer);")
+    lines.append(f"    }}")
+    lines.append(f"")
+    # Sort(T[], IComparer<T>?)
+    lines.append(f"    /// <summary>")
+    lines.append(f"    /// Sorts an array of {type_name} using a sorting network when possible,")
+    lines.append(f"    /// with a custom comparer.")
+    lines.append(f"    /// </summary>")
+    lines.append(f"    public static void Sort({type_name}[] array, IComparer<{type_name}>? comparer)")
+    lines.append(f"    {{")
+    lines.append(f"        ArgumentNullException.ThrowIfNull(array);")
+    lines.append(f"        Sort(array.AsSpan(), comparer);")
+    lines.append(f"    }}")
+    lines.append(f"")
+    # ApplyNetworkWithComparer
+    lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
+    lines.append(f"    private static void ApplyNetworkWithComparer(Span<{type_name}> span, int[] network, IComparer<{type_name}> comparer)")
+    lines.append(f"    {{")
+    lines.append(f"        ref {type_name} first = ref MemoryMarshal.GetReference(span);")
+    lines.append(f"        for (int i = 0; i < network.Length; i += 2)")
+    lines.append(f"        {{")
+    lines.append(f"            ref {type_name} a = ref Unsafe.Add(ref first, network[i]);")
+    lines.append(f"            ref {type_name} b = ref Unsafe.Add(ref first, network[i + 1]);")
+    lines.append(f"            if (comparer.Compare(a, b) > 0)")
+    lines.append(f"            {{")
+    lines.append(f"                {type_name} temp = a;")
+    lines.append(f"                a = b;")
+    lines.append(f"                b = temp;")
+    lines.append(f"            }}")
+    lines.append(f"        }}")
+    lines.append(f"    }}")
+    return "\n".join(lines)
+
+def generate_api_file():
+    lines = []
+    lines.append("using System.Runtime.CompilerServices;")
+    lines.append("using System.Runtime.InteropServices;")
+    lines.append("")
+    lines.append("namespace SortingNetworks;")
+    lines.append("")
+    lines.append("// <auto-generated>")
+    lines.append("// This file was generated by generate_unrolled.py")
+    lines.append("// Do not edit manually.")
+    lines.append("// </auto-generated>")
+    lines.append("")
+    lines.append("/// <summary>")
+    lines.append("/// Provides sorting-network-based sorting for small collections.")
+    lines.append("/// Uses fixed compare-and-swap networks for sizes up to 28, including")
+    lines.append("/// depth-13 networks for 27 and 28 channels from arXiv:2511.04107.")
+    lines.append("/// Falls back to the default .NET sort for larger inputs.")
+    lines.append("/// </summary>")
+    lines.append("public static partial class NetworkSort")
+    lines.append("{")
+
+    for i, type_name in enumerate(PRIMITIVE_TYPES):
+        if i > 0:
+            lines.append("")
+        lines.append(generate_public_api(type_name))
+
+    lines.append("")
+    lines.append("    /// <summary>")
+    lines.append("    /// Sorts an array of <typeparamref name=\"T\"/> using a sorting network when possible.")
+    lines.append("    /// </summary>")
+    lines.append("    public static void Sort<T>(T[] array, IComparer<T> comparer)")
+    lines.append("    {")
+    lines.append("        ArgumentNullException.ThrowIfNull(array);")
+    lines.append("        ArgumentNullException.ThrowIfNull(comparer);")
+    lines.append("        int n = array.Length;")
+    lines.append("        if (n == 27 || n == 28)")
+    lines.append("        {")
+    lines.append("            int[] network = NetworkData.GetNetwork(n);")
+    lines.append("            for (int i = 0; i < network.Length; i += 2)")
+    lines.append("            {")
+    lines.append("                int ai = network[i], bi = network[i + 1];")
+    lines.append("                if (comparer.Compare(array[ai], array[bi]) > 0)")
+    lines.append("                {")
+    lines.append("                    T temp = array[ai];")
+    lines.append("                    array[ai] = array[bi];")
+    lines.append("                    array[bi] = temp;")
+    lines.append("                }")
+    lines.append("            }")
+    lines.append("            return;")
+    lines.append("        }")
+    lines.append("")
+    lines.append("        Array.Sort(array, comparer);")
+    lines.append("    }")
+
+    lines.append("}")
+    lines.append("")
+    return "\n".join(lines)
+
+def generate_unrolled_file():
     lines = []
     lines.append("using System.Runtime.CompilerServices;")
     lines.append("using System.Runtime.InteropServices;")
@@ -108,25 +253,37 @@ def generate_file():
     lines.append("")
     lines.append("public static partial class NetworkSort")
     lines.append("{")
-    
-    for n in [27, 28]:
-        pairs = get_network(n)
-        lines.append(generate_unrolled_method(n, pairs))
-        if n < 28:
-            lines.append("")
-    
+
+    first_method = True
+    for type_name in PRIMITIVE_TYPES:
+        for n in [27, 28]:
+            pairs = get_network(n)
+            if not first_method:
+                lines.append("")
+            lines.append(generate_unrolled_method(n, pairs, type_name))
+            first_method = False
+
     lines.append("}")
     lines.append("")
     return "\n".join(lines)
 
 if __name__ == "__main__":
-    output = generate_file()
-    output_path = sys.argv[1] if len(sys.argv) > 1 else "SortingNetworks/NetworkSort.Unrolled.cs"
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(output)
-    print(f"Generated {output_path}")
-    
+    base_dir = sys.argv[1] if len(sys.argv) > 1 else "SortingNetworks"
+
+    api_path = os.path.join(base_dir, "NetworkSort.cs")
+    api_output = generate_api_file()
+    with open(api_path, "w", encoding="utf-8") as f:
+        f.write(api_output)
+    print(f"Generated {api_path}")
+
+    unrolled_path = os.path.join(base_dir, "NetworkSort.Unrolled.cs")
+    unrolled_output = generate_unrolled_file()
+    with open(unrolled_path, "w", encoding="utf-8") as f:
+        f.write(unrolled_output)
+    print(f"Generated {unrolled_path}")
+
     # Print stats
     for n in [27, 28]:
         pairs = get_network(n)
         print(f"  Sort{n}: {len(pairs)} compare-swaps")
+    print(f"  Types: {', '.join(PRIMITIVE_TYPES)}")

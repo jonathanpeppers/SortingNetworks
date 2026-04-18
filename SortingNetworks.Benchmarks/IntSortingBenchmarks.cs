@@ -5,7 +5,7 @@ namespace SortingNetworks.Benchmarks;
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class SortingBenchmarks
+public class IntSortingBenchmarks
 {
     private const int OpsPerInvoke = 1000;
 
@@ -21,12 +21,13 @@ public class SortingBenchmarks
     [GlobalSetup]
     public void Setup()
     {
+        var rng = new Random(42);
         _source = Kind switch
         {
-            InputKind.Random => GenerateRandom(Length, seed: 42),
+            InputKind.Random => Enumerable.Range(0, Length).Select(_ => rng.Next(-1000, 1000)).ToArray(),
             InputKind.Sorted => Enumerable.Range(0, Length).ToArray(),
             InputKind.Reversed => Enumerable.Range(0, Length).Reverse().ToArray(),
-            InputKind.Duplicates => GenerateDuplicates(Length, seed: 42),
+            InputKind.Duplicates => Enumerable.Range(0, Length).Select(_ => rng.Next(0, 3)).ToArray(),
             _ => throw new ArgumentOutOfRangeException()
         };
         _batch = new int[OpsPerInvoke][];
@@ -49,6 +50,13 @@ public class SortingBenchmarks
     }
 
     [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
+    public void NetworkSort()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            SortingNetworks.NetworkSort.Sort(_batch[i]);
+    }
+
+    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
     public void SpanSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
@@ -56,36 +64,10 @@ public class SortingBenchmarks
     }
 
     [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
-    public void NetworkSort_Array()
-    {
-        for (int i = 0; i < OpsPerInvoke; i++)
-            NetworkSort.Sort(_batch[i]);
-    }
-
-    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
     public void NetworkSort_Span()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
-            NetworkSort.Sort(_batch[i].AsSpan());
-    }
-
-    private static int[] GenerateRandom(int length, int seed)
-    {
-        var rng = new Random(seed);
-        return Enumerable.Range(0, length).Select(_ => rng.Next(-1000, 1000)).ToArray();
-    }
-
-    private static int[] GenerateDuplicates(int length, int seed)
-    {
-        var rng = new Random(seed);
-        return Enumerable.Range(0, length).Select(_ => rng.Next(0, 3)).ToArray();
+            SortingNetworks.NetworkSort.Sort(_batch[i].AsSpan());
     }
 }
 
-public enum InputKind
-{
-    Random,
-    Sorted,
-    Reversed,
-    Duplicates
-}
