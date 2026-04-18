@@ -24,7 +24,7 @@ Remove-Item (Join-Path $repoRoot "benchmark-results.md") -ErrorAction SilentlyCo
 Remove-Item (Join-Path $repoRoot "benchmark-results.json") -ErrorAction SilentlyContinue
 
 # Clean previous BDN artifacts
-$artifactsDir = Join-Path $repoRoot "SortingNetworks.Benchmarks" "BenchmarkDotNet.Artifacts"
+$artifactsDir = Join-Path (Join-Path $repoRoot "SortingNetworks.Benchmarks") "BenchmarkDotNet.Artifacts"
 if (Test-Path $artifactsDir) {
     Remove-Item $artifactsDir -Recurse -Force
 }
