@@ -566,6 +566,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx512F.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_long(span);
+                else
+                    SortSimd28_long(span);
+                return;
+            }
+
             ref long first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -638,6 +647,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx512F.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_ulong(span);
+                else
+                    SortSimd28_ulong(span);
+                return;
+            }
+
             ref ulong first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -1025,6 +1043,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx512F.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_double(span);
+                else
+                    SortSimd28_double(span);
+                return;
+            }
+
             ref double first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
