@@ -4859,4 +4859,2076 @@ public static partial class NetworkSort
         Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v1);
         Unsafe.WriteUnaligned(ref first, v0);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd27_float(Span<float> span)
+    {
+        ref byte first = ref Unsafe.As<float, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<float>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector256<float>>(ref Unsafe.Add(ref first, 32));
+        var v2 = Unsafe.ReadUnaligned<Vector256<float>>(ref Unsafe.Add(ref first, 64));
+        var v3 = Vector256.Create(
+            Sse2.ShiftRightLogical128BitLane(
+                Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 92)),
+                4).AsSingle(),
+            Vector128<float>.Zero);
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 7, 6, 5, 4));
+            var from0_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 0, 4, 5, 6, 7));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+            var shuffled1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 7, 6, 5, 4));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 4, 5, 6, 7));
+            var shuffled2 = Avx.BlendVariable(from2_0, from2_2, Vector256.Create(-1, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+            var from3_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_0, from3_3, Vector256.Create(0, 0, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, -1, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, -1, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(1, 0, 3, 2, 5, 4, 7, 6));
+            var shuffled1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var shuffled2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 3, 0, 1, 5, 4, 7, 6));
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, -1, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 3, 1, 5, 2, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 1, 2, 0, 4, 1, 6, 2));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(-1, 0, 0, -1, 0, -1, 0, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 6, 7, 4, 5));
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, -1, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 5, 2, 3, 0, 1, 6, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 4, 5, 4, 5, 6, 7));
+            var from0_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 0, 1));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0, 0, -1, -1, 0, 0, 0, 0).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 2, 1, 7, 0, 6, 4));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 1, 3, 4, 5, 3, 7));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, -1, 0, 0, 0, -1, 0).AsSingle());
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 2, 3, 6, 7));
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 2, 6, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 2, 7));
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(0, -1, 0, -1, 0, 0, 0, 0).AsSingle());
+            var blend2_2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(-1, 0, -1, 0, 0, 0, 0, -1).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_2, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, -1, 0).AsSingle());
+            var from3_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 2, 3, 4, 5, 6, 7));
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 6, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var blend3_1 = Avx.BlendVariable(from3_0, from3_2, Vector256.Create(0, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_3, Vector256.Create(0, 0, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, -1, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, -1, -1, -1, -1, 0, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, -1, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 3, 6, 5, 4, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 6, 6, 4));
+            var from0_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 0, 4, 5, 6, 7));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0, 0, 0, 0, 0, -1, 0, -1).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0, 0, 0, -1, 0, 0, 0, 0).AsSingle());
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 6, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 0, 1));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 7, 5, 5, 7));
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 2, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 3, 2, 4, 7, 6, 5));
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(-1, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(0, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var from3_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 1, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_0, from3_3, Vector256.Create(0, -1, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, -1, 0, 0, 0, -1, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, -1, 0, 0, -1, -1, 0, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, -1, 0, -1, -1, 0, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 3, 1, 7, 2, 5));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 1, 4, 5, 6, 7));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(-1, 0, 0, -1, 0, 0, 0, 0).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 2, 3, 6, 5, 4, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 0, 3, 4, 1, 6, 2));
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0, 0, -1, 0, 0, -1, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 7, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0, 0, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, -1, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, -1, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, 0, 0, 0, 0, -1, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, -1, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 5, 3, 0, 4, 1, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 4));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, -1, -1, 0, -1, -1, -1, 0).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 3, 5, 2, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 6));
+            var from1_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 1, 7));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, 0, 0, -1, 0, 0, 0, 0).AsSingle());
+            var blend1_2 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_2, from1_3, Vector256.Create(0, 0, 0, 0, 0, 0, -1, 0).AsSingle());
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 7, 5, 6, 7));
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 7, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 5, 7, 4, 2, 6, 3));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 2, 3, 4, 5, 6, 7));
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(0, 0, 0, 0, 0, 0, -1, 0).AsSingle());
+            var blend2_2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(-1, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_2, from2_3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+            var from3_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 2, 3, 4, 5, 6, 7));
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 1, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var blend3_1 = Avx.BlendVariable(from3_1, from3_2, Vector256.Create(0, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_3, Vector256.Create(-1, 0, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, -1, -1, 0, -1, -1, 0, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 6, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 3));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 7, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 0));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 3, 5, 6, 7));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(-1, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, -1, -1, 0, -1, -1, 0, 0).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 1, 2, 3, 0, 5, 6, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(-1, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0, -1, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, -1, -1, -1, -1, 0, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 4, 3, 2, 6, 5, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 5, 2, 7, 4, 1, 6, 3));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 0, 5, 2, 7));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, -1, -1, -1, 0, -1, 0, -1).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 1, 6, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 1));
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, -1, 0, -1, -1, -1, -1, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(-1, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, 0, 0, 0, 0, -1, 0, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, 0, -1, 0, -1, 0, -1, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 7, 3, 4, 5, 6, 2));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 0, 5, 2, 7));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 1, 6, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 2, 1, 6, 7, 4, 5));
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, -1, 0, -1, -1, -1, -1, -1).AsSingle());
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 4, 1, 6, 3));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 1, 5, 6, 7));
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0, 0, 0, 0, -1, 0, 0, 0).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(-1, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, 0, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, 0, -1, 0, 0, -1, 0, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 1, 7, 6, 5, 4));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 3, 2, 6, 5, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 4, 5, 6, 1));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, 0, -1, 0, 0, 0, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 7, 2, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 3, 2, 7, 6, 5, 4));
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, -1, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, -1, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 4, 0, 5, 1, 3, 6, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 0, 2));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 1, 7, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 3, 2, 1, 5, 4, 7, 6));
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, -1, 0, -1, -1, -1, -1, -1).AsSingle());
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, -1, 0, -1, -1, 0, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, -1, -1, -1, -1, -1, -1, 0).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, -1, -1, -1, -1, -1, -1, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0, -1, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, 0, -1, 0, -1, 0, -1, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, 0, -1, 0, -1, 0, -1, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        Sse2.ShiftLeftLogical128BitLane(v3.GetLower().AsByte(), 4)
+            .StoreUnsafe(ref Unsafe.Add(ref first, 92));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 32), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimd28_float(Span<float> span)
+    {
+        ref byte first = ref Unsafe.As<float, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<float>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector256<float>>(ref Unsafe.Add(ref first, 32));
+        var v2 = Unsafe.ReadUnaligned<Vector256<float>>(ref Unsafe.Add(ref first, 64));
+        var v3 = Vector256.Create(
+            Unsafe.ReadUnaligned<Vector128<float>>(ref Unsafe.Add(ref first, 96)),
+            Vector128<float>.Zero);
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 7, 6, 5, 4));
+            var from0_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(3, 2, 1, 0, 4, 5, 6, 7));
+            var shuffled0 = Avx.BlendVariable(from0_2, from0_3, Vector256.Create(-1, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+            var shuffled1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 3, 2, 7, 6, 5, 4));
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 7, 6, 5, 4));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 3, 2, 4, 5, 6, 7));
+            var shuffled2 = Avx.BlendVariable(from2_0, from2_2, Vector256.Create(-1, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+            var from3_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 2, 1, 0, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_0, from3_3, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, -1, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(1, 0, 3, 2, 5, 4, 7, 6));
+            var shuffled1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var shuffled2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 3, 0, 1, 5, 4, 7, 6));
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 3, 2, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, -1, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, -1, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(2, 3, 0, 1, 6, 7, 4, 5));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 4, 6, 3, 1, 5, 2, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(3, 1, 2, 0, 4, 1, 6, 2));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(-1, 0, 0, -1, 0, -1, 0, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 5, 7, 0, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 6, 7, 4, 5));
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 3, 0, 1, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, -1, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, 0, -1, -1, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 5, 2, 3, 0, 1, 6, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 4, 5, 4, 5, 6, 7));
+            var from0_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 0, 1));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0, 0, -1, -1, 0, 0, 0, 0).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(5, 3, 2, 1, 7, 0, 6, 4));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 1, 3, 4, 5, 3, 7));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, -1, 0, 0, 0, -1, 0).AsSingle());
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 2, 3, 6, 7));
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 2, 6, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 2, 3));
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(0, -1, 0, -1, 0, 0, 0, 0).AsSingle());
+            var blend2_2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(-1, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_2, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from3_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(6, 7, 2, 3, 4, 5, 6, 7));
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 6, 7, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var blend3_1 = Avx.BlendVariable(from3_0, from3_2, Vector256.Create(0, 0, -1, -1, 0, 0, 0, 0).AsSingle());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_3, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, -1, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, -1, -1, -1, -1, 0, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 2, 1, 3, 6, 5, 4, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 6, 6, 4));
+            var from0_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 0, 4, 5, 6, 7));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0, 0, 0, 0, 0, -1, 0, -1).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0, 0, 0, -1, 0, 0, 0, 0).AsSingle());
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 5, 2, 3, 6, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 0, 1));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 7, 5, 5, 7));
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 7, 2, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 3, 2, 4, 7, 6, 5));
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(-1, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(0, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var from3_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(3, 1, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 1, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_0, from3_3, Vector256.Create(0, -1, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, -1, 0, 0, 0, -1, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, -1, 0, 0, -1, -1, 0, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, -1, 0, -1, -1, 0, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 4, 6, 3, 1, 7, 2, 5));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 1, 4, 5, 6, 7));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(-1, 0, 0, -1, 0, 0, 0, 0).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(1, 0, 2, 3, 6, 5, 4, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 0, 3, 4, 1, 6, 2));
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 7, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, -1, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, -1, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, 0, 0, 0, 0, -1, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, -1, -1, -1, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 5, 3, 0, 4, 1, 7));
+            var from0_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 4));
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, -1, -1, 0, -1, -1, -1, 0).AsSingle());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 6, 1, 3, 5, 2, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 6));
+            var from1_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 1, 7));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, 0, 0, -1, 0, 0, 0, 0).AsSingle());
+            var blend1_2 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_2, from1_3, Vector256.Create(0, 0, 0, 0, 0, 0, -1, 0).AsSingle());
+            var from2_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 3, 7, 5, 6, 7));
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 7, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 5, 7, 4, 2, 6, 3));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 2, 2, 3, 4, 5, 6, 7));
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(0, 0, 0, 0, 0, 0, -1, 0).AsSingle());
+            var blend2_2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(-1, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_2, from2_3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+            var from3_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 6, 2, 3, 4, 5, 6, 7));
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 1, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var blend3_1 = Avx.BlendVariable(from3_1, from3_2, Vector256.Create(0, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_3, Vector256.Create(-1, 0, 0, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, -1, -1, 0, -1, -1, 0, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, 0, 0, 0, -1, -1, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 5, 6, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 3));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 7, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 0));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 3, 5, 6, 7));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(-1, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, -1, -1, 0, -1, -1, 0, 0).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 4, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(4, 1, 2, 3, 0, 5, 6, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(-1, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0, -1, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, 0, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, -1, -1, -1, -1, -1, 0, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 4, 3, 2, 6, 5, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 5, 2, 7, 4, 1, 6, 3));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 0, 5, 2, 7));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, -1, -1, -1, 0, -1, 0, -1).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(4, 1, 6, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 1));
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, -1, 0, -1, -1, -1, -1, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 7, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(-1, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, 0, 0, 0, 0, -1, 0, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, 0, -1, 0, -1, 0, -1, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 7, 3, 4, 5, 6, 2));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 0, 5, 2, 7));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(4, 1, 6, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 3, 2, 1, 6, 7, 4, 5));
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, -1, 0, -1, -1, -1, -1, -1).AsSingle());
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(2, 5, 0, 7, 4, 1, 6, 3));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 1, 5, 6, 7));
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0, 0, 0, 0, -1, 0, 0, 0).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 4, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(-1, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, 0, -1, -1, 0, 0, -1, -1).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0, 0, -1, 0, 0, -1, 0, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 3, 2, 1, 7, 6, 5, 4));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(1, 0, 4, 3, 2, 6, 5, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 0, 4, 5, 6, 1));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, 0, -1, 0, 0, 0, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(3, 7, 2, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 3, 2, 7, 6, 5, 4));
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, 0, -1, -1, -1, -1, -1, -1).AsSingle());
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(2, 1, 0, 3, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, -1, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, -1, 0, -1, 0, 0, -1, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, 0, -1, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 3, 2, 5, 4, 7, 6));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(2, 4, 0, 5, 1, 3, 6, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 0, 2));
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, -1, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(6, 1, 7, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 3, 2, 1, 5, 4, 7, 6));
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, -1, 0, -1, -1, -1, -1, -1).AsSingle());
+            var shuffled3 = Avx2.PermuteVar8x32(v3, Vector256.Create(1, 0, 2, 3, 4, 5, 6, 7));
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, -1, 0, -1, 0, -1).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0, 0, -1, 0, -1, -1, 0, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, 0, -1, -1, 0, -1, 0, -1).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0, -1, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var from0_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(0, 1, 2, 4, 3, 6, 5, 7));
+            var from0_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from1_0 = Avx2.PermuteVar8x32(v0, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from1_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 7));
+            var from1_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0, -1, -1, -1, -1, -1, -1, 0).AsSingle());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from2_1 = Avx2.PermuteVar8x32(v1, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from2_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(0, 2, 1, 4, 3, 6, 5, 7));
+            var from2_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 0));
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0, -1, -1, -1, -1, -1, -1, 0).AsSingle());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0, 0, 0, 0, 0, 0, 0, -1).AsSingle());
+            var from3_2 = Avx2.PermuteVar8x32(v2, Vector256.Create(7, 1, 2, 3, 4, 5, 6, 7));
+            var from3_3 = Avx2.PermuteVar8x32(v3, Vector256.Create(0, 1, 2, 3, 4, 5, 6, 7));
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0, -1, -1, -1, -1, -1, -1, -1).AsSingle());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0, 0, 0, 0, -1, 0, -1, 0).AsSingle());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1, 0, -1, 0, -1, 0, -1, 0).AsSingle());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1, 0, -1, 0, -1, 0, -1, 0).AsSingle());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1, 0, 0, 0, 0, 0, 0, 0).AsSingle());
+        }
+
+        v3.GetLower().AsByte().StoreUnsafe(ref Unsafe.Add(ref first, 96));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 32), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimdAvx2_27_double(Span<double> span)
+    {
+        ref byte first = ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<double>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 32));
+        var v2 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 64));
+        var v3 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 96));
+        var v4 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 128));
+        var v5 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 160));
+        var v6 = Avx2.Permute4x64(
+            Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 184)),
+            0x39);
+
+        // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_6 = Avx2.Permute4x64(v6, 0x18);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var from1_5 = Avx2.Permute4x64(v5, 0x1B);
+            var shuffled1 = from1_5;
+            var shuffled2 = Avx2.Permute4x64(v2, 0xB1);
+            var shuffled3 = Avx2.Permute4x64(v3, 0x1B);
+            var shuffled4 = Avx2.Permute4x64(v4, 0xB1);
+            var from5_1 = Avx2.Permute4x64(v1, 0x1B);
+            var shuffled5 = from5_1;
+            var from6_0 = Avx2.Permute4x64(v0, 0xDB);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_0, from6_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, -1L, -1L, 0L).AsDouble());
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0xB1);
+            var shuffled1 = Avx2.Permute4x64(v1, 0xB1);
+            var shuffled2 = Avx2.Permute4x64(v2, 0x4E);
+            var shuffled3 = Avx2.Permute4x64(v3, 0x4E);
+            var shuffled4 = Avx2.Permute4x64(v4, 0x4E);
+            var shuffled5 = Avx2.Permute4x64(v5, 0xB1);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xE1);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0x4E);
+            var shuffled1 = Avx2.Permute4x64(v1, 0x4E);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE0);
+            var from2_4 = Avx2.Permute4x64(v4, 0x27);
+            var shuffled2 = Avx.BlendVariable(from2_3, from2_4, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE5);
+            var from3_4 = Avx2.Permute4x64(v4, 0xA4);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0x27);
+            var from4_3 = Avx2.Permute4x64(v3, 0xF4);
+            var shuffled4 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx2.Permute4x64(v5, 0x4E);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xC6);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26)
+        {
+            var from0_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from0_5 = Avx2.Permute4x64(v5, 0x44);
+            var shuffled0 = Avx.BlendVariable(from0_1, from0_5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from1_6 = Avx2.Permute4x64(v6, 0x44);
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_6, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from2_2 = Avx2.Permute4x64(v2, 0x6C);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE5);
+            var from2_4 = Avx2.Permute4x64(v4, 0xD4);
+            var blend2_1 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE0);
+            var from3_3 = Avx2.Permute4x64(v3, 0x27);
+            var from3_4 = Avx2.Permute4x64(v4, 0xF4);
+            var blend3_1 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0xE8);
+            var from4_3 = Avx2.Permute4x64(v3, 0xA4);
+            var from4_4 = Avx2.Permute4x64(v4, 0xC6);
+            var blend4_1 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var from5_0 = Avx2.Permute4x64(v0, 0xEE);
+            var from5_5 = Avx2.Permute4x64(v5, 0xE4);
+            var from5_6 = Avx2.Permute4x64(v6, 0xE4);
+            var blend5_1 = Avx.BlendVariable(from5_0, from5_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from6_1 = Avx2.Permute4x64(v1, 0xEE);
+            var from6_5 = Avx2.Permute4x64(v5, 0xE4);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var blend6_1 = Avx.BlendVariable(from6_1, from6_5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled6 = Avx.BlendVariable(blend6_1, from6_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, -1L, -1L, 0L).AsDouble());
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xD8);
+            var from0_6 = Avx2.Permute4x64(v6, 0x24);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from1_1 = Avx2.Permute4x64(v1, 0xC6);
+            var from1_5 = Avx2.Permute4x64(v5, 0x28);
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from2_2 = Avx2.Permute4x64(v2, 0xE1);
+            var from2_3 = Avx2.Permute4x64(v3, 0x44);
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xEE);
+            var from3_4 = Avx2.Permute4x64(v4, 0x44);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xEE);
+            var from4_4 = Avx2.Permute4x64(v4, 0xB4);
+            var shuffled4 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from5_1 = Avx2.Permute4x64(v1, 0xD7);
+            var from5_5 = Avx2.Permute4x64(v5, 0x6C);
+            var shuffled5 = Avx.BlendVariable(from5_1, from5_5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from6_0 = Avx2.Permute4x64(v0, 0xE7);
+            var from6_6 = Avx2.Permute4x64(v6, 0xD8);
+            var shuffled6 = Avx.BlendVariable(from6_0, from6_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, -1L, 0L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (20,22), (21,25), (23,26)
+        {
+            var from0_1 = Avx2.Permute4x64(v1, 0xE0);
+            var from0_2 = Avx2.Permute4x64(v2, 0x64);
+            var shuffled0 = Avx.BlendVariable(from0_1, from0_2, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE5);
+            var from1_1 = Avx2.Permute4x64(v1, 0x6C);
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from2_0 = Avx2.Permute4x64(v0, 0xEC);
+            var from2_2 = Avx2.Permute4x64(v2, 0xB4);
+            var shuffled2 = Avx.BlendVariable(from2_0, from2_2, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var shuffled3 = Avx2.Permute4x64(v3, 0xB1);
+            var from4_4 = Avx2.Permute4x64(v4, 0xE1);
+            var from4_6 = Avx2.Permute4x64(v6, 0xC4);
+            var shuffled4 = Avx.BlendVariable(from4_4, from4_6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from5_5 = Avx2.Permute4x64(v5, 0xC6);
+            var from5_6 = Avx2.Permute4x64(v6, 0xA4);
+            var shuffled5 = Avx.BlendVariable(from5_5, from5_6, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from6_4 = Avx2.Permute4x64(v4, 0xE6);
+            var from6_5 = Avx2.Permute4x64(v5, 0xF4);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var blend6_1 = Avx.BlendVariable(from6_4, from6_5, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled6 = Avx.BlendVariable(blend6_1, from6_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, -1L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, -1L, -1L, 0L).AsDouble());
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_2 = Avx2.Permute4x64(v2, 0xE8);
+            var from0_3 = Avx2.Permute4x64(v3, 0xD4);
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from1_2 = Avx2.Permute4x64(v2, 0xD4);
+            var from1_3 = Avx2.Permute4x64(v3, 0xE0);
+            var from1_5 = Avx2.Permute4x64(v5, 0x24);
+            var blend1_1 = Avx.BlendVariable(from1_2, from1_3, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from2_0 = Avx2.Permute4x64(v0, 0xD4);
+            var from2_1 = Avx2.Permute4x64(v1, 0xE8);
+            var from2_2 = Avx2.Permute4x64(v2, 0xE4);
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from3_0 = Avx2.Permute4x64(v0, 0xE8);
+            var from3_1 = Avx2.Permute4x64(v1, 0xE5);
+            var from3_5 = Avx2.Permute4x64(v5, 0xA4);
+            var from3_6 = Avx2.Permute4x64(v6, 0xD4);
+            var blend3_1 = Avx.BlendVariable(from3_0, from3_1, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var blend3_2 = Avx.BlendVariable(blend3_1, from3_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_2, from3_6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from4_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from4_5 = Avx2.Permute4x64(v5, 0xD4);
+            var from4_6 = Avx2.Permute4x64(v6, 0xE8);
+            var blend4_1 = Avx.BlendVariable(from4_4, from4_5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var from5_1 = Avx2.Permute4x64(v1, 0xE7);
+            var from5_3 = Avx2.Permute4x64(v3, 0xF4);
+            var from5_4 = Avx2.Permute4x64(v4, 0xE8);
+            var blend5_1 = Avx.BlendVariable(from5_1, from5_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from6_3 = Avx2.Permute4x64(v3, 0xE8);
+            var from6_4 = Avx2.Permute4x64(v4, 0xD4);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var blend6_1 = Avx.BlendVariable(from6_3, from6_4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled6 = Avx.BlendVariable(blend6_1, from6_6, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, -1L, -1L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0x24);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE7);
+            var from1_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from1_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from1_3 = Avx2.Permute4x64(v3, 0xE4);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var blend1_2 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_2, from1_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE7);
+            var from2_4 = Avx2.Permute4x64(v4, 0xE4);
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_3, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_4, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var from3_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from3_2 = Avx2.Permute4x64(v2, 0x24);
+            var from3_4 = Avx2.Permute4x64(v4, 0xE7);
+            var from3_5 = Avx2.Permute4x64(v5, 0xE4);
+            var blend3_1 = Avx.BlendVariable(from3_1, from3_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var blend3_2 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_2, from3_5, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from4_3 = Avx2.Permute4x64(v3, 0x24);
+            var from4_5 = Avx2.Permute4x64(v5, 0xE4);
+            var blend4_1 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_5, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var from5_3 = Avx2.Permute4x64(v3, 0xE4);
+            var from5_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from5_5 = Avx2.Permute4x64(v5, 0xE4);
+            var from5_6 = Avx2.Permute4x64(v6, 0x24);
+            var blend5_1 = Avx.BlendVariable(from5_3, from5_4, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var blend5_2 = Avx.BlendVariable(blend5_1, from5_5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_2, from5_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xE7);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0xC4);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE6);
+            var from1_1 = Avx2.Permute4x64(v1, 0xD8);
+            var from1_2 = Avx2.Permute4x64(v2, 0x24);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE7);
+            var from2_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE4);
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from3_4 = Avx2.Permute4x64(v4, 0xE4);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xE4);
+            var from4_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from4_5 = Avx2.Permute4x64(v5, 0x24);
+            var blend4_1 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from5_4 = Avx2.Permute4x64(v4, 0xE7);
+            var from5_5 = Avx2.Permute4x64(v5, 0xD8);
+            var from5_6 = Avx2.Permute4x64(v6, 0x64);
+            var blend5_1 = Avx.BlendVariable(from5_4, from5_5, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xEC);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0xF4);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xA4);
+            var from1_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from1_2 = Avx2.Permute4x64(v2, 0xE4);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from2_2 = Avx2.Permute4x64(v2, 0x6C);
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var shuffled3 = Avx2.Permute4x64(v3, 0x4E);
+            var from4_4 = Avx2.Permute4x64(v4, 0xC6);
+            var from4_5 = Avx2.Permute4x64(v5, 0xE4);
+            var shuffled4 = Avx.BlendVariable(from4_4, from4_5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from5_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from5_5 = Avx2.Permute4x64(v5, 0xE4);
+            var from5_6 = Avx2.Permute4x64(v6, 0xE5);
+            var blend5_1 = Avx.BlendVariable(from5_4, from5_5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xE0);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0x6C);
+            var shuffled1 = Avx2.Permute4x64(v1, 0x1B);
+            var from2_2 = Avx2.Permute4x64(v2, 0xE1);
+            var from2_3 = Avx2.Permute4x64(v3, 0xC4);
+            var from2_4 = Avx2.Permute4x64(v4, 0x24);
+            var blend2_1 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_4, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE6);
+            var from3_3 = Avx2.Permute4x64(v3, 0xD8);
+            var from3_4 = Avx2.Permute4x64(v4, 0x64);
+            var blend3_1 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0xE7);
+            var from4_3 = Avx2.Permute4x64(v3, 0xEC);
+            var from4_4 = Avx2.Permute4x64(v4, 0xB4);
+            var blend4_1 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var shuffled5 = Avx2.Permute4x64(v5, 0x1B);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xC6);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, -1L, 0L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0xB4);
+            var shuffled1 = Avx2.Permute4x64(v1, 0xB1);
+            var from2_2 = Avx2.Permute4x64(v2, 0xC6);
+            var from2_3 = Avx2.Permute4x64(v3, 0x60);
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xED);
+            var from3_4 = Avx2.Permute4x64(v4, 0x84);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xF6);
+            var from4_4 = Avx2.Permute4x64(v4, 0x6C);
+            var shuffled4 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var shuffled5 = Avx2.Permute4x64(v5, 0xB1);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xE1);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0x24);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE7);
+            var from1_1 = Avx2.Permute4x64(v1, 0xD8);
+            var from1_2 = Avx2.Permute4x64(v2, 0x24);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE7);
+            var from2_2 = Avx2.Permute4x64(v2, 0xD8);
+            var from2_3 = Avx2.Permute4x64(v3, 0x24);
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE7);
+            var from3_3 = Avx2.Permute4x64(v3, 0xD8);
+            var from3_4 = Avx2.Permute4x64(v4, 0x24);
+            var blend3_1 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xE7);
+            var from4_4 = Avx2.Permute4x64(v4, 0xD8);
+            var from4_5 = Avx2.Permute4x64(v5, 0x24);
+            var blend4_1 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from5_4 = Avx2.Permute4x64(v4, 0xE7);
+            var from5_5 = Avx2.Permute4x64(v5, 0xD8);
+            var from5_6 = Avx2.Permute4x64(v6, 0x24);
+            var blend5_1 = Avx.BlendVariable(from5_4, from5_5, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xE7);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+        }
+
+        Avx2.Permute4x64(v6, 0x93).AsByte()
+            .StoreUnsafe(ref Unsafe.Add(ref first, 184));
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 160), v5);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v4);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 96), v3);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 32), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void SortSimdAvx2_28_double(Span<double> span)
+    {
+        ref byte first = ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(span));
+        var v0 = Unsafe.ReadUnaligned<Vector256<double>>(ref first);
+        var v1 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 32));
+        var v2 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 64));
+        var v3 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 96));
+        var v4 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 128));
+        var v5 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 160));
+        var v6 = Unsafe.ReadUnaligned<Vector256<double>>(ref Unsafe.Add(ref first, 192));
+
+        // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
+        {
+            var from0_6 = Avx2.Permute4x64(v6, 0x1B);
+            var shuffled0 = from0_6;
+            var from1_5 = Avx2.Permute4x64(v5, 0x1B);
+            var shuffled1 = from1_5;
+            var shuffled2 = Avx2.Permute4x64(v2, 0xB1);
+            var shuffled3 = Avx2.Permute4x64(v3, 0x1B);
+            var shuffled4 = Avx2.Permute4x64(v4, 0xB1);
+            var from5_1 = Avx2.Permute4x64(v1, 0x1B);
+            var shuffled5 = from5_1;
+            var from6_0 = Avx2.Permute4x64(v0, 0x1B);
+            var shuffled6 = from6_0;
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+        }
+
+        // Step 1: (0,1), (2,3), (4,5), (6,7), (8,10), (9,11), (12,14), (13,15), (16,18), (17,19), (20,21), (22,23), (24,25), (26,27)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0xB1);
+            var shuffled1 = Avx2.Permute4x64(v1, 0xB1);
+            var shuffled2 = Avx2.Permute4x64(v2, 0x4E);
+            var shuffled3 = Avx2.Permute4x64(v3, 0x4E);
+            var shuffled4 = Avx2.Permute4x64(v4, 0x4E);
+            var shuffled5 = Avx2.Permute4x64(v5, 0xB1);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xB1);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+        }
+
+        // Step 2: (0,2), (1,3), (4,6), (5,7), (8,19), (9,12), (10,14), (11,16), (13,17), (15,18), (20,22), (21,23), (24,26), (25,27)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0x4E);
+            var shuffled1 = Avx2.Permute4x64(v1, 0x4E);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE0);
+            var from2_4 = Avx2.Permute4x64(v4, 0x27);
+            var shuffled2 = Avx.BlendVariable(from2_3, from2_4, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE5);
+            var from3_4 = Avx2.Permute4x64(v4, 0xA4);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0x27);
+            var from4_3 = Avx2.Permute4x64(v3, 0xF4);
+            var shuffled4 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx2.Permute4x64(v5, 0x4E);
+            var shuffled6 = Avx2.Permute4x64(v6, 0x4E);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+        }
+
+        // Step 3: (0,4), (1,5), (2,20), (3,21), (6,24), (7,25), (8,13), (9,11), (10,17), (12,15), (14,19), (16,18), (22,26), (23,27)
+        {
+            var from0_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from0_5 = Avx2.Permute4x64(v5, 0x44);
+            var shuffled0 = Avx.BlendVariable(from0_1, from0_5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from1_6 = Avx2.Permute4x64(v6, 0x44);
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_6, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from2_2 = Avx2.Permute4x64(v2, 0x6C);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE5);
+            var from2_4 = Avx2.Permute4x64(v4, 0xD4);
+            var blend2_1 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE0);
+            var from3_3 = Avx2.Permute4x64(v3, 0x27);
+            var from3_4 = Avx2.Permute4x64(v4, 0xF4);
+            var blend3_1 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0xE8);
+            var from4_3 = Avx2.Permute4x64(v3, 0xA4);
+            var from4_4 = Avx2.Permute4x64(v4, 0xC6);
+            var blend4_1 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var from5_0 = Avx2.Permute4x64(v0, 0xEE);
+            var from5_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled5 = Avx.BlendVariable(from5_0, from5_6, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from6_1 = Avx2.Permute4x64(v1, 0xEE);
+            var from6_5 = Avx2.Permute4x64(v5, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_1, from6_5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+        }
+
+        // Step 4: (1,2), (3,24), (4,6), (5,22), (7,20), (8,9), (10,12), (11,13), (14,16), (15,17), (18,19), (21,23), (25,26)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xD8);
+            var from0_6 = Avx2.Permute4x64(v6, 0x24);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from1_1 = Avx2.Permute4x64(v1, 0xC6);
+            var from1_5 = Avx2.Permute4x64(v5, 0x28);
+            var shuffled1 = Avx.BlendVariable(from1_1, from1_5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from2_2 = Avx2.Permute4x64(v2, 0xE1);
+            var from2_3 = Avx2.Permute4x64(v3, 0x44);
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xEE);
+            var from3_4 = Avx2.Permute4x64(v4, 0x44);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xEE);
+            var from4_4 = Avx2.Permute4x64(v4, 0xB4);
+            var shuffled4 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from5_1 = Avx2.Permute4x64(v1, 0xD7);
+            var from5_5 = Avx2.Permute4x64(v5, 0x6C);
+            var shuffled5 = Avx.BlendVariable(from5_1, from5_5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from6_0 = Avx2.Permute4x64(v0, 0xE7);
+            var from6_6 = Avx2.Permute4x64(v6, 0xD8);
+            var shuffled6 = Avx.BlendVariable(from6_0, from6_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, -1L, 0L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+        }
+
+        // Step 5: (0,8), (1,4), (2,6), (3,9), (5,7), (10,11), (12,13), (14,15), (16,17), (18,24), (19,27), (20,22), (21,25), (23,26)
+        {
+            var from0_1 = Avx2.Permute4x64(v1, 0xE0);
+            var from0_2 = Avx2.Permute4x64(v2, 0x64);
+            var shuffled0 = Avx.BlendVariable(from0_1, from0_2, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE5);
+            var from1_1 = Avx2.Permute4x64(v1, 0x6C);
+            var shuffled1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from2_0 = Avx2.Permute4x64(v0, 0xEC);
+            var from2_2 = Avx2.Permute4x64(v2, 0xB4);
+            var shuffled2 = Avx.BlendVariable(from2_0, from2_2, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var shuffled3 = Avx2.Permute4x64(v3, 0xB1);
+            var from4_4 = Avx2.Permute4x64(v4, 0xE1);
+            var from4_6 = Avx2.Permute4x64(v6, 0xC4);
+            var shuffled4 = Avx.BlendVariable(from4_4, from4_6, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from5_5 = Avx2.Permute4x64(v5, 0xC6);
+            var from5_6 = Avx2.Permute4x64(v6, 0xA4);
+            var shuffled5 = Avx.BlendVariable(from5_5, from5_6, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from6_4 = Avx2.Permute4x64(v4, 0xE6);
+            var from6_5 = Avx2.Permute4x64(v5, 0xF4);
+            var shuffled6 = Avx.BlendVariable(from6_4, from6_5, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, -1L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+        }
+
+        // Step 6: (1,10), (2,13), (4,8), (5,12), (6,9), (7,20), (14,25), (15,22), (17,26), (18,21), (19,23)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_2 = Avx2.Permute4x64(v2, 0xE8);
+            var from0_3 = Avx2.Permute4x64(v3, 0xD4);
+            var blend0_1 = Avx.BlendVariable(from0_0, from0_2, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled0 = Avx.BlendVariable(blend0_1, from0_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from1_2 = Avx2.Permute4x64(v2, 0xD4);
+            var from1_3 = Avx2.Permute4x64(v3, 0xE0);
+            var from1_5 = Avx2.Permute4x64(v5, 0x24);
+            var blend1_1 = Avx.BlendVariable(from1_2, from1_3, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from2_0 = Avx2.Permute4x64(v0, 0xD4);
+            var from2_1 = Avx2.Permute4x64(v1, 0xE8);
+            var from2_2 = Avx2.Permute4x64(v2, 0xE4);
+            var blend2_1 = Avx.BlendVariable(from2_0, from2_1, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from3_0 = Avx2.Permute4x64(v0, 0xE8);
+            var from3_1 = Avx2.Permute4x64(v1, 0xE5);
+            var from3_5 = Avx2.Permute4x64(v5, 0xA4);
+            var from3_6 = Avx2.Permute4x64(v6, 0xD4);
+            var blend3_1 = Avx.BlendVariable(from3_0, from3_1, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var blend3_2 = Avx.BlendVariable(blend3_1, from3_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_2, from3_6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from4_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from4_5 = Avx2.Permute4x64(v5, 0xD4);
+            var from4_6 = Avx2.Permute4x64(v6, 0xE8);
+            var blend4_1 = Avx.BlendVariable(from4_4, from4_5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var from5_1 = Avx2.Permute4x64(v1, 0xE7);
+            var from5_3 = Avx2.Permute4x64(v3, 0xF4);
+            var from5_4 = Avx2.Permute4x64(v4, 0xE8);
+            var blend5_1 = Avx.BlendVariable(from5_1, from5_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from6_3 = Avx2.Permute4x64(v3, 0xE8);
+            var from6_4 = Avx2.Permute4x64(v4, 0xD4);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var blend6_1 = Avx.BlendVariable(from6_3, from6_4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled6 = Avx.BlendVariable(blend6_1, from6_6, Vector256.Create(-1L, 0L, 0L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, -1L, -1L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+        }
+
+        // Step 7: (3,4), (6,14), (7,11), (8,15), (9,17), (10,18), (12,19), (13,21), (16,20), (23,24)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0x24);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE7);
+            var from1_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from1_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from1_3 = Avx2.Permute4x64(v3, 0xE4);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var blend1_2 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_2, from1_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE7);
+            var from2_4 = Avx2.Permute4x64(v4, 0xE4);
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_3, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_4, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var from3_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from3_2 = Avx2.Permute4x64(v2, 0x24);
+            var from3_4 = Avx2.Permute4x64(v4, 0xE7);
+            var from3_5 = Avx2.Permute4x64(v5, 0xE4);
+            var blend3_1 = Avx.BlendVariable(from3_1, from3_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var blend3_2 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_2, from3_5, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from4_3 = Avx2.Permute4x64(v3, 0x24);
+            var from4_5 = Avx2.Permute4x64(v5, 0xE4);
+            var blend4_1 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_5, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var from5_3 = Avx2.Permute4x64(v3, 0xE4);
+            var from5_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from5_5 = Avx2.Permute4x64(v5, 0xE4);
+            var from5_6 = Avx2.Permute4x64(v6, 0x24);
+            var blend5_1 = Avx.BlendVariable(from5_3, from5_4, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var blend5_2 = Avx.BlendVariable(blend5_1, from5_5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_2, from5_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xE7);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+        }
+
+        // Step 8: (2,4), (5,6), (7,8), (9,13), (11,15), (12,16), (14,18), (19,20), (21,22), (23,25)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0xC4);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE6);
+            var from1_1 = Avx2.Permute4x64(v1, 0xD8);
+            var from1_2 = Avx2.Permute4x64(v2, 0x24);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE7);
+            var from2_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from2_3 = Avx2.Permute4x64(v3, 0xE4);
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE4);
+            var from3_4 = Avx2.Permute4x64(v4, 0xE4);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xE4);
+            var from4_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from4_5 = Avx2.Permute4x64(v5, 0x24);
+            var blend4_1 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from5_4 = Avx2.Permute4x64(v4, 0xE7);
+            var from5_5 = Avx2.Permute4x64(v5, 0xD8);
+            var from5_6 = Avx2.Permute4x64(v6, 0x64);
+            var blend5_1 = Avx.BlendVariable(from5_4, from5_5, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xEC);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 9: (2,7), (4,8), (6,10), (9,11), (12,14), (13,15), (16,18), (17,21), (19,23), (20,25)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0xF4);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xA4);
+            var from1_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from1_2 = Avx2.Permute4x64(v2, 0xE4);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE4);
+            var from2_2 = Avx2.Permute4x64(v2, 0x6C);
+            var shuffled2 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var shuffled3 = Avx2.Permute4x64(v3, 0x4E);
+            var from4_4 = Avx2.Permute4x64(v4, 0xC6);
+            var from4_5 = Avx2.Permute4x64(v5, 0xE4);
+            var shuffled4 = Avx.BlendVariable(from4_4, from4_5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from5_4 = Avx2.Permute4x64(v4, 0xE4);
+            var from5_5 = Avx2.Permute4x64(v5, 0xE4);
+            var from5_6 = Avx2.Permute4x64(v6, 0xE5);
+            var blend5_1 = Avx.BlendVariable(from5_4, from5_5, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xE0);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 10: (1,3), (4,7), (5,6), (8,9), (10,12), (11,16), (13,14), (15,17), (18,19), (20,23), (21,22), (24,26)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0x6C);
+            var shuffled1 = Avx2.Permute4x64(v1, 0x1B);
+            var from2_2 = Avx2.Permute4x64(v2, 0xE1);
+            var from2_3 = Avx2.Permute4x64(v3, 0xC4);
+            var from2_4 = Avx2.Permute4x64(v4, 0x24);
+            var blend2_1 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_4, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE6);
+            var from3_3 = Avx2.Permute4x64(v3, 0xD8);
+            var from3_4 = Avx2.Permute4x64(v4, 0x64);
+            var blend3_1 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from4_2 = Avx2.Permute4x64(v2, 0xE7);
+            var from4_3 = Avx2.Permute4x64(v3, 0xEC);
+            var from4_4 = Avx2.Permute4x64(v4, 0xB4);
+            var blend4_1 = Avx.BlendVariable(from4_2, from4_3, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var shuffled5 = Avx2.Permute4x64(v5, 0x1B);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xC6);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, -1L, 0L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+        }
+
+        // Step 11: (2,3), (4,5), (6,7), (8,10), (9,12), (11,13), (14,16), (15,18), (17,19), (20,21), (22,23), (24,25)
+        {
+            var shuffled0 = Avx2.Permute4x64(v0, 0xB4);
+            var shuffled1 = Avx2.Permute4x64(v1, 0xB1);
+            var from2_2 = Avx2.Permute4x64(v2, 0xC6);
+            var from2_3 = Avx2.Permute4x64(v3, 0x60);
+            var shuffled2 = Avx.BlendVariable(from2_2, from2_3, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xED);
+            var from3_4 = Avx2.Permute4x64(v4, 0x84);
+            var shuffled3 = Avx.BlendVariable(from3_2, from3_4, Vector256.Create(0L, 0L, -1L, -1L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xF6);
+            var from4_4 = Avx2.Permute4x64(v4, 0x6C);
+            var shuffled4 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var shuffled5 = Avx2.Permute4x64(v5, 0xB1);
+            var shuffled6 = Avx2.Permute4x64(v6, 0xE1);
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(0L, 0L, -1L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, -1L, 0L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, 0L, -1L, -1L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(0L, -1L, 0L, -1L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(0L, -1L, 0L, 0L).AsDouble());
+        }
+
+        // Step 12: (3,4), (5,6), (7,8), (9,10), (11,12), (13,14), (15,16), (17,18), (19,20), (21,22), (23,24)
+        {
+            var from0_0 = Avx2.Permute4x64(v0, 0xE4);
+            var from0_1 = Avx2.Permute4x64(v1, 0x24);
+            var shuffled0 = Avx.BlendVariable(from0_0, from0_1, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from1_0 = Avx2.Permute4x64(v0, 0xE7);
+            var from1_1 = Avx2.Permute4x64(v1, 0xD8);
+            var from1_2 = Avx2.Permute4x64(v2, 0x24);
+            var blend1_1 = Avx.BlendVariable(from1_0, from1_1, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled1 = Avx.BlendVariable(blend1_1, from1_2, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from2_1 = Avx2.Permute4x64(v1, 0xE7);
+            var from2_2 = Avx2.Permute4x64(v2, 0xD8);
+            var from2_3 = Avx2.Permute4x64(v3, 0x24);
+            var blend2_1 = Avx.BlendVariable(from2_1, from2_2, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled2 = Avx.BlendVariable(blend2_1, from2_3, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from3_2 = Avx2.Permute4x64(v2, 0xE7);
+            var from3_3 = Avx2.Permute4x64(v3, 0xD8);
+            var from3_4 = Avx2.Permute4x64(v4, 0x24);
+            var blend3_1 = Avx.BlendVariable(from3_2, from3_3, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled3 = Avx.BlendVariable(blend3_1, from3_4, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from4_3 = Avx2.Permute4x64(v3, 0xE7);
+            var from4_4 = Avx2.Permute4x64(v4, 0xD8);
+            var from4_5 = Avx2.Permute4x64(v5, 0x24);
+            var blend4_1 = Avx.BlendVariable(from4_3, from4_4, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled4 = Avx.BlendVariable(blend4_1, from4_5, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from5_4 = Avx2.Permute4x64(v4, 0xE7);
+            var from5_5 = Avx2.Permute4x64(v5, 0xD8);
+            var from5_6 = Avx2.Permute4x64(v6, 0x24);
+            var blend5_1 = Avx.BlendVariable(from5_4, from5_5, Vector256.Create(0L, -1L, -1L, 0L).AsDouble());
+            var shuffled5 = Avx.BlendVariable(blend5_1, from5_6, Vector256.Create(0L, 0L, 0L, -1L).AsDouble());
+            var from6_5 = Avx2.Permute4x64(v5, 0xE7);
+            var from6_6 = Avx2.Permute4x64(v6, 0xE4);
+            var shuffled6 = Avx.BlendVariable(from6_5, from6_6, Vector256.Create(0L, -1L, -1L, -1L).AsDouble());
+            var mins0 = Avx.Min(v0, shuffled0);
+            var maxs0 = Avx.Max(v0, shuffled0);
+            v0 = Avx.BlendVariable(mins0, maxs0, Vector256.Create(0L, 0L, 0L, 0L).AsDouble());
+            var mins1 = Avx.Min(v1, shuffled1);
+            var maxs1 = Avx.Max(v1, shuffled1);
+            v1 = Avx.BlendVariable(mins1, maxs1, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins2 = Avx.Min(v2, shuffled2);
+            var maxs2 = Avx.Max(v2, shuffled2);
+            v2 = Avx.BlendVariable(mins2, maxs2, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins3 = Avx.Min(v3, shuffled3);
+            var maxs3 = Avx.Max(v3, shuffled3);
+            v3 = Avx.BlendVariable(mins3, maxs3, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins4 = Avx.Min(v4, shuffled4);
+            var maxs4 = Avx.Max(v4, shuffled4);
+            v4 = Avx.BlendVariable(mins4, maxs4, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins5 = Avx.Min(v5, shuffled5);
+            var maxs5 = Avx.Max(v5, shuffled5);
+            v5 = Avx.BlendVariable(mins5, maxs5, Vector256.Create(-1L, 0L, -1L, 0L).AsDouble());
+            var mins6 = Avx.Min(v6, shuffled6);
+            var maxs6 = Avx.Max(v6, shuffled6);
+            v6 = Avx.BlendVariable(mins6, maxs6, Vector256.Create(-1L, 0L, 0L, 0L).AsDouble());
+        }
+
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 192), v6);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 160), v5);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 128), v4);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 96), v3);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 64), v2);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, 32), v1);
+        Unsafe.WriteUnaligned(ref first, v0);
+    }
 }

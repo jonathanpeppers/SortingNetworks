@@ -84,9 +84,15 @@ For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is used when
 available. The 27-28 elements require seven `Vector128` registers — exceeding
 TBL4's 4-register table limit. This is solved with a two-stage TBL/TBX lookup:
 elements 0-15 are in Table A and elements 16-27 are in Table B, with
-`VectorTableLookupExtension` (TBX) chaining the results. On x86, `int` and
-`uint` use AVX2 SIMD (see above), while `float` falls back to the scalar
-unrolled sort.
+`VectorTableLookupExtension` (TBX) chaining the results.
+
+For `float`, AVX2 SIMD is used on x86 with four `Vector256<float>` registers
+(8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
+`BlendVariable` composition, and `Avx.Min`/`Avx.Max` handles comparisons.
+
+For `double`, AVX-512F SIMD is used on x86 when available (four `Vector512`
+registers). On CPUs without AVX-512F, an AVX2 fallback uses seven
+`Vector256<double>` registers (4 elements each) with `Permute4x64` shuffles.
 
 ## Benchmarks
 
@@ -113,6 +119,20 @@ cross-vector shuffles via `PermuteVar8x32`:
 | int | 103 ns | 58 ns | **1.8x** |
 | uint | 106 ns | 55 ns | **1.9x** |
 
+For `float`, AVX2 SIMD uses four `Vector256<float>` registers with
+`PermuteVar8x32` shuffles and `Avx.Min`/`Avx.Max` comparisons:
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| float | 1,598 ns | 107 ns | **15x** |
+
+For `double`, AVX2 SIMD uses seven `Vector256<double>` registers with
+`Permute4x64` shuffles (on CPUs with AVX-512F, an AVX-512 path is used instead):
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| double | 1,630 ns | 110 ns | **15x** |
+
 For other types without a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
@@ -120,13 +140,11 @@ sorting network dominates:
 |---|---|---|---|
 | short | 1,411 ns | 101 ns | **14x** |
 | ushort | 1,288 ns | 100 ns | **13x** |
-| float | 1,598 ns | 107 ns | **15x** |
-| double | 1,630 ns | 110 ns | **15x** |
 | long | 1,398 ns | 104 ns | **13x** |
 | nint | 1,408 ns | 105 ns | **13x** |
 | nuint | 1,381 ns | 103 ns | **13x** |
 
-> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512 SIMD (packing all 27-28 elements into a single `Vector512<ushort>`) for even greater speedups.
+> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, and `long` uses AVX-512F SIMD for even greater speedups.
 
 #### Types where Array.Sort is already SIMD-optimized
 
