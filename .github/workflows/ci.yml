@@ -30,7 +30,15 @@ jobs:
       - name: Benchmarks
         run: |
           dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*' --exporters GitHub
-          cat BenchmarkDotNet.Artifacts/results/*-report-github.md >> $GITHUB_STEP_SUMMARY
+          for f in BenchmarkDotNet.Artifacts/results/*-report-github.md; do
+            name=$(basename "$f" -report-github.md)
+            name=${name##*.}
+            name=${name%SortingBenchmarks}
+            echo "## $name" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat "$f" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
