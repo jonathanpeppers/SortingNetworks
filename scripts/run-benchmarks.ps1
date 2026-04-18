@@ -57,7 +57,7 @@ $mdFiles = Get-ChildItem $resultsDir -Filter "*-github.md" | Sort-Object Name
 if ($mdFiles.Count -eq 0) { throw "No markdown report files found in $resultsDir" }
 $mdContent = ($mdFiles | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n`n---`n`n"
 $mdDest = Join-Path $resultsOut "benchmark-results.md"
-Set-Content $mdDest $mdContent -Encoding utf8NoBOM
+Set-Content $mdDest $mdContent -Encoding UTF8
 Write-Host "Wrote $mdDest ($($mdFiles.Count) report(s) combined)" -ForegroundColor Green
 
 # Copy JSON report(s) -> benchmark-results.json
@@ -68,7 +68,7 @@ if ($jsonFiles.Count -eq 1) {
 } else {
     # Wrap multiple reports into a single JSON array
     $allJson = $jsonFiles | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json }
-    ConvertTo-Json $allJson -Depth 20 | Set-Content (Join-Path $resultsOut "benchmark-results.json") -Encoding utf8NoBOM
+    ConvertTo-Json $allJson -Depth 20 | Set-Content (Join-Path $resultsOut "benchmark-results.json") -Encoding UTF8
 }
 $jsonDest = Join-Path $resultsOut "benchmark-results.json"
 Write-Host "Wrote $jsonDest ($($jsonFiles.Count) report(s) combined)" -ForegroundColor Green
@@ -76,3 +76,4 @@ Write-Host "Wrote $jsonDest ($($jsonFiles.Count) report(s) combined)" -Foregroun
 Write-Host "`nDone! Results saved to:" -ForegroundColor Cyan
 Write-Host "  Human-readable: results/benchmark-results.md"
 Write-Host "  AI-readable:    results/benchmark-results.json"
+
