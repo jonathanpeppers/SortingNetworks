@@ -12,13 +12,15 @@ namespace SortingNetworks;
 
 public static partial class NetworkSort
 {
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static void SortSimd27(Span<byte> span)
     {
-        Span<byte> buffer = stackalloc byte[32];
-        span.CopyTo(buffer);
-
-        ref byte bufRef = ref MemoryMarshal.GetReference(buffer);
-        var vec = Unsafe.ReadUnaligned<Vector256<byte>>(ref bufRef);
+        ref byte first = ref MemoryMarshal.GetReference(span);
+        var lo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);
+        var hi = Sse2.ShiftRightLogical128BitLane(
+            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 11)),
+            5);
+        var vec = Vector256.Create(lo, hi);
 
         // Step 0: (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
         {
@@ -164,17 +166,22 @@ public static partial class NetworkSort
             vec = Avx2.BlendVariable(mins, maxs, Vector256.Create((byte)0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
         }
 
-        Unsafe.WriteUnaligned(ref bufRef, vec);
-        buffer.Slice(0, 27).CopyTo(span);
+        lo = vec.GetLower();
+        hi = vec.GetUpper();
+        Sse2.ShiftLeftLogical128BitLane(hi, 5)
+            .StoreUnsafe(ref Unsafe.Add(ref first, 11));
+        lo.StoreUnsafe(ref first);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static void SortSimd28(Span<byte> span)
     {
-        Span<byte> buffer = stackalloc byte[32];
-        span.CopyTo(buffer);
-
-        ref byte bufRef = ref MemoryMarshal.GetReference(buffer);
-        var vec = Unsafe.ReadUnaligned<Vector256<byte>>(ref bufRef);
+        ref byte first = ref MemoryMarshal.GetReference(span);
+        var lo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);
+        var hi = Sse2.ShiftRightLogical128BitLane(
+            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, 12)),
+            4);
+        var vec = Vector256.Create(lo, hi);
 
         // Step 0: (0,27), (1,26), (2,25), (3,24), (4,23), (5,22), (6,21), (7,20), (8,9), (10,11), (12,15), (13,14), (16,17), (18,19)
         {
@@ -320,7 +327,10 @@ public static partial class NetworkSort
             vec = Avx2.BlendVariable(mins, maxs, Vector256.Create((byte)0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
         }
 
-        Unsafe.WriteUnaligned(ref bufRef, vec);
-        buffer.Slice(0, 28).CopyTo(span);
+        lo = vec.GetLower();
+        hi = vec.GetUpper();
+        Sse2.ShiftLeftLogical128BitLane(hi, 4)
+            .StoreUnsafe(ref Unsafe.Add(ref first, 12));
+        lo.StoreUnsafe(ref first);
     }
 }

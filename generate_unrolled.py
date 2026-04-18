@@ -167,14 +167,19 @@ def fmt_vec256(values):
 
 def generate_simd_sort_method(n, steps):
     """Generate a SortSimdN method for byte using AVX2."""
+    load_offset = n - 16  # 11 for n=27, 12 for n=28
+    shift_amount = 32 - n  # 5 for n=27, 4 for n=28
+
     lines = []
+    lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]")
     lines.append(f"    private static void SortSimd{n}(Span<byte> span)")
     lines.append(f"    {{")
-    lines.append(f"        Span<byte> buffer = stackalloc byte[32];")
-    lines.append(f"        span.CopyTo(buffer);")
-    lines.append(f"")
-    lines.append(f"        ref byte bufRef = ref MemoryMarshal.GetReference(buffer);")
-    lines.append(f"        var vec = Unsafe.ReadUnaligned<Vector256<byte>>(ref bufRef);")
+    lines.append(f"        ref byte first = ref MemoryMarshal.GetReference(span);")
+    lines.append(f"        var lo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);")
+    lines.append(f"        var hi = Sse2.ShiftRightLogical128BitLane(")
+    lines.append(f"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {load_offset})),")
+    lines.append(f"            {shift_amount});")
+    lines.append(f"        var vec = Vector256.Create(lo, hi);")
 
     for si, step in enumerate(steps):
         perm = compute_shuffle_perm(step)
@@ -207,8 +212,11 @@ def generate_simd_sort_method(n, steps):
             lines.append(f"        }}")
 
     lines.append(f"")
-    lines.append(f"        Unsafe.WriteUnaligned(ref bufRef, vec);")
-    lines.append(f"        buffer.Slice(0, {n}).CopyTo(span);")
+    lines.append(f"        lo = vec.GetLower();")
+    lines.append(f"        hi = vec.GetUpper();")
+    lines.append(f"        Sse2.ShiftLeftLogical128BitLane(hi, {shift_amount})")
+    lines.append(f"            .StoreUnsafe(ref Unsafe.Add(ref first, {load_offset}));")
+    lines.append(f"        lo.StoreUnsafe(ref first);")
     lines.append(f"    }}")
     return "\n".join(lines)
 
