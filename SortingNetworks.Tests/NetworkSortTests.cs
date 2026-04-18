@@ -450,7 +450,7 @@ public class NetworkSortTests
         var rng = new Random(42);
         var array = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
         var expected = (string[])array.Clone();
-        Array.Sort(expected, StringComparer.Ordinal);
+        Array.Sort(expected);
 
         NetworkSort.Sort(array, (IComparer<string>?)null);
         Assert.Equal(expected, array);
@@ -528,6 +528,19 @@ public class NetworkSortTests
         Assert.Equal(charsExpected, chars);
     }
 
+
+    [Fact]
+    public void Sort_FallsBackForStrings()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 29).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
 
     public static TheoryData<int> Lengths => new() { 27, 28 };
 }
