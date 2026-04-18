@@ -162,9 +162,13 @@ public class NetworkSortTests
     [Fact]
     public void Sort_NullComparer_UsesDefault()
     {
-        var input = new[] { 3, 1, 2 };
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
         NetworkSort.Sort(input, null);
-        Assert.Equal([1, 2, 3], input);
+        Assert.Equal(expected, input);
     }
 
     [Fact]
@@ -435,75 +439,108 @@ public class NetworkSortTests
     [Fact]
     public void Sort_NullComparer_Throws_Generic()
     {
-        var array = new string[] { "a", "b" };
+        var rng = new Random(42);
+        var array = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort<string>(array, (IComparer<string>)null!));
     }
 
     [Fact]
     public void Sort_NullComparer_UsesDefault_String()
     {
-        var array = new string[] { "c", "a", "b" };
+        var rng = new Random(42);
+        var array = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+        var expected = (string[])array.Clone();
+        Array.Sort(expected);
+
         NetworkSort.Sort(array, (IComparer<string>?)null);
-        Assert.Equal(["a", "b", "c"], array);
+        Assert.Equal(expected, array);
     }
 
     [Fact]
     public void Sort_NullComparer_UsesDefault_Primitives()
     {
-        var bytes = new byte[] { 3, 1, 2 };
+        var rng = new Random(42);
+
+        var bytes = Enumerable.Range(0, 27).Select(_ => (byte)rng.Next(0, 256)).ToArray();
+        var bytesExpected = (byte[])bytes.Clone();
+        Array.Sort(bytesExpected);
         NetworkSort.Sort(bytes, null);
-        Assert.Equal(new byte[] { 1, 2, 3 }, bytes);
+        Assert.Equal(bytesExpected, bytes);
 
-        var sbytes = new sbyte[] { 3, 1, 2 };
+        var sbytes = Enumerable.Range(0, 27).Select(_ => (sbyte)rng.Next(-128, 128)).ToArray();
+        var sbytesExpected = (sbyte[])sbytes.Clone();
+        Array.Sort(sbytesExpected);
         NetworkSort.Sort(sbytes, null);
-        Assert.Equal(new sbyte[] { 1, 2, 3 }, sbytes);
+        Assert.Equal(sbytesExpected, sbytes);
 
-        var shorts = new short[] { 3, 1, 2 };
+        var shorts = Enumerable.Range(0, 27).Select(_ => (short)rng.Next(-1000, 1000)).ToArray();
+        var shortsExpected = (short[])shorts.Clone();
+        Array.Sort(shortsExpected);
         NetworkSort.Sort(shorts, null);
-        Assert.Equal(new short[] { 1, 2, 3 }, shorts);
+        Assert.Equal(shortsExpected, shorts);
 
-        var ushorts = new ushort[] { 3, 1, 2 };
+        var ushorts = Enumerable.Range(0, 27).Select(_ => (ushort)rng.Next(0, 2000)).ToArray();
+        var ushortsExpected = (ushort[])ushorts.Clone();
+        Array.Sort(ushortsExpected);
         NetworkSort.Sort(ushorts, null);
-        Assert.Equal(new ushort[] { 1, 2, 3 }, ushorts);
+        Assert.Equal(ushortsExpected, ushorts);
 
-        var ints = new int[] { 3, 1, 2 };
+        var ints = Enumerable.Range(0, 27).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var intsExpected = (int[])ints.Clone();
+        Array.Sort(intsExpected);
         NetworkSort.Sort(ints, null);
-        Assert.Equal(new int[] { 1, 2, 3 }, ints);
+        Assert.Equal(intsExpected, ints);
 
-        var uints = new uint[] { 3, 1, 2 };
+        var uints = Enumerable.Range(0, 27).Select(_ => (uint)rng.Next(0, 2000)).ToArray();
+        var uintsExpected = (uint[])uints.Clone();
+        Array.Sort(uintsExpected);
         NetworkSort.Sort(uints, null);
-        Assert.Equal(new uint[] { 1, 2, 3 }, uints);
+        Assert.Equal(uintsExpected, uints);
 
-        var longs = new long[] { 3, 1, 2 };
+        var longs = Enumerable.Range(0, 27).Select(_ => (long)rng.Next(-1000, 1000)).ToArray();
+        var longsExpected = (long[])longs.Clone();
+        Array.Sort(longsExpected);
         NetworkSort.Sort(longs, null);
-        Assert.Equal(new long[] { 1, 2, 3 }, longs);
+        Assert.Equal(longsExpected, longs);
 
-        var ulongs = new ulong[] { 3, 1, 2 };
+        var ulongs = Enumerable.Range(0, 27).Select(_ => (ulong)rng.Next(0, 2000)).ToArray();
+        var ulongsExpected = (ulong[])ulongs.Clone();
+        Array.Sort(ulongsExpected);
         NetworkSort.Sort(ulongs, null);
-        Assert.Equal(new ulong[] { 1, 2, 3 }, ulongs);
+        Assert.Equal(ulongsExpected, ulongs);
 
-        var floats = new float[] { 3, 1, 2 };
+        var floats = Enumerable.Range(0, 27).Select(_ => (float)(rng.NextDouble() * 2000 - 1000)).ToArray();
+        var floatsExpected = (float[])floats.Clone();
+        Array.Sort(floatsExpected);
         NetworkSort.Sort(floats, null);
-        Assert.Equal(new float[] { 1, 2, 3 }, floats);
+        Assert.Equal(floatsExpected, floats);
 
-        var doubles = new double[] { 3, 1, 2 };
+        var doubles = Enumerable.Range(0, 27).Select(_ => rng.NextDouble() * 2000 - 1000).ToArray();
+        var doublesExpected = (double[])doubles.Clone();
+        Array.Sort(doublesExpected);
         NetworkSort.Sort(doubles, null);
-        Assert.Equal(new double[] { 1, 2, 3 }, doubles);
+        Assert.Equal(doublesExpected, doubles);
 
-        var chars = new char[] { 'c', 'a', 'b' };
+        var chars = Enumerable.Range(0, 27).Select(_ => (char)rng.Next(32, 127)).ToArray();
+        var charsExpected = (char[])chars.Clone();
+        Array.Sort(charsExpected);
         NetworkSort.Sort(chars, null);
-        Assert.Equal(new char[] { 'a', 'b', 'c' }, chars);
+        Assert.Equal(charsExpected, chars);
     }
 
 
-    public static TheoryData<int> Lengths
+    [Fact]
+    public void Sort_FallsBackForStrings()
     {
-        get
-        {
-            var data = new TheoryData<int>();
-            for (int i = 0; i <= 64; i++)
-                data.Add(i);
-            return data;
-        }
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 29).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+        var expected = (string[])input.Clone();
+        Array.Sort(expected, StringComparer.Ordinal);
+
+        NetworkSort.Sort(input);
+
+        Assert.Equal(expected, input);
     }
+
+    public static TheoryData<int> Lengths => new() { 27, 28 };
 }
