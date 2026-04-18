@@ -79,18 +79,15 @@ def generate_unrolled_method(n, pairs):
     # Only inline small methods; larger ones can't be inlined anyway
     if n <= 8:
         lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveInlining)]")
-    lines.append(f"    private static void Sort{n}<T>(ref T first) where T : IComparable<T>")
+    lines.append(f"    private static void Sort{n}(ref int first)")
     lines.append(f"    {{")
-    # Load values into locals (not ref locals) to enable register allocation
-    lines.append(f"        T e0 = first;")
+    lines.append(f"        int e0 = first;")
     for i in range(1, n):
-        lines.append(f"        T e{i} = Unsafe.Add(ref first, {i});")
+        lines.append(f"        int e{i} = Unsafe.Add(ref first, {i});")
     lines.append(f"")
-    # Emit compare-and-swap for each comparator
     for a, b in pairs:
-        lines.append(f"        if (e{a}.CompareTo(e{b}) > 0) {{ T temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
+        lines.append(f"        if (e{a} > e{b}) {{ int temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
     lines.append(f"")
-    # Write values back to memory
     lines.append(f"        first = e0;")
     for i in range(1, n):
         lines.append(f"        Unsafe.Add(ref first, {i}) = e{i};")
@@ -112,7 +109,7 @@ def generate_file():
     lines.append("public static partial class NetworkSort")
     lines.append("{")
     
-    for n in range(2, 29):
+    for n in [27, 28]:
         pairs = get_network(n)
         lines.append(generate_unrolled_method(n, pairs))
         if n < 28:
@@ -130,6 +127,6 @@ if __name__ == "__main__":
     print(f"Generated {output_path}")
     
     # Print stats
-    for n in range(2, 29):
+    for n in [27, 28]:
         pairs = get_network(n)
         print(f"  Sort{n}: {len(pairs)} compare-swaps")

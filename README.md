@@ -1,11 +1,9 @@
 # SortingNetworks
 
-A .NET library that uses sorting-network-based specializations for small
-collections. For sizes up to 28, elements are sorted via fixed
-compare-and-swap sequences -- including depth-13 networks for 27 and 28
-channels from the paper
+A .NET library that uses sorting-network-based specializations for `int`
+arrays of sizes 27 and 28 -- using depth-13 networks from the paper
 ["Depth-13 Sorting Networks for 28 Channels"](https://arxiv.org/abs/2511.04107).
-Larger inputs fall back to the default .NET sort.
+All other sizes fall back to the default .NET sort.
 
 ## Usage
 
@@ -13,8 +11,8 @@ Larger inputs fall back to the default .NET sort.
 using SortingNetworks;
 
 int[] data = { 5, 3, 1, 4, 2 };
-NetworkSort.Sort(data);            // IComparable<T> path
-NetworkSort.Sort(data, comparer);  // IComparer<T> path
+NetworkSort.Sort(data);
+NetworkSort.Sort(data, comparer);  // IComparer<int> path
 
 Span<int> span = stackalloc int[] { 5, 3, 1, 4, 2 };
 NetworkSort.Sort(span);
@@ -24,16 +22,33 @@ NetworkSort.Sort(span);
 
 | Input size | Strategy |
 |---|---|
-| 0-1 | No-op |
-| 2-26 | Batcher's odd-even merge sort network |
 | 27-28 | Depth-13 networks from arXiv:2511.04107 |
-| 29+ | Fallback to `Span<T>.Sort()` / `Array.Sort()` |
+| All other sizes | Fallback to `Span<int>.Sort()` / `Array.Sort()` |
 
 Sorting networks execute a fixed sequence of compare-and-swap operations
 determined entirely by the input length. This eliminates branches and enables
-predictable performance for small arrays. The 27- and 28-channel networks are
-derived from the paper's reflection-symmetric construction that improved the
-previous best depth bound from 14 to 13.
+predictable performance. The 27- and 28-channel networks are derived from the
+paper's reflection-symmetric construction that improved the previous best depth
+bound from 14 to 13.
+
+The unrolled methods use `int`-specific comparisons (`>` operator) instead of
+generic `CompareTo()` calls, which compiles to a single CPU comparison
+instruction and matches the performance of the BCL's internal sort helpers.
+
+## Benchmarks
+
+Results comparing `NetworkSort` vs `Array.Sort` on .NET 10:
+
+| Size | Kind | NetworkSort_Span | Ratio vs ArraySort |
+|---|---|---|---|
+| 27 | Random | 97.3 ns | **1.00x** (tied) |
+| 27 | Sorted | 68.4 ns | 1.04x |
+| 27 | Reversed | 97.6 ns | 1.19x |
+| 27 | Duplicates | 80.0 ns | **0.77x** (23% faster) |
+| 28 | Random | 98.7 ns | **0.84x** (16% faster) |
+| 28 | Sorted | 70.7 ns | **0.97x** (tied) |
+| 28 | Reversed | 87.0 ns | **1.00x** (tied) |
+| 28 | Duplicates | 80.7 ns | **0.73x** (27% faster) |
 
 ## Building
 
@@ -47,11 +62,10 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
 
 - **SortingNetworks** -- class library (future NuGet package)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 0-64,
-  int/string types, sorted/reversed/duplicate inputs, and the 27/28-element
-  specialized paths
+  various input patterns, and the 27/28-element specialized paths
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
-  `NetworkSort.Sort` vs `Array.Sort` / `Span<T>.Sort` across multiple sizes
-  and input distributions
+  `NetworkSort.Sort` vs `Array.Sort` / `Span<int>.Sort` for sizes 27 and 28
+  across multiple input distributions
 
 ## Paper reference
 

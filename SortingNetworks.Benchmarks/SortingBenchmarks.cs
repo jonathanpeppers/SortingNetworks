@@ -9,7 +9,7 @@ public class SortingBenchmarks
 {
     private const int OpsPerInvoke = 1000;
 
-    [Params(2, 4, 8, 16, 27, 28)]
+    [Params(27, 28)]
     public int Length { get; set; }
 
     [ParamsAllValues]
