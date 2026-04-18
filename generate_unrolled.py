@@ -165,16 +165,30 @@ def fmt_vec256(values):
     parts = ", ".join(f"0x{v:02X}" for v in values)
     return f"Vector256.Create((byte){parts})"
 
-def generate_simd_sort_method(n, steps):
-    """Generate a SortSimdN method for byte using AVX2."""
+def generate_simd_sort_method(n, steps, type_name):
+    """Generate a SortSimdN method for byte or sbyte using AVX2."""
     load_offset = n - 16  # 11 for n=27, 12 for n=28
     shift_amount = 32 - n  # 5 for n=27, 4 for n=28
+    is_signed = (type_name == "sbyte")
+    suffix = f"_{type_name}" if type_name != "byte" else ""
+
+    # Min/Max calls differ by signedness
+    if is_signed:
+        min_expr = lambda v, s: f"Avx2.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()"
+        max_expr = lambda v, s: f"Avx2.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()"
+    else:
+        min_expr = lambda v, s: f"Avx2.Min({v}, {s})"
+        max_expr = lambda v, s: f"Avx2.Max({v}, {s})"
 
     lines = []
     lines.append(f"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]")
-    lines.append(f"    private static void SortSimd{n}(Span<byte> span)")
+    lines.append(f"    private static void SortSimd{n}{suffix}(Span<{type_name}> span)")
     lines.append(f"    {{")
-    lines.append(f"        ref byte first = ref MemoryMarshal.GetReference(span);")
+    # Load: reinterpret as byte for all bitwise operations
+    if is_signed:
+        lines.append(f"        ref byte first = ref Unsafe.As<{type_name}, byte>(ref MemoryMarshal.GetReference(span));")
+    else:
+        lines.append(f"        ref byte first = ref MemoryMarshal.GetReference(span);")
     lines.append(f"        var lo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);")
     lines.append(f"        var hi = Sse2.ShiftRightLogical128BitLane(")
     lines.append(f"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {load_offset})),")
@@ -198,16 +212,16 @@ def generate_simd_sort_method(n, steps):
             lines.append(f"            var fromLo = Avx2.Shuffle(loLo, {fmt_vec256(maskLo)});")
             lines.append(f"            var fromHi = Avx2.Shuffle(hiHi, {fmt_vec256(maskHi)});")
             lines.append(f"            var shuffled = Avx2.Or(fromLo, fromHi);")
-            lines.append(f"            var mins = Avx2.Min(vec, shuffled);")
-            lines.append(f"            var maxs = Avx2.Max(vec, shuffled);")
+            lines.append(f"            var mins = {min_expr('vec', 'shuffled')};")
+            lines.append(f"            var maxs = {max_expr('vec', 'shuffled')};")
             lines.append(f"            vec = Avx2.BlendVariable(mins, maxs, {fmt_vec256(blend)});")
             lines.append(f"        }}")
         else:
             mask = compute_intra_lane_mask(perm)
             lines.append(f"        {{")
             lines.append(f"            var shuffled = Avx2.Shuffle(vec, {fmt_vec256(mask)});")
-            lines.append(f"            var mins = Avx2.Min(vec, shuffled);")
-            lines.append(f"            var maxs = Avx2.Max(vec, shuffled);")
+            lines.append(f"            var mins = {min_expr('vec', 'shuffled')};")
+            lines.append(f"            var maxs = {max_expr('vec', 'shuffled')};")
             lines.append(f"            vec = Avx2.BlendVariable(mins, maxs, {fmt_vec256(blend)});")
             lines.append(f"        }}")
 
@@ -221,7 +235,7 @@ def generate_simd_sort_method(n, steps):
     return "\n".join(lines)
 
 def generate_simd_file():
-    """Generate NetworkSort.Simd.cs with AVX2 byte sorting methods."""
+    """Generate NetworkSort.Simd.cs with AVX2 byte/sbyte sorting methods."""
     lines = []
     lines.append("using System.Runtime.CompilerServices;")
     lines.append("using System.Runtime.InteropServices;")
@@ -238,12 +252,15 @@ def generate_simd_file():
     lines.append("public static partial class NetworkSort")
     lines.append("{")
 
-    for n in [27, 28]:
-        pairs = get_network(n)
-        steps = get_network_steps(n)
-        if n == 28:
-            lines.append("")
-        lines.append(generate_simd_sort_method(n, steps))
+    first = True
+    for type_name in ["byte", "sbyte"]:
+        for n in [27, 28]:
+            pairs = get_network(n)
+            steps = get_network_steps(n)
+            if not first:
+                lines.append("")
+            lines.append(generate_simd_sort_method(n, steps, type_name))
+            first = False
 
     lines.append("}")
     lines.append("")
@@ -288,6 +305,16 @@ def generate_public_api(type_name):
         lines.append(f"                    SortSimd27(span);")
         lines.append(f"                else")
         lines.append(f"                    SortSimd28(span);")
+        lines.append(f"                return;")
+        lines.append(f"            }}")
+        lines.append(f"")
+    elif type_name == "sbyte":
+        lines.append(f"            if (Avx2.IsSupported)")
+        lines.append(f"            {{")
+        lines.append(f"                if (n == 27)")
+        lines.append(f"                    SortSimd27_sbyte(span);")
+        lines.append(f"                else")
+        lines.append(f"                    SortSimd28_sbyte(span);")
         lines.append(f"                return;")
         lines.append(f"            }}")
         lines.append(f"")

@@ -106,6 +106,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_sbyte(span);
+                else
+                    SortSimd28_sbyte(span);
+                return;
+            }
+
             ref sbyte first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
