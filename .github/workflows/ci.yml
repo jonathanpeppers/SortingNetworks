@@ -27,21 +27,6 @@ jobs:
       - name: Test
         run: dotnet test -c Release --no-build
 
-      - name: Benchmarks
-        run: |
-          dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*' --exporters GitHub
-          for f in BenchmarkDotNet.Artifacts/results/*-report-github.md; do
-            name=$(basename "$f" -report-github.md)
-            name=${name##*.}
-            name=${name%SortingBenchmarks}
-            echo "## $name" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "> **ArraySort** = BCL baseline \`Array.Sort\`, **NetworkSort** = this library" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            cat "$f" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          done
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         if: always()
@@ -50,3 +35,74 @@ jobs:
           path: |
             **/*.nupkg
             **/*.binlog
+
+  benchmark:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Benchmarks
+        shell: bash
+        run: |
+          dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*' --exporters GitHub
+          for f in BenchmarkDotNet.Artifacts/results/*-report-github.md; do
+            name=$(basename "$f" -report-github.md)
+            name=${name##*.}
+            name=${name%SortingBenchmarks}
+            echo "## $name" >> benchmark-summary.md
+            echo "" >> benchmark-summary.md
+            echo "> **ArraySort** = BCL baseline \`Array.Sort\`, **NetworkSort** = this library" >> benchmark-summary.md
+            echo "" >> benchmark-summary.md
+            cat "$f" >> benchmark-summary.md
+            echo "" >> benchmark-summary.md
+          done
+
+      - name: Upload benchmark summary
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: benchmark-summary-${{ matrix.os }}
+          path: benchmark-summary.md
+          if-no-files-found: ignore
+
+  summarize:
+    needs: [benchmark]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Download all benchmark summaries
+        uses: actions/download-artifact@v7
+        with:
+          pattern: benchmark-summary-*
+
+      - name: Merge summaries
+        shell: bash
+        run: |
+          shopt -s nullglob
+          dirs=(benchmark-summary-*/)
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo "No benchmark summary artifacts found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          for dir in "${dirs[@]}"; do
+            if [ ! -f "${dir}/benchmark-summary.md" ]; then
+              continue
+            fi
+            os="${dir#benchmark-summary-}"
+            os="${os%/}"
+            echo "# ${os}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat "${dir}/benchmark-summary.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+          done
