@@ -14,6 +14,7 @@ public class SortingBenchmarks
     public InputKind Kind { get; set; }
 
     private int[] _source = null!;
+    private int[] _data = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -26,35 +27,23 @@ public class SortingBenchmarks
             InputKind.Duplicates => GenerateDuplicates(Length, seed: 42),
             _ => throw new ArgumentOutOfRangeException()
         };
+        _data = new int[Length];
     }
+
+    [IterationSetup]
+    public void IterationSetup() => Array.Copy(_source, _data, Length);
 
     [Benchmark(Baseline = true)]
-    public void ArraySort()
-    {
-        var data = (int[])_source.Clone();
-        Array.Sort(data);
-    }
+    public void ArraySort() => Array.Sort(_data);
 
     [Benchmark]
-    public void SpanSort()
-    {
-        var data = (int[])_source.Clone();
-        data.AsSpan().Sort();
-    }
+    public void SpanSort() => _data.AsSpan().Sort();
 
     [Benchmark]
-    public void NetworkSort_Array()
-    {
-        var data = (int[])_source.Clone();
-        NetworkSort.Sort(data);
-    }
+    public void NetworkSort_Array() => NetworkSort.Sort(_data);
 
     [Benchmark]
-    public void NetworkSort_Span()
-    {
-        var data = (int[])_source.Clone();
-        NetworkSort.Sort(data.AsSpan());
-    }
+    public void NetworkSort_Span() => NetworkSort.Sort(_data.AsSpan());
 
     private static int[] GenerateRandom(int length, int seed)
     {
