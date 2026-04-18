@@ -27,7 +27,7 @@ jobs:
 
       - name: Benchmarks
         run: |
-          dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*'
+          dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*' --exporters GitHub
           cat BenchmarkDotNet.Artifacts/results/*-report-github.md >> $GITHUB_STEP_SUMMARY
 
       - name: Upload artifacts
