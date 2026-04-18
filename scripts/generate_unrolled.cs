@@ -1267,10 +1267,8 @@ void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B
     if (n == 27)
     {
         w.WriteLine("""
-                var upper = vec1.GetUpper();
                 Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
-                    Sse2.ShiftLeftLogical128BitLane(upper.GetUpper(), 4));
-                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), upper.GetLower());
+                    Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
                 Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
                 Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
         """);
@@ -1278,8 +1276,7 @@ void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B
     else
     {
         w.WriteLine("""
-                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetUpper());
-                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), vec1.GetUpper().GetLower());
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
                 Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
                 Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
         """);

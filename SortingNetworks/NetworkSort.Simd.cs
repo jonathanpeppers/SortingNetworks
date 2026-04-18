@@ -2914,10 +2914,8 @@ public static partial class NetworkSort
             vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
 
             // Store results
-        var upper = vec1.GetUpper();
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
-            Sse2.ShiftLeftLogical128BitLane(upper.GetUpper(), 4));
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), upper.GetLower());
+            Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
     }
@@ -3065,8 +3063,7 @@ public static partial class NetworkSort
             vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
 
             // Store results
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetUpper());
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), vec1.GetUpper().GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
     }
@@ -3215,10 +3212,8 @@ public static partial class NetworkSort
             vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
 
             // Store results
-        var upper = vec1.GetUpper();
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
-            Sse2.ShiftLeftLogical128BitLane(upper.GetUpper(), 4));
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), upper.GetLower());
+            Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
     }
@@ -3366,8 +3361,7 @@ public static partial class NetworkSort
             vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
 
             // Store results
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetUpper());
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), vec1.GetUpper().GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
     }
@@ -3516,10 +3510,8 @@ public static partial class NetworkSort
             vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
 
             // Store results
-        var upper = vec1.GetUpper();
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
-            Sse2.ShiftLeftLogical128BitLane(upper.GetUpper(), 4));
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), upper.GetLower());
+            Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
     }
@@ -3667,8 +3659,7 @@ public static partial class NetworkSort
             vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
 
             // Store results
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetUpper());
-        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)), vec1.GetUpper().GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
         Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
     }
