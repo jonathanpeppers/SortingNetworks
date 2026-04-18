@@ -1,5 +1,5 @@
 /// Generate unrolled sorting network methods for SortingNetworks.
-/// Usage: dotnet run generate_unrolled.cs
+/// Usage: dotnet run scripts/generate_unrolled.cs
 
 using System.Text;
 
