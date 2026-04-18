@@ -74,7 +74,28 @@ def get_network(n):
 
 # --- Code generation ---
 
+# Sizes below this threshold use value locals (loaded into registers).
+# Sizes at or above use SwapIfGreater (operates on memory in-place)
+# to avoid register spills from too many live locals.
+SWAP_THRESHOLD = 17
+
 def generate_unrolled_method(n, pairs):
+    if n >= SWAP_THRESHOLD:
+        return generate_swap_method(n, pairs)
+    return generate_value_local_method(n, pairs)
+
+def generate_swap_method(n, pairs):
+    """Generate a method that uses SwapIfGreater for each comparator."""
+    lines = []
+    lines.append(f"    private static void Sort{n}<T>(ref T first) where T : IComparable<T>")
+    lines.append(f"    {{")
+    for a, b in pairs:
+        lines.append(f"        SwapIfGreater(ref first, {a}, {b});")
+    lines.append(f"    }}")
+    return "\n".join(lines)
+
+def generate_value_local_method(n, pairs):
+    """Generate a method that loads all values into locals for register allocation."""
     lines = []
     # Only inline small methods; larger ones can't be inlined anyway
     if n <= 8:
@@ -86,9 +107,9 @@ def generate_unrolled_method(n, pairs):
     for i in range(1, n):
         lines.append(f"        T e{i} = Unsafe.Add(ref first, {i});")
     lines.append(f"")
-    # Emit compare-and-swap for each comparator
+    # Emit compare-and-swap for each comparator using GreaterThan
     for a, b in pairs:
-        lines.append(f"        if (e{a}.CompareTo(e{b}) > 0) {{ T temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
+        lines.append(f"        if (GreaterThan(e{a}, e{b})) {{ T temp = e{a}; e{a} = e{b}; e{b} = temp; }}")
     lines.append(f"")
     # Write values back to memory
     lines.append(f"        first = e0;")

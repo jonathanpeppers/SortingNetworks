@@ -22,6 +22,12 @@ public static partial class NetworkSort
         if (n <= NetworkData.MaxNetworkSize)
         {
             ref T first = ref MemoryMarshal.GetReference(span);
+
+            // For larger networks, an O(n) sorted check avoids running
+            // all comparators on already-sorted input.
+            if (n >= 9 && IsSorted(ref first, n))
+                return;
+
             switch (n)
             {
                 case 2: Sort2(ref first); return;
@@ -121,5 +127,58 @@ public static partial class NetworkSort
                 b = temp;
             }
         }
+    }
+
+    /// <summary>
+    /// Fast comparison that bypasses CompareTo for primitive types.
+    /// The JIT constant-folds typeof checks and eliminates boxing,
+    /// compiling to a single comparison instruction for primitives.
+    /// Same pattern used by the BCL in ArraySortHelper.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool GreaterThan<T>(T left, T right) where T : IComparable<T>
+    {
+        if (typeof(T) == typeof(byte)) return (byte)(object)left! > (byte)(object)right!;
+        if (typeof(T) == typeof(sbyte)) return (sbyte)(object)left! > (sbyte)(object)right!;
+        if (typeof(T) == typeof(ushort)) return (ushort)(object)left! > (ushort)(object)right!;
+        if (typeof(T) == typeof(short)) return (short)(object)left! > (short)(object)right!;
+        if (typeof(T) == typeof(uint)) return (uint)(object)left! > (uint)(object)right!;
+        if (typeof(T) == typeof(int)) return (int)(object)left! > (int)(object)right!;
+        if (typeof(T) == typeof(ulong)) return (ulong)(object)left! > (ulong)(object)right!;
+        if (typeof(T) == typeof(long)) return (long)(object)left! > (long)(object)right!;
+        if (typeof(T) == typeof(nuint)) return (nuint)(object)left! > (nuint)(object)right!;
+        if (typeof(T) == typeof(nint)) return (nint)(object)left! > (nint)(object)right!;
+        if (typeof(T) == typeof(float)) return (float)(object)left! > (float)(object)right!;
+        if (typeof(T) == typeof(double)) return (double)(object)left! > (double)(object)right!;
+        return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>
+    /// Compare-and-swap two elements in-place using their offsets from a base reference.
+    /// Used by larger sorting networks (17+ elements) to avoid loading all
+    /// values into locals, which causes register spills at those sizes.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static void SwapIfGreater<T>(ref T first, int i, int j) where T : IComparable<T>
+    {
+        ref T a = ref Unsafe.Add(ref first, i);
+        ref T b = ref Unsafe.Add(ref first, j);
+        if (GreaterThan(a, b))
+        {
+            T temp = a;
+            a = b;
+            b = temp;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsSorted<T>(ref T first, int n) where T : IComparable<T>
+    {
+        for (int i = 0; i < n - 1; i++)
+        {
+            if (GreaterThan(Unsafe.Add(ref first, i), Unsafe.Add(ref first, i + 1)))
+                return false;
+        }
+        return true;
     }
 }
