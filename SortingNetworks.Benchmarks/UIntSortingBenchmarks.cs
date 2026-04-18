@@ -43,6 +43,7 @@ public class UIntSortingBenchmarks
     public void NetworkSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
-            SortingNetworks.NetworkSort.Sort(_batch[i].AsSpan());
+            SortingNetworks.NetworkSort.Sort(_batch[i]);
     }
 }
+
