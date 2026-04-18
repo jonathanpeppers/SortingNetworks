@@ -68,8 +68,13 @@ For `byte` and `sbyte`, the library additionally uses SIMD vectorization
 when available — AVX2 on x86 and AdvSimd (NEON) on ARM64. All 27-28 elements
 fit in a single vector register, allowing each of the 13 network steps to
 execute as a vectorized shuffle + min/max + blend operation instead of
-individual scalar compare-and-swap branches. On platforms without SIMD support,
-this falls back to the scalar unrolled sort.
+individual scalar compare-and-swap branches.
+
+For `short`, `ushort`, and `char` (16-bit types), AVX-512 SIMD is used on x86
+when available, packing all elements into a single `Vector512<ushort>`. On
+ARM64, four `Vector128<byte>` vectors with `VectorTableLookup` (TBL4) provide
+cross-vector shuffles for the same 16-bit types. On platforms without SIMD
+support, this falls back to the scalar unrolled sort.
 
 ## Benchmarks
 
@@ -101,6 +106,8 @@ sorting network dominates:
 | nint | 1,430 ns | 106 ns | **14x** |
 | nuint | 1,393 ns | 105 ns | **13x** |
 
+> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512 SIMD (packing all 27-28 elements into a single `Vector512<ushort>`) for even greater speedups.
+
 #### Types where Array.Sort is already SIMD-optimized
 
 .NET 10 has SIMD-accelerated sort paths for `int`, `uint`, `char`, and
@@ -127,15 +134,32 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 ### ARM64 (Apple M1, AdvSimd/NEON)
 
-On ARM64, the library uses AdvSimd (NEON) intrinsics for `byte` and `sbyte`,
-achieving ~4.7x speedup over the scalar unrolled path:
+On ARM64, the library uses AdvSimd (NEON) intrinsics for `byte`, `sbyte`,
+`short`, `ushort`, and `char`:
 
-| Type | Length | Scalar (main) | NEON SIMD (PR) | Speedup |
-|---|---|---|---|---|
-| byte | 27 | 92 ns | 20 ns | **4.7x** |
-| byte | 28 | 96 ns | 20 ns | **4.7x** |
-| sbyte | 27 | 99 ns | 22 ns | **4.5x** |
-| sbyte | 28 | 100 ns | 21 ns | **4.7x** |
+#### SIMD-accelerated types
+
+For `byte` and `sbyte`, all elements fit in two `Vector128<byte>` registers.
+For `short` and `ushort`, four `Vector128<byte>` registers with TBL4
+cross-vector shuffles are used:
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| byte | 1,212 ns | 29 ns | **42x** |
+| sbyte | 1,358 ns | 31 ns | **44x** |
+| short | 1,382 ns | 53 ns | **26x** |
+| ushort | 1,242 ns | 55 ns | **23x** |
+
+#### Types where Array.Sort is already SIMD-optimized
+
+.NET 10 has SIMD-accelerated sort for `char` on ARM64. NetworkSort's NEON
+path still provides a ~2x improvement:
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| char | 102 ns | 51 ns | **2x** |
+
+#### Other types (scalar unrolled network)
 
 For other types, the unrolled scalar sorting network provides the same large
 speedup over `Array.Sort` as on x86:
@@ -145,7 +169,6 @@ speedup over `Array.Sort` as on x86:
 | double | 1,568 ns | 102 ns | **15x** |
 | float | 1,496 ns | 100 ns | **15x** |
 | long | 1,472 ns | 100 ns | **15x** |
-| short | 1,443 ns | 93 ns | **16x** |
 
 ### int detailed results (SIMD-optimized baseline)
 
