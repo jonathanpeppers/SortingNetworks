@@ -43,6 +43,20 @@ public class StringSortingBenchmarks
     public void NetworkSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
-            SortingNetworks.NetworkSort.Sort(_batch[i], StringComparer.Ordinal);
+            SortingNetworks.NetworkSort.Sort(_batch[i]);
+    }
+
+    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
+    public void SpanSort()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            _batch[i].AsSpan().Sort(StringComparer.Ordinal);
+    }
+
+    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
+    public void NetworkSort_Span()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            SortingNetworks.NetworkSort.Sort(_batch[i].AsSpan());
     }
 }
