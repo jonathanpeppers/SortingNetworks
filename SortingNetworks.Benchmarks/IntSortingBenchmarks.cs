@@ -50,23 +50,9 @@ public class IntSortingBenchmarks
     }
 
     [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
-    public void SpanSort()
+    public void NetworkSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
-            _batch[i].AsSpan().Sort();
-    }
-
-    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
-    public void NetworkSort_Array()
-    {
-        for (int i = 0; i < OpsPerInvoke; i++)
-            NetworkSort.Sort(_batch[i]);
-    }
-
-    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
-    public void NetworkSort_Span()
-    {
-        for (int i = 0; i < OpsPerInvoke; i++)
-            NetworkSort.Sort(_batch[i].AsSpan());
+            SortingNetworks.NetworkSort.Sort(_batch[i].AsSpan());
     }
 }
