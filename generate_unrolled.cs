@@ -133,9 +133,17 @@ List<List<(int A, int B)>> GetNetwork28Steps()
     int idx = 0;
     foreach (int size in network28StepSizes)
     {
-        steps.Add(pairs.GetRange(idx, size));
+        var step = pairs.GetRange(idx, size);
+        // Validate each step is a disjoint matching (no element in two pairs)
+        var used = new HashSet<int>();
+        foreach (var (a, b) in step)
+            if (!used.Add(a) || !used.Add(b))
+                throw new InvalidOperationException($"SIMD step {steps.Count}: pair ({a},{b}) overlaps with another pair.");
+        steps.Add(step);
         idx += size;
     }
+    if (idx != pairs.Count)
+        throw new InvalidOperationException($"network28StepSizes covers {idx} of {pairs.Count} pairs.");
     return steps;
 }
 
