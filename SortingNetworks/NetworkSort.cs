@@ -747,6 +747,17 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (nint.Size == 8 && Avx512F.IsSupported)
+            {
+                Sort(MemoryMarshal.Cast<nint, long>(span));
+                return;
+            }
+            if (nint.Size == 4)
+            {
+                Sort(MemoryMarshal.Cast<nint, int>(span));
+                return;
+            }
+
             ref nint first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -819,6 +830,17 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (nuint.Size == 8 && Avx512F.IsSupported)
+            {
+                Sort(MemoryMarshal.Cast<nuint, ulong>(span));
+                return;
+            }
+            if (nuint.Size == 4)
+            {
+                Sort(MemoryMarshal.Cast<nuint, uint>(span));
+                return;
+            }
+
             ref nuint first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);

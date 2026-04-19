@@ -47,6 +47,120 @@ NetworkSort.Sort(names, StringComparer.OrdinalIgnoreCase);  // custom comparer
 NetworkSort.Sort(myArray, myComparer);
 ```
 
+## How it works
+
+A [sorting network](https://en.wikipedia.org/wiki/Sorting_network) is a fixed
+sequence of **compare-and-swap** operations that sorts any input of a given
+size. Unlike comparison-based algorithms such as quicksort, the sequence of
+comparisons is determined entirely by the input length — not by the data values
+— which eliminates branches and enables predictable, data-oblivious
+performance.
+
+Each compare-and-swap takes two elements and puts the smaller one first:
+
+```
+if a > b
+    swap(a, b)
+```
+
+A sorting network arranges these operations into **layers** (also called
+*depth*). Comparators within the same layer operate on independent pairs, so
+they can execute in parallel. The **depth** of a network is the number of
+layers — fewer layers means lower latency.
+
+### The paper
+
+This library implements the networks from:
+
+> Chengu Wang, **"Depth-13 Sorting Networks for 28 Channels"**,
+> [arXiv:2511.04107](https://arxiv.org/abs/2511.04107), 2025.
+
+The paper established new depth upper bounds for sorting networks on 27 and 28
+channels, improving the previous best bound from **14 to 13**. The
+28-channel network is constructed with **reflectional symmetry** by:
+
+1. Combining high-quality prefixes of 16-channel and 12-channel networks (5
+   layers each),
+2. Extending them greedily one comparator at a time to reach 6 layers, and
+3. Using a **SAT solver** to complete the remaining layers 7–13.
+
+The 27-channel network is derived from the 28-channel network by removing all
+comparators that involve channel 27.
+
+### Scalar implementation
+
+The simplest path unrolls every compare-and-swap from the network into
+straight-line code. For a 3-element example, a depth-3 network looks like:
+
+```csharp
+// Sort 3 elements with a sorting network (depth 3, 3 comparators)
+static void Sort3(ref int e0, ref int e1, ref int e2)
+{
+    // Layer 1 — two independent comparators could go here, but
+    // for 3 elements there is only one pair per layer.
+    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+
+    // Layer 2
+    if (e1 > e2) { int t = e1; e1 = e2; e2 = t; }
+
+    // Layer 3
+    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+}
+```
+
+For the real 27/28-element networks the same pattern is used — the code
+generator emits all ~185 comparators across 13 layers as a flat `if`/swap
+sequence. Elements are loaded into local variables via `Unsafe.Add(ref T, n)`
+to avoid bounds checks:
+
+```csharp
+// Actual generated code (simplified) for the first layer of Sort27<int>:
+int e0 = first;
+int e1 = Unsafe.Add(ref first, 1);
+// ... load e2 through e26 ...
+
+// Layer 1 comparators:
+if (e1  > e26) { int temp = e1;  e1  = e26; e26 = temp; }
+if (e2  > e25) { int temp = e2;  e2  = e25; e25 = temp; }
+if (e3  > e24) { int temp = e3;  e3  = e24; e24 = temp; }
+// ... remaining comparators in layers 2–13 ...
+```
+
+### SIMD implementation
+
+For types that fit well in SIMD registers, the library replaces the scalar
+`if`/swap pattern with vectorized **min/max/select** operations. Instead of
+comparing one pair at a time, an entire layer of the sorting network executes
+in a few instructions.
+
+Here is a simplified example for `byte` with AVX2 — all 27 elements fit in a
+single `Vector256<byte>` (32 lanes, 5 unused):
+
+```csharp
+// Load all elements into one 256-bit vector
+var vec = LoadVector256(ref first); // [e0, e1, ..., e26, 0, 0, 0, 0, 0]
+
+// For each of the 13 layers:
+//   1. Shuffle: rearrange elements to pair up comparators
+var shuffled = Vector256.Shuffle(vec, layerPermutation);
+
+//   2. Min/Max: compare all pairs simultaneously
+var mins = Vector256.Min(vec, shuffled);
+var maxs = Vector256.Max(vec, shuffled);
+
+//   3. Select: pick min or max for each position using a mask
+vec = Vector256.ConditionalSelect(layerMask, maxs, mins);
+
+// After all 13 layers, store the sorted vector back
+StoreVector256(ref first, vec);
+```
+
+Each layer becomes three SIMD instructions — **shuffle**, **min/max**, and
+**blend** — instead of many individual branches. For `byte`, this produces a
+**33-41x** speedup over `Array.Sort`. The same pattern extends to wider types
+(`int`, `float`, `double`) using multiple SIMD registers with cross-vector
+shuffles.
+
 ## Design
 
 | Input size | Strategy |
@@ -64,12 +178,11 @@ The unrolled methods use type-specific comparisons (`>` operator) instead of
 generic `CompareTo()` calls, which compiles to a single CPU comparison
 instruction and matches the performance of the BCL's internal sort helpers.
 
-For `byte` and `sbyte`, the library uses a unified cross-platform SIMD path
-using `Vector256`/`Vector128` APIs that work on both x86 (AVX2/SSSE3) and
-ARM64 (AdvSimd/NEON). All 27-28 elements fit in a single `Vector256<byte>`
-(or a pair of `Vector128<byte>` on ARM), allowing each of the 13 network
-steps to execute as a vectorized shuffle + min/max + conditional-select
-operation instead of individual scalar compare-and-swap branches.
+For `byte` and `sbyte`, the library additionally uses SIMD vectorization
+when available — AVX2 on x86 and AdvSimd (NEON) on ARM64. All 27-28 elements
+fit in a single vector register, allowing each of the 13 network steps to
+execute as a vectorized shuffle + min/max + blend operation instead of
+individual scalar compare-and-swap branches.
 
 For `int` and `uint`, AVX2 SIMD is used on x86 with four `Vector256<int>`
 registers (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
@@ -99,6 +212,13 @@ For `double`, AVX-512F SIMD is used on x86 when available (four `Vector512`
 registers). On CPUs without AVX-512F, an AVX2 fallback uses seven
 `Vector256<double>` registers (4 elements each) with `Permute4x64` shuffles.
 
+For `nint` and `nuint`, the library dispatches to the corresponding fixed-size
+integer sort via `MemoryMarshal.Cast` when SIMD is available for the target type.
+On 64-bit platforms with AVX-512, `nint`/`nuint` dispatch to `long`/`ulong` to
+use AVX-512F SIMD. On 32-bit platforms, they dispatch to `int`/`uint`. When no
+SIMD path exists for the target type (e.g., ARM64 or AVX2-only x86 for 64-bit),
+the scalar unrolled network is used directly to avoid dispatch overhead.
+
 ## Benchmarks
 
 ### x86 (Intel Core i9-9900K, AVX2)
@@ -107,50 +227,49 @@ Results comparing `NetworkSort` vs `Array.Sort` on .NET 10:
 
 #### Types where NetworkSort is significantly faster
 
-For `byte` and `sbyte`, the library uses a unified cross-platform SIMD path --
-all 27-28 elements fit in a single `Vector256<byte>` (AVX2) or a pair of
-`Vector128<byte>` (SSSE3/AdvSimd), enabling each network step to execute as a
-vectorized min/max/conditional-select operation:
+For `byte` and `sbyte`, the library uses AVX2 SIMD vectorization -- all 27-28
+elements fit in a single `Vector256<byte>` register, enabling each network step
+to execute as a vectorized min/max/blend operation:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,319 ns | 40 ns | **33x** |
-| sbyte | 1,444 ns | 41 ns | **35x** |
+| byte | 1,308 ns | 39 ns | **34x** |
+| sbyte | 1,435 ns | 43 ns | **33x** |
 
 For `int` and `uint`, AVX2 SIMD uses four `Vector256<int>` registers with
 cross-vector shuffles via `PermuteVar8x32`:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| int | 102 ns | 57 ns | **1.8x** |
-| uint | 108 ns | 54 ns | **2.0x** |
+| int | 105 ns | 56 ns | **1.9x** |
+| uint | 107 ns | 56 ns | **1.9x** |
 
 For `float`, AVX2 SIMD uses four `Vector256<float>` registers with
 `PermuteVar8x32` shuffles and `Avx.Min`/`Avx.Max` comparisons:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,568 ns | 76 ns | **21x** |
+| float | 1,597 ns | 75 ns | **21x** |
 
 For `double`, AVX2 SIMD uses seven `Vector256<double>` registers with
 `Permute4x64` shuffles (on CPUs with AVX-512F, an AVX-512 path is used instead):
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,622 ns | 93 ns | **17x** |
+| double | 1,651 ns | 96 ns | **17x** |
 
 For other types without a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| short | 1,389 ns | 100 ns | **14x** |
-| ushort | 1,305 ns | 101 ns | **13x** |
-| long | 1,554 ns | 103 ns | **15x** |
-| nint | 1,419 ns | 103 ns | **14x** |
-| nuint | 1,421 ns | 104 ns | **14x** |
+| short | 1,382 ns | 101 ns | **14x** |
+| ushort | 1,290 ns | 100 ns | **13x** |
+| long | 1,427 ns | 103 ns | **14x** |
+| nint | 1,415 ns | 103 ns | **14x** |
+| nuint | 1,428 ns | 103 ns | **14x** |
 
-> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, and `int`, `uint`, and `float` use AVX-512F SIMD for even greater speedups.
+> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, `int`, `uint`, and `float` use AVX-512F SIMD, and `nint`/`nuint` dispatch to `long`/`ulong` for even greater speedups.
 
 #### Types where Array.Sort is already SIMD-optimized
 
@@ -159,8 +278,8 @@ types the BCL is already very fast and NetworkSort provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| char | 93 ns | 97 ns | ~1x |
-| ulong | 117 ns | 102 ns | ~1.2x |
+| char | 94 ns | 97 ns | ~1x |
+| ulong | 116 ns | 100 ns | ~1.2x |
 
 > **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and NetworkSort may be slower for these types.
 
@@ -171,7 +290,7 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| string | 976 ns | 532 ns | **1.8x** |
+| string | 977 ns | 525 ns | **1.9x** |
 
 ### x86 AVX-512F (AMD EPYC 9V74, GitHub Actions)
 
@@ -243,14 +362,14 @@ speedup over `Array.Sort` as on x86:
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 57 ns | **0.56x** (44% faster) |
-| 27 | Sorted | 57 ns | **0.80x** (20% faster) |
+| 27 | Random | 57 ns | **0.54x** (46% faster) |
+| 27 | Sorted | 59 ns | **0.85x** (15% faster) |
 | 27 | Reversed | 58 ns | **0.68x** (32% faster) |
-| 27 | Duplicates | 57 ns | **0.52x** (48% faster) |
-| 28 | Random | 58 ns | **0.48x** (52% faster) |
-| 28 | Sorted | 56 ns | **0.77x** (23% faster) |
-| 28 | Reversed | 57 ns | **0.56x** (44% faster) |
-| 28 | Duplicates | 57 ns | **0.50x** (50% faster) |
+| 27 | Duplicates | 58 ns | **0.53x** (47% faster) |
+| 28 | Random | 57 ns | **0.47x** (53% faster) |
+| 28 | Sorted | 57 ns | **0.78x** (22% faster) |
+| 28 | Reversed | 58 ns | **0.65x** (35% faster) |
+| 28 | Duplicates | 57 ns | **0.51x** (49% faster) |
 
 ### int detailed results (ARM64)
 

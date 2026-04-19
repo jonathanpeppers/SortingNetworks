@@ -1834,6 +1834,36 @@ void WritePublicApi(StreamWriter w, string t)
     w.WriteLine("        int n = span.Length;");
     w.WriteLine("        if (n == 27 || n == 28)");
     w.WriteLine("        {");
+    if (t == "nint")
+    {
+        // Gate 64-bit dispatch on Avx512F — long only has SIMD via AVX-512.
+        // On ARM64 and AVX2-only x86, fall through to the scalar unrolled path.
+        w.WriteLine("            if (nint.Size == 8 && Avx512F.IsSupported)");
+        w.WriteLine("            {");
+        w.WriteLine("                Sort(MemoryMarshal.Cast<nint, long>(span));");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine("            if (nint.Size == 4)");
+        w.WriteLine("            {");
+        w.WriteLine("                Sort(MemoryMarshal.Cast<nint, int>(span));");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine();
+    }
+    else if (t == "nuint")
+    {
+        w.WriteLine("            if (nuint.Size == 8 && Avx512F.IsSupported)");
+        w.WriteLine("            {");
+        w.WriteLine("                Sort(MemoryMarshal.Cast<nuint, ulong>(span));");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine("            if (nuint.Size == 4)");
+        w.WriteLine("            {");
+        w.WriteLine("                Sort(MemoryMarshal.Cast<nuint, uint>(span));");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine();
+    }
     if (hasSimd32_512)
     {
         w.WriteLine("            if (Avx512F.IsSupported)");
