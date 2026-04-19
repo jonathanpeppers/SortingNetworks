@@ -437,22 +437,9 @@ void WriteSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> steps
             w.WriteLine($"            var fromLo = Avx2.Shuffle(loLo, {FmtVec256(maskLo)});");
             w.WriteLine($"            var fromHi = Avx2.Shuffle(hiHi, {FmtVec256(maskHi)});");
             w.WriteLine("            var shuffled = Avx2.Or(fromLo, fromHi);");
-            bool allMin = blend.All(b => b == 0x00);
-            bool allMax = blend.All(b => b == 0xFF);
-            if (allMin)
-            {
-                w.WriteLine($"            vec = {MinExpr(typeName, "vec", "shuffled")};");
-            }
-            else if (allMax)
-            {
-                w.WriteLine($"            vec = {MaxExpr(typeName, "vec", "shuffled")};");
-            }
-            else
-            {
-                w.WriteLine($"            var mins = {MinExpr(typeName, "vec", "shuffled")};");
-                w.WriteLine($"            var maxs = {MaxExpr(typeName, "vec", "shuffled")};");
-                w.WriteLine($"            vec = Avx2.BlendVariable(mins, maxs, {FmtVec256(blend)});");
-            }
+            w.WriteLine($"            var mins = {MinExpr(typeName, "vec", "shuffled")};");
+            w.WriteLine($"            var maxs = {MaxExpr(typeName, "vec", "shuffled")};");
+            w.WriteLine($"            vec = Avx2.BlendVariable(mins, maxs, {FmtVec256(blend)});");
             w.WriteLine("        }");
         }
         else
@@ -460,22 +447,9 @@ void WriteSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> steps
             var mask = ComputeIntraLaneMask(perm);
             w.WriteLine("        {");
             w.WriteLine($"            var shuffled = Avx2.Shuffle(vec, {FmtVec256(mask)});");
-            bool allMin = blend.All(b => b == 0x00);
-            bool allMax = blend.All(b => b == 0xFF);
-            if (allMin)
-            {
-                w.WriteLine($"            vec = {MinExpr(typeName, "vec", "shuffled")};");
-            }
-            else if (allMax)
-            {
-                w.WriteLine($"            vec = {MaxExpr(typeName, "vec", "shuffled")};");
-            }
-            else
-            {
-                w.WriteLine($"            var mins = {MinExpr(typeName, "vec", "shuffled")};");
-                w.WriteLine($"            var maxs = {MaxExpr(typeName, "vec", "shuffled")};");
-                w.WriteLine($"            vec = Avx2.BlendVariable(mins, maxs, {FmtVec256(blend)});");
-            }
+            w.WriteLine($"            var mins = {MinExpr(typeName, "vec", "shuffled")};");
+            w.WriteLine($"            var maxs = {MaxExpr(typeName, "vec", "shuffled")};");
+            w.WriteLine($"            vec = Avx2.BlendVariable(mins, maxs, {FmtVec256(blend)});");
             w.WriteLine("        }");
         }
     }
@@ -525,22 +499,9 @@ void WriteSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> ste
         w.WriteLine($"        // Step {si}: {pairStr}");
         w.WriteLine("        {");
         w.WriteLine($"            var shuffled = Avx512BW.PermuteVar32x16(vec, {FmtVec512_UShort(perm)});");
-        bool allMin = blend.All(v => v == 0);
-        bool allMax = blend.All(v => v == 0xFFFF);
-        if (allMin)
-        {
-            w.WriteLine($"            vec = {MinExpr16(typeName, "vec", "shuffled")};");
-        }
-        else if (allMax)
-        {
-            w.WriteLine($"            vec = {MaxExpr16(typeName, "vec", "shuffled")};");
-        }
-        else
-        {
-            w.WriteLine($"            var mins = {MinExpr16(typeName, "vec", "shuffled")};");
-            w.WriteLine($"            var maxs = {MaxExpr16(typeName, "vec", "shuffled")};");
-            w.WriteLine($"            vec = Vector512.ConditionalSelect({FmtVec512_UShort(blend)}, maxs, mins);");
-        }
+        w.WriteLine($"            var mins = {MinExpr16(typeName, "vec", "shuffled")};");
+        w.WriteLine($"            var maxs = {MaxExpr16(typeName, "vec", "shuffled")};");
+        w.WriteLine($"            vec = Vector512.ConditionalSelect({FmtVec512_UShort(blend)}, maxs, mins);");
         w.WriteLine("        }");
     }
 
