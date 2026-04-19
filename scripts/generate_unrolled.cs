@@ -1394,8 +1394,26 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
         w.WriteLine("            var tableA = (v0, v1, v2, v3);");
         w.WriteLine("            var tableB = (v4, v5, v6, Vector128<byte>.Zero);");
 
+        // Determine which vectors are identity (all elements map to themselves)
+        bool[] vectorIsIdentity = new bool[7];
         for (int vi = 0; vi < 7; vi++)
         {
+            bool isIdentity = true;
+            for (int ei = 0; ei < 4; ei++)
+            {
+                if (perm[vi * 4 + ei] != vi * 4 + ei)
+                {
+                    isIdentity = false;
+                    break;
+                }
+            }
+            vectorIsIdentity[vi] = isIdentity;
+        }
+
+        for (int vi = 0; vi < 7; vi++)
+        {
+            if (vectorIsIdentity[vi]) continue;
+
             byte[] idxA = new byte[16];
             byte[] idxB = new byte[16];
             bool needsA = false, needsB = false;
@@ -1436,6 +1454,8 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
 
         for (int vi = 0; vi < 7; vi++)
         {
+            if (vectorIsIdentity[vi]) continue;
+
             byte[] blendMask = new byte[16];
             for (int ei = 0; ei < 4; ei++)
             {
