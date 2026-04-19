@@ -180,17 +180,17 @@ cross-vector shuffles are used:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,211 ns | 26 ns | **47x** |
-| sbyte | 1,358 ns | 31 ns | **44x** |
-| short | 1,382 ns | 53 ns | **26x** |
-| ushort | 1,242 ns | 55 ns | **23x** |
+| byte | 1,200 ns | 29 ns | **41x** |
+| sbyte | 1,230 ns | 30 ns | **41x** |
+| short | 1,264 ns | 54 ns | **23x** |
+| ushort | 1,254 ns | 54 ns | **23x** |
 
 For `int`, `uint`, and `float`, seven `Vector128` registers with two-stage
 TBL/TBX cross-vector shuffles are used:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,504 ns | 85 ns | **18x** |
+| float | 1,464 ns | 84 ns | **17x** |
 
 > **Note:** `float` benefits enormously because .NET's `Array.Sort` does not
 > have a SIMD-accelerated path for `float` on ARM64.
@@ -202,9 +202,9 @@ NetworkSort's NEON path still provides improvements:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| char | 102 ns | 51 ns | **2x** |
-| int | 102 ns | 86 ns | **1.2x** |
-| uint | 114 ns | 81 ns | **1.4x** |
+| char | 121 ns | 51 ns | **2.4x** |
+| int | 105 ns | 88 ns | **1.2x** |
+| uint | 112 ns | 85 ns | **1.3x** |
 
 #### Other types (scalar unrolled network)
 
@@ -213,8 +213,8 @@ speedup over `Array.Sort` as on x86:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,478 ns | 110 ns | **13x** |
-| long | 1,472 ns | 100 ns | **15x** |
+| double | 1,523 ns | 111 ns | **14x** |
+| long | 1,254 ns | 106 ns | **12x** |
 
 ### int detailed results (AVX2 SIMD)
 
@@ -233,14 +233,14 @@ speedup over `Array.Sort` as on x86:
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 82 ns | **0.81x** (19% faster) |
-| 27 | Sorted | 81 ns | 1.41x |
-| 27 | Reversed | 80 ns | 1.27x |
-| 27 | Duplicates | 82 ns | **0.80x** (20% faster) |
-| 28 | Random | 79 ns | **0.66x** (34% faster) |
-| 28 | Sorted | 79 ns | 1.33x |
-| 28 | Reversed | 79 ns | 1.21x |
-| 28 | Duplicates | 80 ns | **0.74x** (26% faster) |
+| 27 | Random | 88 ns | **0.84x** (16% faster) |
+| 27 | Sorted | 88 ns | 1.54x |
+| 27 | Reversed | 85 ns | 1.38x |
+| 27 | Duplicates | 85 ns | **0.65x** (35% faster) |
+| 28 | Random | 84 ns | **0.68x** (32% faster) |
+| 28 | Sorted | 83 ns | 1.41x |
+| 28 | Reversed | 84 ns | 1.28x |
+| 28 | Duplicates | 83 ns | **0.75x** (25% faster) |
 
 > With AVX2 SIMD, NetworkSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the SIMD path wins for random and duplicate-heavy inputs, while sorted/reversed inputs are slightly slower for size 27 (the fixed comparison sequence can't exploit pre-sorted data). Size 28 is faster across the board on both platforms.
 
