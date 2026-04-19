@@ -47,6 +47,120 @@ NetworkSort.Sort(names, StringComparer.OrdinalIgnoreCase);  // custom comparer
 NetworkSort.Sort(myArray, myComparer);
 ```
 
+## How it works
+
+A [sorting network](https://en.wikipedia.org/wiki/Sorting_network) is a fixed
+sequence of **compare-and-swap** operations that sorts any input of a given
+size. Unlike comparison-based algorithms such as quicksort, the sequence of
+comparisons is determined entirely by the input length — not by the data values
+— which eliminates branches and enables predictable, data-oblivious
+performance.
+
+Each compare-and-swap takes two elements and puts the smaller one first:
+
+```
+if a > b
+    swap(a, b)
+```
+
+A sorting network arranges these operations into **layers** (also called
+*depth*). Comparators within the same layer operate on independent pairs, so
+they can execute in parallel. The **depth** of a network is the number of
+layers — fewer layers means lower latency.
+
+### The paper
+
+This library implements the networks from:
+
+> Chengu Wang, **"Depth-13 Sorting Networks for 28 Channels"**,
+> [arXiv:2511.04107](https://arxiv.org/abs/2511.04107), 2025.
+
+The paper established new depth upper bounds for sorting networks on 27 and 28
+channels, improving the previous best bound from **14 to 13**. The
+28-channel network is constructed with **reflectional symmetry** by:
+
+1. Combining high-quality prefixes of 16-channel and 12-channel networks (5
+   layers each),
+2. Extending them greedily one comparator at a time to reach 6 layers, and
+3. Using a **SAT solver** to complete the remaining layers 7–13.
+
+The 27-channel network is derived from the 28-channel network by removing all
+comparators that involve channel 27.
+
+### Scalar implementation
+
+The simplest path unrolls every compare-and-swap from the network into
+straight-line code. For a 3-element example, a depth-3 network looks like:
+
+```csharp
+// Sort 3 elements with a sorting network (depth 3, 3 comparators)
+static void Sort3(ref int e0, ref int e1, ref int e2)
+{
+    // Layer 1 — two independent comparators could go here, but
+    // for 3 elements there is only one pair per layer.
+    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+
+    // Layer 2
+    if (e1 > e2) { int t = e1; e1 = e2; e2 = t; }
+
+    // Layer 3
+    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+}
+```
+
+For the real 27/28-element networks the same pattern is used — the code
+generator emits all ~185 comparators across 13 layers as a flat `if`/swap
+sequence. Elements are loaded into local variables via `Unsafe.Add(ref T, n)`
+to avoid bounds checks:
+
+```csharp
+// Actual generated code (simplified) for the first layer of Sort27<int>:
+int e0 = first;
+int e1 = Unsafe.Add(ref first, 1);
+// ... load e2 through e26 ...
+
+// Layer 1 comparators:
+if (e1  > e26) { int temp = e1;  e1  = e26; e26 = temp; }
+if (e2  > e25) { int temp = e2;  e2  = e25; e25 = temp; }
+if (e3  > e24) { int temp = e3;  e3  = e24; e24 = temp; }
+// ... remaining comparators in layers 2–13 ...
+```
+
+### SIMD implementation
+
+For types that fit well in SIMD registers, the library replaces the scalar
+`if`/swap pattern with vectorized **min/max/select** operations. Instead of
+comparing one pair at a time, an entire layer of the sorting network executes
+in a few instructions.
+
+Here is a simplified example for `byte` with AVX2 — all 27 elements fit in a
+single `Vector256<byte>` (32 lanes, 5 unused):
+
+```csharp
+// Load all elements into one 256-bit vector
+var vec = LoadVector256(ref first); // [e0, e1, ..., e26, 0, 0, 0, 0, 0]
+
+// For each of the 13 layers:
+//   1. Shuffle: rearrange elements to pair up comparators
+var shuffled = Vector256.Shuffle(vec, layerPermutation);
+
+//   2. Min/Max: compare all pairs simultaneously
+var mins = Vector256.Min(vec, shuffled);
+var maxs = Vector256.Max(vec, shuffled);
+
+//   3. Select: pick min or max for each position using a mask
+vec = Vector256.ConditionalSelect(layerMask, maxs, mins);
+
+// After all 13 layers, store the sorted vector back
+StoreVector256(ref first, vec);
+```
+
+Each layer becomes three SIMD instructions — **shuffle**, **min/max**, and
+**blend** — instead of many individual branches. For `byte`, this produces a
+**33-41x** speedup over `Array.Sort`. The same pattern extends to wider types
+(`int`, `float`, `double`) using multiple SIMD registers with cross-vector
+shuffles.
+
 ## Design
 
 | Input size | Strategy |
