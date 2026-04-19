@@ -1051,7 +1051,7 @@ void WriteSimdSortMethodFloat(StreamWriter w, int n, List<List<(int A, int B)>> 
                         foreach (var (destLane, _) in sourceGroups[srcReg])
                             blendMask[destLane] = -1;
                         string next = bi < sortedSources.Count - 1 ? $"blend{tri}_{bi}" : $"shuffled{tri}";
-                        w.WriteLine($"            var {next} = Avx.BlendVariable({prev}, from{tri}_{srcReg}, {FmtVec256_Int(blendMask)}.AsSingle());");
+                        w.WriteLine($"            var {next} = Vector256.ConditionalSelect({FmtVec256_Int(blendMask)}.AsSingle(), from{tri}_{srcReg}, {prev});");
                         prev = next;
                     }
                 }
@@ -1079,7 +1079,7 @@ void WriteSimdSortMethodFloat(StreamWriter w, int n, List<List<(int A, int B)>> 
             {
                 w.WriteLine($"            var mins{tri} = Avx.Min(v{tri}, shuffled{tri});");
                 w.WriteLine($"            var maxs{tri} = Avx.Max(v{tri}, shuffled{tri});");
-                w.WriteLine($"            v{tri} = Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256_Int(maxMask)}.AsSingle());");
+                w.WriteLine($"            v{tri} = Vector256.ConditionalSelect({FmtVec256_Int(maxMask)}.AsSingle(), maxs{tri}, mins{tri});");
             }
         }
 
@@ -1230,7 +1230,7 @@ void WriteSimdSortMethodDouble(StreamWriter w, int n, List<List<(int A, int B)>>
                         foreach (var (destLane, _) in sourceGroups[srcReg])
                             blendMask[destLane] = -1L;
                         string next = bi < sortedSources.Count - 1 ? $"blend{tri}_{bi}" : $"shuffled{tri}";
-                        w.WriteLine($"            var {next} = Avx.BlendVariable({prev}, from{tri}_{srcReg}, {FmtVec256_Long(blendMask)}.AsDouble());");
+                        w.WriteLine($"            var {next} = Vector256.ConditionalSelect({FmtVec256_Long(blendMask)}.AsDouble(), from{tri}_{srcReg}, {prev});");
                         prev = next;
                     }
                 }
@@ -1258,7 +1258,7 @@ void WriteSimdSortMethodDouble(StreamWriter w, int n, List<List<(int A, int B)>>
             {
                 w.WriteLine($"            var mins{tri} = Avx.Min(v{tri}, shuffled{tri});");
                 w.WriteLine($"            var maxs{tri} = Avx.Max(v{tri}, shuffled{tri});");
-                w.WriteLine($"            v{tri} = Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256_Long(maxMask)}.AsDouble());");
+                w.WriteLine($"            v{tri} = Vector256.ConditionalSelect({FmtVec256_Long(maxMask)}.AsDouble(), maxs{tri}, mins{tri});");
             }
         }
 
@@ -1616,7 +1616,7 @@ void WriteArmSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> 
             {
                 w.WriteLine($"            var mins{vi} = {ArmMinExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
                 w.WriteLine($"            var maxs{vi} = {ArmMaxExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
-                w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+                w.WriteLine($"            v{vi} = Vector128.ConditionalSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
             }
         }
 
@@ -1749,7 +1749,7 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
                 }
                 w.WriteLine($"            var mins{vi} = {ArmMinExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
                 w.WriteLine($"            var maxs{vi} = {ArmMaxExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
-                w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+                w.WriteLine($"            v{vi} = Vector128.ConditionalSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
             }
         }
 
