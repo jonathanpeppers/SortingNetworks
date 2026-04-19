@@ -99,9 +99,11 @@ registers). On CPUs without AVX-512F, an AVX2 fallback uses seven
 `Vector256<double>` registers (4 elements each) with `Permute4x64` shuffles.
 
 For `nint` and `nuint`, the library dispatches to the corresponding fixed-size
-integer sort (`long`/`ulong` on 64-bit platforms, `int`/`uint` on 32-bit) via
-`MemoryMarshal.Cast`. This zero-cost reinterpret gives `nint`/`nuint` access to
-all SIMD paths available for the underlying type.
+integer sort via `MemoryMarshal.Cast` when SIMD is available for the target type.
+On 64-bit platforms with AVX-512, `nint`/`nuint` dispatch to `long`/`ulong` to
+use AVX-512F SIMD. On 32-bit platforms, they dispatch to `int`/`uint`. When no
+SIMD path exists for the target type (e.g., ARM64 or AVX2-only x86 for 64-bit),
+the scalar unrolled network is used directly to avoid dispatch overhead.
 
 ## Benchmarks
 

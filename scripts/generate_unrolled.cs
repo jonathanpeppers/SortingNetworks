@@ -1836,7 +1836,9 @@ void WritePublicApi(StreamWriter w, string t)
     w.WriteLine("        {");
     if (t == "nint")
     {
-        w.WriteLine("            if (nint.Size == 8)");
+        // Gate 64-bit dispatch on Avx512F — long only has SIMD via AVX-512.
+        // On ARM64 and AVX2-only x86, fall through to the scalar unrolled path.
+        w.WriteLine("            if (nint.Size == 8 && Avx512F.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine("                Sort(MemoryMarshal.Cast<nint, long>(span));");
         w.WriteLine("                return;");
@@ -1850,7 +1852,7 @@ void WritePublicApi(StreamWriter w, string t)
     }
     else if (t == "nuint")
     {
-        w.WriteLine("            if (nuint.Size == 8)");
+        w.WriteLine("            if (nuint.Size == 8 && Avx512F.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine("                Sort(MemoryMarshal.Cast<nuint, ulong>(span));");
         w.WriteLine("                return;");

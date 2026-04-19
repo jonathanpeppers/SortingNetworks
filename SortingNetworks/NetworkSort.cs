@@ -747,7 +747,7 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
-            if (nint.Size == 8)
+            if (nint.Size == 8 && Avx512F.IsSupported)
             {
                 Sort(MemoryMarshal.Cast<nint, long>(span));
                 return;
@@ -830,7 +830,7 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
-            if (nuint.Size == 8)
+            if (nuint.Size == 8 && Avx512F.IsSupported)
             {
                 Sort(MemoryMarshal.Cast<nuint, ulong>(span));
                 return;
