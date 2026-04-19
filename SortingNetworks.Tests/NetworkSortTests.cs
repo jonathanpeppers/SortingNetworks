@@ -430,6 +430,8 @@ public class NetworkSortTests
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((uint[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((long[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((ulong[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((nint[])null!));
+        Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((nuint[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((float[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((double[])null!));
         Assert.Throws<ArgumentNullException>(() => NetworkSort.Sort((char[])null!));
