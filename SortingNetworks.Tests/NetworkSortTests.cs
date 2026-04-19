@@ -930,6 +930,201 @@ public class NetworkSortTests
         Assert.Equal(expected, input);
     }
 
+    // --- Min/Max edge-case tests for all primitive types ---
+
+    private static T[] BuildMinMaxArray<T>(int length, T minValue, T maxValue, Func<Random, T> generator)
+    {
+        var rng = new Random(42 + length);
+        var input = new T[length];
+        input[0] = minValue;
+        input[1] = maxValue;
+        input[2] = minValue;
+        input[3] = maxValue;
+        for (int i = 4; i < length; i++)
+            input[i] = generator(rng);
+        // Fisher-Yates shuffle so extremes aren't always at the start
+        rng = new Random(123 + length);
+        for (int i = length - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            (input[i], input[j]) = (input[j], input[i]);
+        }
+        return input;
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_Byte(int length)
+    {
+        var input = BuildMinMaxArray(length, byte.MinValue, byte.MaxValue, rng => (byte)rng.Next(0, 256));
+        var expected = (byte[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_SByte(int length)
+    {
+        var input = BuildMinMaxArray(length, sbyte.MinValue, sbyte.MaxValue, rng => (sbyte)rng.Next(-128, 128));
+        var expected = (sbyte[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_Short(int length)
+    {
+        var input = BuildMinMaxArray(length, short.MinValue, short.MaxValue, rng => (short)rng.Next(short.MinValue, short.MaxValue + 1));
+        var expected = (short[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_UShort(int length)
+    {
+        var input = BuildMinMaxArray(length, ushort.MinValue, ushort.MaxValue, rng => (ushort)rng.Next(0, ushort.MaxValue + 1));
+        var expected = (ushort[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_Int(int length)
+    {
+        var input = BuildMinMaxArray(length, int.MinValue, int.MaxValue, rng => rng.Next());
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_UInt(int length)
+    {
+        var input = BuildMinMaxArray(length, uint.MinValue, uint.MaxValue, rng => (uint)rng.Next());
+        var expected = (uint[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_Long(int length)
+    {
+        var input = BuildMinMaxArray(length, long.MinValue, long.MaxValue, rng => (long)rng.Next());
+        var expected = (long[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_ULong(int length)
+    {
+        var input = BuildMinMaxArray(length, ulong.MinValue, ulong.MaxValue, rng => (ulong)rng.Next());
+        var expected = (ulong[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_NInt(int length)
+    {
+        var input = BuildMinMaxArray(length, nint.MinValue, nint.MaxValue, rng => (nint)rng.Next());
+        var expected = (nint[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_NUInt(int length)
+    {
+        var input = BuildMinMaxArray(length, nuint.MinValue, nuint.MaxValue, rng => (nuint)rng.Next());
+        var expected = (nuint[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_Char(int length)
+    {
+        var input = BuildMinMaxArray(length, char.MinValue, char.MaxValue, rng => (char)rng.Next(0, char.MaxValue + 1));
+        var expected = (char[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Extremes_Float(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = new float[length];
+        input[0] = float.MinValue;
+        input[1] = float.MaxValue;
+        input[2] = float.NegativeInfinity;
+        input[3] = float.PositiveInfinity;
+        input[4] = float.Epsilon;
+        input[5] = -0.0f;
+        for (int i = 6; i < length; i++)
+            input[i] = (float)(rng.NextDouble() * 2000 - 1000);
+        rng = new Random(123 + length);
+        for (int i = length - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            (input[i], input[j]) = (input[j], input[i]);
+        }
+        var expected = (float[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Extremes_Double(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = new double[length];
+        input[0] = double.MinValue;
+        input[1] = double.MaxValue;
+        input[2] = double.NegativeInfinity;
+        input[3] = double.PositiveInfinity;
+        input[4] = double.Epsilon;
+        input[5] = -0.0;
+        for (int i = 6; i < length; i++)
+            input[i] = rng.NextDouble() * 2000 - 1000;
+        rng = new Random(123 + length);
+        for (int i = length - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            (input[i], input[j]) = (input[j], input[i]);
+        }
+        var expected = (double[])input.Clone();
+        Array.Sort(expected);
+        NetworkSort.Sort(input);
+        Assert.Equal(expected, input);
+    }
+
     // --- Gap #6: nint/nuint in null-comparer test ---
 
     [Fact]
