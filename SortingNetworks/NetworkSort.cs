@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
 
@@ -35,12 +36,12 @@ public static partial class NetworkSort
                 return;
             }
 
-            if (AdvSimd.Arm64.IsSupported)
+            if (Ssse3.IsSupported || AdvSimd.IsSupported)
             {
                 if (n == 27)
-                    SortSimdArm27(span);
+                    SortSimd128_27(span);
                 else
-                    SortSimdArm28(span);
+                    SortSimd128_28(span);
                 return;
             }
 
@@ -125,12 +126,12 @@ public static partial class NetworkSort
                 return;
             }
 
-            if (AdvSimd.Arm64.IsSupported)
+            if (Ssse3.IsSupported || AdvSimd.IsSupported)
             {
                 if (n == 27)
-                    SortSimdArm27_sbyte(span);
+                    SortSimd128_27_sbyte(span);
                 else
-                    SortSimdArm28_sbyte(span);
+                    SortSimd128_28_sbyte(span);
                 return;
             }
 
