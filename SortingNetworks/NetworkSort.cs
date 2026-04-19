@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
 
@@ -26,7 +27,7 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
-            if (Avx2.IsSupported)
+            if (Vector256.IsHardwareAccelerated)
             {
                 if (n == 27)
                     SortSimd27(span);
@@ -35,12 +36,12 @@ public static partial class NetworkSort
                 return;
             }
 
-            if (AdvSimd.Arm64.IsSupported)
+            if (Vector128.IsHardwareAccelerated)
             {
                 if (n == 27)
-                    SortSimdArm27(span);
+                    SortSimd128_27(span);
                 else
-                    SortSimdArm28(span);
+                    SortSimd128_28(span);
                 return;
             }
 
@@ -116,7 +117,7 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
-            if (Avx2.IsSupported)
+            if (Vector256.IsHardwareAccelerated)
             {
                 if (n == 27)
                     SortSimd27_sbyte(span);
@@ -125,12 +126,12 @@ public static partial class NetworkSort
                 return;
             }
 
-            if (AdvSimd.Arm64.IsSupported)
+            if (Vector128.IsHardwareAccelerated)
             {
                 if (n == 27)
-                    SortSimdArm27_sbyte(span);
+                    SortSimd128_27_sbyte(span);
                 else
-                    SortSimdArm28_sbyte(span);
+                    SortSimd128_28_sbyte(span);
                 return;
             }
 

@@ -171,9 +171,6 @@ List<List<(int A, int B)>> GetNetworkSteps(int n) => n switch
     _ => throw new ArgumentException($"SIMD steps only for n=27,28"),
 };
 
-bool StepNeedsCrossLane(List<(int A, int B)> step) =>
-    step.Any(p => (p.A < 16) != (p.B < 16));
-
 int[] ComputeShufflePerm(List<(int A, int B)> step)
 {
     int[] perm = Enumerable.Range(0, 32).ToArray();
@@ -189,60 +186,87 @@ byte[] ComputeBlendMask(List<(int A, int B)> step)
     return blend;
 }
 
-(byte[] MaskLo, byte[] MaskHi) ComputeCrossLaneMasks(int[] perm)
-{
-    byte[] maskLo = new byte[32], maskHi = new byte[32];
-    for (int i = 0; i < 32; i++)
-    {
-        int src = perm[i];
-        if (src < 16) { maskLo[i] = (byte)src; maskHi[i] = 0x80; }
-        else { maskLo[i] = 0x80; maskHi[i] = (byte)(src - 16); }
-    }
-    return (maskLo, maskHi);
-}
-
-byte[] ComputeIntraLaneMask(int[] perm)
-{
-    byte[] mask = perm.Select(v => (byte)v).ToArray();
-    for (int i = 16; i < 32; i++)
-        if (mask[i] >= 16) mask[i] -= 16;
-    return mask;
-}
-
-// --- ARM NEON helpers ---
+// --- Format helpers ---
 
 string FmtVec128(byte[] values) =>
     $"Vector128.Create((byte){string.Join(", ", values.Select(v => $"0x{v:X2}"))})";
 
-byte[] ArmShuffleLo(int[] perm)
-{
-    byte[] idx = new byte[16];
-    for (int i = 0; i < 16; i++)
-        idx[i] = (byte)perm[i];
-    return idx;
-}
-
-byte[] ArmShuffleHi(int[] perm)
-{
-    byte[] idx = new byte[16];
-    for (int i = 0; i < 16; i++)
-        idx[i] = (byte)perm[i + 16];
-    return idx;
-}
-
 byte[] BlendLo(byte[] blend) => blend[..16];
 byte[] BlendHi(byte[] blend) => blend[16..];
 
-string ArmMinExpr(string typeName, string v, string s) => typeName switch
+// --- Unified cross-platform helpers ---
+
+byte[] ComputeFullPerm256(int[] perm) =>
+    perm.Select(v => (byte)v).ToArray();
+
+(byte[] FromLo, byte[] FromHi) SplitShuffle128(int[] perm, int halfOffset)
 {
-    "sbyte" => $"AdvSimd.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()",
-    _ => $"AdvSimd.Min({v}, {s})",
+    byte[] fromLo = new byte[16], fromHi = new byte[16];
+    for (int i = 0; i < 16; i++)
+    {
+        int src = perm[i + halfOffset];
+        if (src < 16) { fromLo[i] = (byte)src; fromHi[i] = 0x80; }
+        else { fromLo[i] = 0x80; fromHi[i] = (byte)(src - 16); }
+    }
+    return (fromLo, fromHi);
+}
+
+bool Shuffle128NeedsCross(int[] perm, int halfOffset)
+{
+    for (int i = 0; i < 16; i++)
+    {
+        int src = perm[i + halfOffset];
+        int halfSrc = src < 16 ? 0 : 1;
+        int halfDst = halfOffset < 16 ? 0 : 1;
+        if (halfSrc != halfDst) return true;
+    }
+    return false;
+}
+
+byte[] ComputeShiftRightMask(int shiftAmount)
+{
+    byte[] mask = new byte[16];
+    for (int i = 0; i < 16; i++)
+    {
+        int src = i + shiftAmount;
+        mask[i] = src < 16 ? (byte)src : (byte)0x80;
+    }
+    return mask;
+}
+
+byte[] ComputeShiftLeftMask(int shiftAmount)
+{
+    byte[] mask = new byte[16];
+    for (int i = 0; i < 16; i++)
+    {
+        int src = i - shiftAmount;
+        mask[i] = src >= 0 ? (byte)src : (byte)0x80;
+    }
+    return mask;
+}
+
+string UnifiedMinExpr256(string typeName, string v, string s) => typeName switch
+{
+    "sbyte" => $"Vector256.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()",
+    _ => $"Vector256.Min({v}, {s})",
 };
 
-string ArmMaxExpr(string typeName, string v, string s) => typeName switch
+string UnifiedMaxExpr256(string typeName, string v, string s) => typeName switch
 {
-    "sbyte" => $"AdvSimd.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()",
-    _ => $"AdvSimd.Max({v}, {s})",
+    "sbyte" => $"Vector256.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()",
+    _ => $"Vector256.Max({v}, {s})",
+};
+
+string UnifiedMinExpr128(string typeName, string v, string s) => typeName switch
+{
+    "sbyte" => $"Vector128.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()",
+    _ => $"Vector128.Min({v}, {s})",
+};
+
+string UnifiedMaxExpr128(string typeName, string v, string s) => typeName switch
+{
+    "sbyte" => $"Vector128.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()",
+    _ => $"Vector128.Max({v}, {s})",
 };
 
 string ArmMinExpr16(string typeName, string v, string s) => typeName switch
@@ -279,18 +303,6 @@ string FmtVec512_UShort(ushort[] values) =>
 
 string FmtVec512_Long(long[] values) =>
     $"Vector512.Create({string.Join(", ", values.Select(v => $"{v}L"))})";
-
-string MinExpr(string typeName, string v, string s) => typeName switch
-{
-    "sbyte" => $"Avx2.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()",
-    _ => $"Avx2.Min({v}, {s})",
-};
-
-string MaxExpr(string typeName, string v, string s) => typeName switch
-{
-    "sbyte" => $"Avx2.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()",
-    _ => $"Avx2.Max({v}, {s})",
-};
 
 string MinExpr16(string typeName, string v, string s) => typeName switch
 {
@@ -398,7 +410,7 @@ void WriteUnrolledMethod(StreamWriter w, int n, List<(int A, int B)> pairs, stri
     w.WriteLine("    }");
 }
 
-void WriteSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
+void WriteUnifiedByteSortMethod256(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
 {
     int loadOffset = n - 16;
     int shiftAmount = 32 - n;
@@ -407,14 +419,17 @@ void WriteSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> steps
         ? $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));"
         : "ref byte first = ref MemoryMarshal.GetReference(span);";
 
+    var shiftRightMask = ComputeShiftRightMask(shiftAmount);
+    var shiftLeftMask = ComputeShiftLeftMask(shiftAmount);
+
     w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
     w.WriteLine($"    private static void SortSimd{n}{suffix}(Span<{typeName}> span)");
     w.WriteLine("    {");
     w.WriteLine($"        {refCast}");
     w.WriteLine("        var lo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);");
-    w.WriteLine("        var hi = Sse2.ShiftRightLogical128BitLane(");
+    w.WriteLine($"        var hi = Vector128.Shuffle(");
     w.WriteLine($"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {loadOffset})),");
-    w.WriteLine($"            {shiftAmount});");
+    w.WriteLine($"            {FmtVec128(shiftRightMask)});");
     w.WriteLine("        var vec = Vector256.Create(lo, hi);");
 
     for (int si = 0; si < steps.Count; si++)
@@ -422,44 +437,97 @@ void WriteSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> steps
         var step = steps[si];
         var perm = ComputeShufflePerm(step);
         var blend = ComputeBlendMask(step);
-        bool cross = StepNeedsCrossLane(step);
+        var fullPerm = ComputeFullPerm256(perm);
         string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
 
         w.WriteLine();
         w.WriteLine($"        // Step {si}: {pairStr}");
-
-        if (cross)
-        {
-            var (maskLo, maskHi) = ComputeCrossLaneMasks(perm);
-            w.WriteLine("        {");
-            w.WriteLine("            var loLo = Avx2.Permute2x128(vec, vec, 0x00);");
-            w.WriteLine("            var hiHi = Avx2.Permute2x128(vec, vec, 0x11);");
-            w.WriteLine($"            var fromLo = Avx2.Shuffle(loLo, {FmtVec256(maskLo)});");
-            w.WriteLine($"            var fromHi = Avx2.Shuffle(hiHi, {FmtVec256(maskHi)});");
-            w.WriteLine("            var shuffled = Avx2.Or(fromLo, fromHi);");
-            w.WriteLine($"            var mins = {MinExpr(typeName, "vec", "shuffled")};");
-            w.WriteLine($"            var maxs = {MaxExpr(typeName, "vec", "shuffled")};");
-            w.WriteLine($"            vec = Avx2.BlendVariable(mins, maxs, {FmtVec256(blend)});");
-            w.WriteLine("        }");
-        }
-        else
-        {
-            var mask = ComputeIntraLaneMask(perm);
-            w.WriteLine("        {");
-            w.WriteLine($"            var shuffled = Avx2.Shuffle(vec, {FmtVec256(mask)});");
-            w.WriteLine($"            var mins = {MinExpr(typeName, "vec", "shuffled")};");
-            w.WriteLine($"            var maxs = {MaxExpr(typeName, "vec", "shuffled")};");
-            w.WriteLine($"            vec = Avx2.BlendVariable(mins, maxs, {FmtVec256(blend)});");
-            w.WriteLine("        }");
-        }
+        w.WriteLine("        {");
+        w.WriteLine($"            var shuffled = Vector256.Shuffle(vec, {FmtVec256(fullPerm)});");
+        w.WriteLine($"            var mins = {UnifiedMinExpr256(typeName, "vec", "shuffled")};");
+        w.WriteLine($"            var maxs = {UnifiedMaxExpr256(typeName, "vec", "shuffled")};");
+        w.WriteLine($"            vec = Vector256.ConditionalSelect({FmtVec256(blend)}, maxs, mins);");
+        w.WriteLine("        }");
     }
 
     w.WriteLine();
     w.WriteLine("        lo = vec.GetLower();");
     w.WriteLine("        hi = vec.GetUpper();");
-    w.WriteLine($"        Sse2.ShiftLeftLogical128BitLane(hi, {shiftAmount})");
+    w.WriteLine($"        Vector128.Shuffle(hi, {FmtVec128(shiftLeftMask)})");
     w.WriteLine($"            .StoreUnsafe(ref Unsafe.Add(ref first, {loadOffset}));");
     w.WriteLine("        lo.StoreUnsafe(ref first);");
+    w.WriteLine("    }");
+}
+
+void WriteUnifiedByteSortMethod128(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
+{
+    int loadOffset = n - 16;
+    int shiftAmount = 32 - n;
+    int storeShift = 16 - shiftAmount;
+    string suffix = typeName != "byte" ? $"_{typeName}" : "";
+    string refCast = typeName == "sbyte"
+        ? $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));"
+        : "ref byte first = ref MemoryMarshal.GetReference(span);";
+
+    var shiftRightMask = ComputeShiftRightMask(shiftAmount);
+    var shiftLeftMask = ComputeShiftLeftMask(shiftAmount);
+
+    w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
+    w.WriteLine($"    private static void SortSimd128_{n}{suffix}(Span<{typeName}> span)");
+    w.WriteLine("    {");
+    w.WriteLine($"        {refCast}");
+    w.WriteLine("        var vecLo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);");
+    w.WriteLine($"        var vecHi = Vector128.Shuffle(");
+    w.WriteLine($"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {loadOffset})),");
+    w.WriteLine($"            {FmtVec128(shiftRightMask)});");
+
+    for (int si = 0; si < steps.Count; si++)
+    {
+        var step = steps[si];
+        var perm = ComputeShufflePerm(step);
+        var blend = ComputeBlendMask(step);
+        string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+
+        var (loFromLo, loFromHi) = SplitShuffle128(perm, 0);
+        var (hiFromLo, hiFromHi) = SplitShuffle128(perm, 16);
+        bool loCross = Shuffle128NeedsCross(perm, 0);
+        bool hiCross = Shuffle128NeedsCross(perm, 16);
+
+        w.WriteLine();
+        w.WriteLine($"        // Step {si}: {pairStr}");
+        w.WriteLine("        {");
+
+        if (loCross)
+        {
+            w.WriteLine($"            var shuffledLo = Vector128.Shuffle(vecLo, {FmtVec128(loFromLo)}) | Vector128.Shuffle(vecHi, {FmtVec128(loFromHi)});");
+        }
+        else
+        {
+            w.WriteLine($"            var shuffledLo = Vector128.Shuffle(vecLo, {FmtVec128(loFromLo)});");
+        }
+
+        if (hiCross)
+        {
+            w.WriteLine($"            var shuffledHi = Vector128.Shuffle(vecLo, {FmtVec128(hiFromLo)}) | Vector128.Shuffle(vecHi, {FmtVec128(hiFromHi)});");
+        }
+        else
+        {
+            w.WriteLine($"            var shuffledHi = Vector128.Shuffle(vecHi, {FmtVec128(hiFromHi)});");
+        }
+
+        w.WriteLine($"            var minsLo = {UnifiedMinExpr128(typeName, "vecLo", "shuffledLo")};");
+        w.WriteLine($"            var maxsLo = {UnifiedMaxExpr128(typeName, "vecLo", "shuffledLo")};");
+        w.WriteLine($"            var minsHi = {UnifiedMinExpr128(typeName, "vecHi", "shuffledHi")};");
+        w.WriteLine($"            var maxsHi = {UnifiedMaxExpr128(typeName, "vecHi", "shuffledHi")};");
+        w.WriteLine($"            vecLo = Vector128.ConditionalSelect({FmtVec128(BlendLo(blend))}, maxsLo, minsLo);");
+        w.WriteLine($"            vecHi = Vector128.ConditionalSelect({FmtVec128(BlendHi(blend))}, maxsHi, minsHi);");
+        w.WriteLine("        }");
+    }
+
+    w.WriteLine();
+    w.WriteLine($"        Vector128.Shuffle(vecHi, {FmtVec128(shiftLeftMask)})");
+    w.WriteLine($"            .StoreUnsafe(ref Unsafe.Add(ref first, {loadOffset}));");
+    w.WriteLine("        vecLo.StoreUnsafe(ref first);");
     w.WriteLine("    }");
 }
 
@@ -1413,7 +1481,9 @@ void WriteSimdFile(StreamWriter w)
         {
             var steps = GetNetworkSteps(n);
             if (!first) w.WriteLine();
-            WriteSimdSortMethod(w, n, steps, typeName);
+            WriteUnifiedByteSortMethod256(w, n, steps, typeName);
+            w.WriteLine();
+            WriteUnifiedByteSortMethod128(w, n, steps, typeName);
             first = false;
         }
     }
@@ -1475,82 +1545,6 @@ void WriteSimdFile(StreamWriter w)
     w.WriteLine("}");
 }
 
-void WriteArmSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
-{
-    int loadOffset = n - 16;
-    int shiftAmount = 32 - n;
-    int storeShift = 16 - shiftAmount;
-    string suffix = typeName != "byte" ? $"_{typeName}" : "";
-    string refCast = typeName == "sbyte"
-        ? $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));"
-        : "ref byte first = ref MemoryMarshal.GetReference(span);";
-
-    w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
-    w.WriteLine($"    private static void SortSimdArm{n}{suffix}(Span<{typeName}> span)");
-    w.WriteLine("    {");
-    w.WriteLine($"        {refCast}");
-    w.WriteLine("        var vecLo = Unsafe.ReadUnaligned<Vector128<byte>>(ref first);");
-    w.WriteLine($"        var vecHi = AdvSimd.ExtractVector128(");
-    w.WriteLine($"            Unsafe.ReadUnaligned<Vector128<byte>>(ref Unsafe.Add(ref first, {loadOffset})),");
-    w.WriteLine($"            Vector128<byte>.Zero,");
-    w.WriteLine($"            {shiftAmount});");
-
-    for (int si = 0; si < steps.Count; si++)
-    {
-        var step = steps[si];
-        var perm = ComputeShufflePerm(step);
-        var blend = ComputeBlendMask(step);
-        string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
-
-        w.WriteLine();
-        w.WriteLine($"        // Step {si}: {pairStr}");
-        w.WriteLine("        {");
-        w.WriteLine("            var table = (vecLo, vecHi);");
-        w.WriteLine($"            var shuffledLo = AdvSimd.Arm64.VectorTableLookup(table, {FmtVec128(ArmShuffleLo(perm))});");
-        w.WriteLine($"            var shuffledHi = AdvSimd.Arm64.VectorTableLookup(table, {FmtVec128(ArmShuffleHi(perm))});");
-        byte[] blendLo = BlendLo(blend);
-        byte[] blendHi = BlendHi(blend);
-        bool allMinLo = blendLo.All(b => b == 0x00);
-        bool allMaxLo = blendLo.All(b => b == 0xFF);
-        bool allMinHi = blendHi.All(b => b == 0x00);
-        bool allMaxHi = blendHi.All(b => b == 0xFF);
-        if (allMinLo)
-        {
-            w.WriteLine($"            vecLo = {ArmMinExpr(typeName, "vecLo", "shuffledLo")};");
-        }
-        else if (allMaxLo)
-        {
-            w.WriteLine($"            vecLo = {ArmMaxExpr(typeName, "vecLo", "shuffledLo")};");
-        }
-        else
-        {
-            w.WriteLine($"            var minsLo = {ArmMinExpr(typeName, "vecLo", "shuffledLo")};");
-            w.WriteLine($"            var maxsLo = {ArmMaxExpr(typeName, "vecLo", "shuffledLo")};");
-            w.WriteLine($"            vecLo = AdvSimd.BitwiseSelect({FmtVec128(blendLo)}, maxsLo, minsLo);");
-        }
-        if (allMinHi)
-        {
-            w.WriteLine($"            vecHi = {ArmMinExpr(typeName, "vecHi", "shuffledHi")};");
-        }
-        else if (allMaxHi)
-        {
-            w.WriteLine($"            vecHi = {ArmMaxExpr(typeName, "vecHi", "shuffledHi")};");
-        }
-        else
-        {
-            w.WriteLine($"            var minsHi = {ArmMinExpr(typeName, "vecHi", "shuffledHi")};");
-            w.WriteLine($"            var maxsHi = {ArmMaxExpr(typeName, "vecHi", "shuffledHi")};");
-            w.WriteLine($"            vecHi = AdvSimd.BitwiseSelect({FmtVec128(blendHi)}, maxsHi, minsHi);");
-        }
-        w.WriteLine("        }");
-    }
-
-    w.WriteLine();
-    w.WriteLine($"        AdvSimd.ExtractVector128(Vector128<byte>.Zero, vecHi, {storeShift})");
-    w.WriteLine($"            .StoreUnsafe(ref Unsafe.Add(ref first, {loadOffset}));");
-    w.WriteLine("        vecLo.StoreUnsafe(ref first);");
-    w.WriteLine("    }");
-}
 
 void WriteArmSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
 {
@@ -1800,17 +1794,6 @@ void WriteArmSimdFile(StreamWriter w)
         """);
 
     bool first = true;
-    foreach (string typeName in new[] { "byte", "sbyte" })
-    {
-        foreach (int n in new[] { 27, 28 })
-        {
-            var steps = GetNetworkSteps(n);
-            if (!first) w.WriteLine();
-            WriteArmSimdSortMethod(w, n, steps, typeName);
-            first = false;
-        }
-    }
-
     foreach (string typeName in new[] { "short", "ushort", "char" })
     {
         foreach (int n in new[] { 27, 28 })
@@ -1897,10 +1880,30 @@ void WritePublicApi(StreamWriter w, string t)
         w.WriteLine("            }");
         w.WriteLine();
     }
-    else if (hasSimd8 || hasSimd16)
+    else if (hasSimd8)
     {
-        string isaCheck = hasSimd8 ? "Avx2.IsSupported" : "Avx512BW.IsSupported";
-        w.WriteLine($"            if ({isaCheck})");
+        w.WriteLine("            if (Vector256.IsHardwareAccelerated)");
+        w.WriteLine("            {");
+        w.WriteLine($"                if (n == 27)");
+        w.WriteLine($"                    SortSimd27{suffix}(span);");
+        w.WriteLine("                else");
+        w.WriteLine($"                    SortSimd28{suffix}(span);");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine();
+        w.WriteLine("            if (Vector128.IsHardwareAccelerated)");
+        w.WriteLine("            {");
+        w.WriteLine($"                if (n == 27)");
+        w.WriteLine($"                    SortSimd128_27{suffix}(span);");
+        w.WriteLine("                else");
+        w.WriteLine($"                    SortSimd128_28{suffix}(span);");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine();
+    }
+    else if (hasSimd16)
+    {
+        w.WriteLine("            if (Avx512BW.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine($"                if (n == 27)");
         w.WriteLine($"                    SortSimd27{suffix}(span);");
@@ -1930,7 +1933,6 @@ void WritePublicApi(StreamWriter w, string t)
         w.WriteLine("                return;");
         w.WriteLine("            }");
         w.WriteLine();
-        // double: AVX2 fallback after AVX-512F
         if (hasAvx2Float)
         {
             w.WriteLine("            if (Avx2.IsSupported)");
@@ -2130,6 +2132,7 @@ void WriteApiFile(StreamWriter w)
     w.Write("""
         using System.Runtime.CompilerServices;
         using System.Runtime.InteropServices;
+        using System.Runtime.Intrinsics;
         using System.Runtime.Intrinsics.X86;
         using System.Runtime.Intrinsics.Arm;
 
