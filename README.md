@@ -263,7 +263,7 @@ speedup over `Array.Sort` as on x86:
 | 28 | Reversed | 84 ns | 1.28x |
 | 28 | Duplicates | 83 ns | **0.75x** (25% faster) |
 
-> With AVX2 SIMD, NetworkSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the SIMD path wins for random and duplicate-heavy inputs, while sorted/reversed inputs are slightly slower for size 27 (the fixed comparison sequence can't exploit pre-sorted data). Size 28 is faster across the board on both platforms.
+> With AVX2 SIMD, NetworkSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the SIMD path wins for random and duplicate-heavy inputs, while sorted/reversed inputs are slower for both sizes 27 and 28 (the fixed comparison sequence can't exploit pre-sorted data).
 
 ## Building
 
