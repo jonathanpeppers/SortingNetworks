@@ -1680,7 +1680,6 @@ void WritePublicApi(StreamWriter w, string t)
     bool hasSimd16 = t == "short" || t == "ushort" || t == "char";
     bool hasSimd32 = t == "int" || t == "uint";
     bool hasSimd32_512 = t == "int" || t == "uint" || t == "float";
-    bool hasArmSimd32 = t == "int" || t == "uint" || t == "float";
     bool hasSimd64 = t == "long" || t == "ulong" || t == "double";
     bool hasAvx2Float = t == "float" || t == "double";
 
