@@ -1832,6 +1832,32 @@ void WritePublicApi(StreamWriter w, string t)
     w.WriteLine($"    public static void Sort(Span<{t}> span)");
     w.WriteLine("    {");
     w.WriteLine("        int n = span.Length;");
+    if (t == "nint")
+    {
+        w.WriteLine("        if (nint.Size == 8)");
+        w.WriteLine("        {");
+        w.WriteLine("            Sort(MemoryMarshal.Cast<nint, long>(span));");
+        w.WriteLine("            return;");
+        w.WriteLine("        }");
+        w.WriteLine("        if (nint.Size == 4)");
+        w.WriteLine("        {");
+        w.WriteLine("            Sort(MemoryMarshal.Cast<nint, int>(span));");
+        w.WriteLine("            return;");
+        w.WriteLine("        }");
+    }
+    else if (t == "nuint")
+    {
+        w.WriteLine("        if (nuint.Size == 8)");
+        w.WriteLine("        {");
+        w.WriteLine("            Sort(MemoryMarshal.Cast<nuint, ulong>(span));");
+        w.WriteLine("            return;");
+        w.WriteLine("        }");
+        w.WriteLine("        if (nuint.Size == 4)");
+        w.WriteLine("        {");
+        w.WriteLine("            Sort(MemoryMarshal.Cast<nuint, uint>(span));");
+        w.WriteLine("            return;");
+        w.WriteLine("        }");
+    }
     w.WriteLine("        if (n == 27 || n == 28)");
     w.WriteLine("        {");
     if (hasSimd32_512)
