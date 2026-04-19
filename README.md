@@ -112,41 +112,41 @@ to execute as a vectorized min/max/blend operation:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,284 ns | 41 ns | **31x** |
-| sbyte | 1,427 ns | 44 ns | **32x** |
+| byte | 1,323 ns | 41 ns | **32x** |
+| sbyte | 1,450 ns | 43 ns | **34x** |
 
 For `int` and `uint`, AVX2 SIMD uses four `Vector256<int>` registers with
 cross-vector shuffles via `PermuteVar8x32`:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| int | 103 ns | 58 ns | **1.8x** |
-| uint | 106 ns | 55 ns | **1.9x** |
+| int | 105 ns | 57 ns | **1.8x** |
+| uint | 109 ns | 54 ns | **2.0x** |
 
 For `float`, AVX2 SIMD uses four `Vector256<float>` registers with
 `PermuteVar8x32` shuffles and `Avx.Min`/`Avx.Max` comparisons:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,598 ns | 107 ns | **15x** |
+| float | 1,531 ns | 76 ns | **20x** |
 
 For `double`, AVX2 SIMD uses seven `Vector256<double>` registers with
 `Permute4x64` shuffles (on CPUs with AVX-512F, an AVX-512 path is used instead):
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,630 ns | 110 ns | **15x** |
+| double | 1,628 ns | 94 ns | **17x** |
 
 For other types without a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| short | 1,411 ns | 101 ns | **14x** |
-| ushort | 1,288 ns | 100 ns | **13x** |
-| long | 1,398 ns | 104 ns | **13x** |
-| nint | 1,408 ns | 105 ns | **13x** |
-| nuint | 1,381 ns | 103 ns | **13x** |
+| short | 1,364 ns | 102 ns | **13x** |
+| ushort | 1,288 ns | 101 ns | **13x** |
+| long | 1,423 ns | 104 ns | **14x** |
+| nint | 1,395 ns | 103 ns | **14x** |
+| nuint | 1,370 ns | 103 ns | **13x** |
 
 > **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, and `int`, `uint`, and `float` use AVX-512F SIMD for even greater speedups.
 
@@ -157,8 +157,8 @@ types the BCL is already very fast and NetworkSort provides a smaller benefit:
 
 | Type | ArraySort (27) | NetworkSort (27) | Ratio |
 |---|---|---|---|
-| char | 94 ns | 96 ns | ~1x |
-| ulong | 120 ns | 100 ns | ~1.2x |
+| char | 96 ns | 97 ns | ~1x |
+| ulong | 117 ns | 101 ns | ~1.2x |
 
 > **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and NetworkSort may be slower for these types.
 
@@ -169,7 +169,7 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| string | 986 ns | 532 ns | **1.9x** |
+| string | 974 ns | 528 ns | **1.8x** |
 
 ### x86 AVX-512F (AMD EPYC 9V74, GitHub Actions)
 
@@ -241,14 +241,14 @@ speedup over `Array.Sort` as on x86:
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 58 ns | **0.57x** (43% faster) |
-| 27 | Sorted | 58 ns | **0.82x** (18% faster) |
-| 27 | Reversed | 57 ns | **0.67x** (33% faster) |
-| 27 | Duplicates | 57 ns | **0.54x** (46% faster) |
-| 28 | Random | 58 ns | **0.48x** (52% faster) |
-| 28 | Sorted | 57 ns | **0.78x** (22% faster) |
-| 28 | Reversed | 57 ns | **0.64x** (36% faster) |
-| 28 | Duplicates | 58 ns | **0.52x** (48% faster) |
+| 27 | Random | 57 ns | **0.54x** (46% faster) |
+| 27 | Sorted | 59 ns | **0.84x** (16% faster) |
+| 27 | Reversed | 59 ns | **0.69x** (31% faster) |
+| 27 | Duplicates | 57 ns | **0.53x** (47% faster) |
+| 28 | Random | 56 ns | **0.45x** (55% faster) |
+| 28 | Sorted | 56 ns | **0.78x** (22% faster) |
+| 28 | Reversed | 57 ns | **0.63x** (37% faster) |
+| 28 | Duplicates | 56 ns | **0.50x** (50% faster) |
 
 ### int detailed results (ARM64)
 

@@ -649,9 +649,20 @@ void WriteSimdSortMethod32_Avx2(StreamWriter w, int n, List<List<(int A, int B)>
                     blendImm |= 1 << j;
             }
 
-            w.WriteLine($"            var min{d} = {MinExpr32(typeName, $"v{d}", $"s{d}")};");
-            w.WriteLine($"            var max{d} = {MaxExpr32(typeName, $"v{d}", $"s{d}")};");
-            w.WriteLine($"            v{d} = Avx2.Blend(min{d}, max{d}, 0x{blendImm:X2});");
+            if (blendImm == 0x00)
+            {
+                w.WriteLine($"            v{d} = {MinExpr32(typeName, $"v{d}", $"s{d}")};");
+            }
+            else if (blendImm == 0xFF)
+            {
+                w.WriteLine($"            v{d} = {MaxExpr32(typeName, $"v{d}", $"s{d}")};");
+            }
+            else
+            {
+                w.WriteLine($"            var min{d} = {MinExpr32(typeName, $"v{d}", $"s{d}")};");
+                w.WriteLine($"            var max{d} = {MaxExpr32(typeName, $"v{d}", $"s{d}")};");
+                w.WriteLine($"            v{d} = Avx2.Blend(min{d}, max{d}, 0x{blendImm:X2});");
+            }
         }
 
         w.WriteLine("        }");
@@ -800,20 +811,48 @@ void WriteSimdSortMethod64(StreamWriter w, int n, List<List<(int A, int B)>> ste
             for (int j = 0; j < 8; j++)
                 blendMask[j] = blend32[vi * 8 + j];
 
+            bool allMin = blendMask.All(v => v == 0);
+            bool allMax = blendMask.All(v => v == -1L);
+
             if (typeName == "double")
             {
-                // Use CompareGreaterThan + ConditionalSelect to match scalar
-                // `if (a > b) { swap }` semantics for NaN and ±0.
-                w.WriteLine($"            var gt{vi} = Avx512F.CompareGreaterThan(v{vi}.AsDouble(), shuffled{vi}.AsDouble()).AsInt64();");
-                w.WriteLine($"            var mins{vi} = Vector512.ConditionalSelect(gt{vi}, shuffled{vi}, v{vi});");
-                w.WriteLine($"            var maxs{vi} = Vector512.ConditionalSelect(gt{vi}, v{vi}, shuffled{vi});");
+                if (allMin)
+                {
+                    w.WriteLine($"            var gt{vi} = Avx512F.CompareGreaterThan(v{vi}.AsDouble(), shuffled{vi}.AsDouble()).AsInt64();");
+                    w.WriteLine($"            v{vi} = Vector512.ConditionalSelect(gt{vi}, shuffled{vi}, v{vi});");
+                }
+                else if (allMax)
+                {
+                    w.WriteLine($"            var gt{vi} = Avx512F.CompareGreaterThan(v{vi}.AsDouble(), shuffled{vi}.AsDouble()).AsInt64();");
+                    w.WriteLine($"            v{vi} = Vector512.ConditionalSelect(gt{vi}, v{vi}, shuffled{vi});");
+                }
+                else
+                {
+                    // Use CompareGreaterThan + ConditionalSelect to match scalar
+                    // `if (a > b) { swap }` semantics for NaN and ±0.
+                    w.WriteLine($"            var gt{vi} = Avx512F.CompareGreaterThan(v{vi}.AsDouble(), shuffled{vi}.AsDouble()).AsInt64();");
+                    w.WriteLine($"            var mins{vi} = Vector512.ConditionalSelect(gt{vi}, shuffled{vi}, v{vi});");
+                    w.WriteLine($"            var maxs{vi} = Vector512.ConditionalSelect(gt{vi}, v{vi}, shuffled{vi});");
+                    w.WriteLine($"            v{vi} = Vector512.ConditionalSelect({FmtVec512_Long(blendMask)}, maxs{vi}, mins{vi});");
+                }
             }
             else
             {
-                w.WriteLine($"            var mins{vi} = {MinExpr64(typeName, $"v{vi}", $"shuffled{vi}")};");
-                w.WriteLine($"            var maxs{vi} = {MaxExpr64(typeName, $"v{vi}", $"shuffled{vi}")};");
+                if (allMin)
+                {
+                    w.WriteLine($"            v{vi} = {MinExpr64(typeName, $"v{vi}", $"shuffled{vi}")};");
+                }
+                else if (allMax)
+                {
+                    w.WriteLine($"            v{vi} = {MaxExpr64(typeName, $"v{vi}", $"shuffled{vi}")};");
+                }
+                else
+                {
+                    w.WriteLine($"            var mins{vi} = {MinExpr64(typeName, $"v{vi}", $"shuffled{vi}")};");
+                    w.WriteLine($"            var maxs{vi} = {MaxExpr64(typeName, $"v{vi}", $"shuffled{vi}")};");
+                    w.WriteLine($"            v{vi} = Vector512.ConditionalSelect({FmtVec512_Long(blendMask)}, maxs{vi}, mins{vi});");
+                }
             }
-            w.WriteLine($"            v{vi} = Vector512.ConditionalSelect({FmtVec512_Long(blendMask)}, maxs{vi}, mins{vi});");
         }
 
         w.WriteLine("        }");
@@ -959,9 +998,22 @@ void WriteSimdSortMethodFloat(StreamWriter w, int n, List<List<(int A, int B)>> 
             int[] maxMask = new int[regSize];
             for (int lane = 0; lane < regSize; lane++)
                 if (isMax[baseElem + lane]) maxMask[lane] = -1;
-            w.WriteLine($"            var mins{tri} = Avx.Min(v{tri}, shuffled{tri});");
-            w.WriteLine($"            var maxs{tri} = Avx.Max(v{tri}, shuffled{tri});");
-            w.WriteLine($"            v{tri} = Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256_Int(maxMask)}.AsSingle());");
+            bool allMin = maxMask.All(v => v == 0);
+            bool allMax = maxMask.All(v => v == -1);
+            if (allMin)
+            {
+                w.WriteLine($"            v{tri} = Avx.Min(v{tri}, shuffled{tri});");
+            }
+            else if (allMax)
+            {
+                w.WriteLine($"            v{tri} = Avx.Max(v{tri}, shuffled{tri});");
+            }
+            else
+            {
+                w.WriteLine($"            var mins{tri} = Avx.Min(v{tri}, shuffled{tri});");
+                w.WriteLine($"            var maxs{tri} = Avx.Max(v{tri}, shuffled{tri});");
+                w.WriteLine($"            v{tri} = Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256_Int(maxMask)}.AsSingle());");
+            }
         }
 
         w.WriteLine("        }");
@@ -1125,9 +1177,22 @@ void WriteSimdSortMethodDouble(StreamWriter w, int n, List<List<(int A, int B)>>
             long[] maxMask = new long[regSize];
             for (int lane = 0; lane < regSize; lane++)
                 if (isMax[baseElem + lane]) maxMask[lane] = -1L;
-            w.WriteLine($"            var mins{tri} = Avx.Min(v{tri}, shuffled{tri});");
-            w.WriteLine($"            var maxs{tri} = Avx.Max(v{tri}, shuffled{tri});");
-            w.WriteLine($"            v{tri} = Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256_Long(maxMask)}.AsDouble());");
+            bool allMin = maxMask.All(v => v == 0);
+            bool allMax = maxMask.All(v => v == -1L);
+            if (allMin)
+            {
+                w.WriteLine($"            v{tri} = Avx.Min(v{tri}, shuffled{tri});");
+            }
+            else if (allMax)
+            {
+                w.WriteLine($"            v{tri} = Avx.Max(v{tri}, shuffled{tri});");
+            }
+            else
+            {
+                w.WriteLine($"            var mins{tri} = Avx.Min(v{tri}, shuffled{tri});");
+                w.WriteLine($"            var maxs{tri} = Avx.Max(v{tri}, shuffled{tri});");
+                w.WriteLine($"            v{tri} = Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256_Long(maxMask)}.AsDouble());");
+            }
         }
 
         w.WriteLine("        }");
@@ -1202,6 +1267,10 @@ void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B
         """);
     }
 
+    bool declaredS0 = false, declaredS1 = false;
+    bool declaredMin0 = false, declaredMax0 = false;
+    bool declaredMin1 = false, declaredMax1 = false;
+
     for (int stepIdx = 0; stepIdx < steps.Count; stepIdx++)
     {
         var step = steps[stepIdx];
@@ -1229,14 +1298,10 @@ void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B
         w.WriteLine();
         w.WriteLine($"            // Step {stepIdx}");
 
-        string varDecl = stepIdx == 0 ? "var " : "";
-        w.WriteLine($"            {varDecl}s0 = Avx512F.PermuteVar16x32x2(vec0, {FmtVec512_Int(indicesVec0)}, vec1);");
-        w.WriteLine($"            {varDecl}s1 = Avx512F.PermuteVar16x32x2(vec0, {FmtVec512_Int(indicesVec1)}, vec1);");
-
-        w.WriteLine($"            {varDecl}min0 = {MinExpr32_512(typeName, "vec0", "s0")};");
-        w.WriteLine($"            {varDecl}max0 = {MaxExpr32_512(typeName, "vec0", "s0")};");
-        w.WriteLine($"            {varDecl}min1 = {MinExpr32_512(typeName, "vec1", "s1")};");
-        w.WriteLine($"            {varDecl}max1 = {MaxExpr32_512(typeName, "vec1", "s1")};");
+        string s0Decl = !declaredS0 ? "var " : ""; declaredS0 = true;
+        string s1Decl = !declaredS1 ? "var " : ""; declaredS1 = true;
+        w.WriteLine($"            {s0Decl}s0 = Avx512F.PermuteVar16x32x2(vec0, {FmtVec512_Int(indicesVec0)}, vec1);");
+        w.WriteLine($"            {s1Decl}s1 = Avx512F.PermuteVar16x32x2(vec0, {FmtVec512_Int(indicesVec1)}, vec1);");
 
         int[] blendMask0 = new int[16];
         int[] blendMask1 = new int[16];
@@ -1258,8 +1323,45 @@ void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B
             }
         }
 
-        w.WriteLine($"            vec0 = Vector512.ConditionalSelect({FmtVec512_Int(blendMask0)}, max0, min0);");
-        w.WriteLine($"            vec1 = Vector512.ConditionalSelect({FmtVec512_Int(blendMask1)}, max1, min1);");
+        bool allMin0 = blendMask0.All(v => v == 0);
+        bool allMax0 = blendMask0.All(v => v == -1);
+        bool allMin1 = blendMask1.All(v => v == 0);
+        bool allMax1 = blendMask1.All(v => v == -1);
+
+        if (!allMax0)
+        {
+            string d = !declaredMin0 ? "var " : ""; declaredMin0 = true;
+            w.WriteLine($"            {d}min0 = {MinExpr32_512(typeName, "vec0", "s0")};");
+        }
+        if (!allMin0)
+        {
+            string d = !declaredMax0 ? "var " : ""; declaredMax0 = true;
+            w.WriteLine($"            {d}max0 = {MaxExpr32_512(typeName, "vec0", "s0")};");
+        }
+        if (!allMax1)
+        {
+            string d = !declaredMin1 ? "var " : ""; declaredMin1 = true;
+            w.WriteLine($"            {d}min1 = {MinExpr32_512(typeName, "vec1", "s1")};");
+        }
+        if (!allMin1)
+        {
+            string d = !declaredMax1 ? "var " : ""; declaredMax1 = true;
+            w.WriteLine($"            {d}max1 = {MaxExpr32_512(typeName, "vec1", "s1")};");
+        }
+
+        if (allMin0)
+            w.WriteLine($"            vec0 = min0;");
+        else if (allMax0)
+            w.WriteLine($"            vec0 = max0;");
+        else
+            w.WriteLine($"            vec0 = Vector512.ConditionalSelect({FmtVec512_Int(blendMask0)}, max0, min0);");
+
+        if (allMin1)
+            w.WriteLine($"            vec1 = min1;");
+        else if (allMax1)
+            w.WriteLine($"            vec1 = max1;");
+        else
+            w.WriteLine($"            vec1 = Vector512.ConditionalSelect({FmtVec512_Int(blendMask1)}, max1, min1);");
     }
 
     w.WriteLine();
@@ -1406,12 +1508,40 @@ void WriteArmSimdSortMethod(StreamWriter w, int n, List<List<(int A, int B)>> st
         w.WriteLine("            var table = (vecLo, vecHi);");
         w.WriteLine($"            var shuffledLo = AdvSimd.Arm64.VectorTableLookup(table, {FmtVec128(ArmShuffleLo(perm))});");
         w.WriteLine($"            var shuffledHi = AdvSimd.Arm64.VectorTableLookup(table, {FmtVec128(ArmShuffleHi(perm))});");
-        w.WriteLine($"            var minsLo = {ArmMinExpr(typeName, "vecLo", "shuffledLo")};");
-        w.WriteLine($"            var maxsLo = {ArmMaxExpr(typeName, "vecLo", "shuffledLo")};");
-        w.WriteLine($"            var minsHi = {ArmMinExpr(typeName, "vecHi", "shuffledHi")};");
-        w.WriteLine($"            var maxsHi = {ArmMaxExpr(typeName, "vecHi", "shuffledHi")};");
-        w.WriteLine($"            vecLo = AdvSimd.BitwiseSelect({FmtVec128(BlendLo(blend))}, maxsLo, minsLo);");
-        w.WriteLine($"            vecHi = AdvSimd.BitwiseSelect({FmtVec128(BlendHi(blend))}, maxsHi, minsHi);");
+        byte[] blendLo = BlendLo(blend);
+        byte[] blendHi = BlendHi(blend);
+        bool allMinLo = blendLo.All(b => b == 0x00);
+        bool allMaxLo = blendLo.All(b => b == 0xFF);
+        bool allMinHi = blendHi.All(b => b == 0x00);
+        bool allMaxHi = blendHi.All(b => b == 0xFF);
+        if (allMinLo)
+        {
+            w.WriteLine($"            vecLo = {ArmMinExpr(typeName, "vecLo", "shuffledLo")};");
+        }
+        else if (allMaxLo)
+        {
+            w.WriteLine($"            vecLo = {ArmMaxExpr(typeName, "vecLo", "shuffledLo")};");
+        }
+        else
+        {
+            w.WriteLine($"            var minsLo = {ArmMinExpr(typeName, "vecLo", "shuffledLo")};");
+            w.WriteLine($"            var maxsLo = {ArmMaxExpr(typeName, "vecLo", "shuffledLo")};");
+            w.WriteLine($"            vecLo = AdvSimd.BitwiseSelect({FmtVec128(blendLo)}, maxsLo, minsLo);");
+        }
+        if (allMinHi)
+        {
+            w.WriteLine($"            vecHi = {ArmMinExpr(typeName, "vecHi", "shuffledHi")};");
+        }
+        else if (allMaxHi)
+        {
+            w.WriteLine($"            vecHi = {ArmMaxExpr(typeName, "vecHi", "shuffledHi")};");
+        }
+        else
+        {
+            w.WriteLine($"            var minsHi = {ArmMinExpr(typeName, "vecHi", "shuffledHi")};");
+            w.WriteLine($"            var maxsHi = {ArmMaxExpr(typeName, "vecHi", "shuffledHi")};");
+            w.WriteLine($"            vecHi = AdvSimd.BitwiseSelect({FmtVec128(blendHi)}, maxsHi, minsHi);");
+        }
         w.WriteLine("        }");
     }
 
@@ -1479,9 +1609,22 @@ void WriteArmSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> 
                 blendMask[ei * 2] = blend[vi * 8 + ei];
                 blendMask[ei * 2 + 1] = blend[vi * 8 + ei];
             }
-            w.WriteLine($"            var mins{vi} = {ArmMinExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
-            w.WriteLine($"            var maxs{vi} = {ArmMaxExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
-            w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+            bool allMin = blendMask.All(b => b == 0x00);
+            bool allMax = blendMask.All(b => b == 0xFF);
+            if (allMin)
+            {
+                w.WriteLine($"            v{vi} = {ArmMinExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
+            }
+            else if (allMax)
+            {
+                w.WriteLine($"            v{vi} = {ArmMaxExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
+            }
+            else
+            {
+                w.WriteLine($"            var mins{vi} = {ArmMinExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
+                w.WriteLine($"            var maxs{vi} = {ArmMaxExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
+                w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+            }
         }
 
         w.WriteLine("        }");
