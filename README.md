@@ -73,6 +73,8 @@ individual scalar compare-and-swap branches.
 For `int` and `uint`, AVX2 SIMD is used on x86 with four `Vector256<int>`
 registers (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
 `Blend` composition, and `Min`/`Max` handles signed and unsigned comparisons.
+On CPUs with AVX-512F, an AVX-512F path uses two `Vector512<int>` registers
+(16 elements each) with `PermuteVar16x32x2` cross-vector shuffles.
 
 For `short`, `ushort`, and `char` (16-bit types), AVX-512 SIMD is used on x86
 when available, packing all elements into a single `Vector512<ushort>`. On
@@ -89,6 +91,8 @@ elements 0-15 are in Table A and elements 16-27 are in Table B, with
 For `float`, AVX2 SIMD is used on x86 with four `Vector256<float>` registers
 (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
 `BlendVariable` composition, and `Avx.Min`/`Avx.Max` handles comparisons.
+On CPUs with AVX-512F, an AVX-512F path uses two `Vector512<float>` registers
+(16 elements each) with `PermuteVar16x32x2` cross-vector shuffles.
 
 For `double`, AVX-512F SIMD is used on x86 when available (four `Vector512`
 registers). On CPUs without AVX-512F, an AVX2 fallback uses seven
@@ -144,7 +148,7 @@ sorting network dominates:
 | nint | 1,408 ns | 105 ns | **13x** |
 | nuint | 1,381 ns | 103 ns | **13x** |
 
-> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, and `long` uses AVX-512F SIMD for even greater speedups.
+> **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, and `int`, `uint`, and `float` use AVX-512F SIMD for even greater speedups.
 
 #### Types where Array.Sort is already SIMD-optimized
 
@@ -166,6 +170,23 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
 | string | 986 ns | 532 ns | **1.9x** |
+
+### x86 AVX-512F (AMD EPYC 9V74, GitHub Actions)
+
+On CPUs with AVX-512F (e.g., AMD EPYC, Intel Ice Lake+), `int`, `uint`, and
+`float` use two `Vector512` registers with `PermuteVar16x32x2` cross-vector
+shuffles:
+
+| Type | ArraySort (27) | NetworkSort (27) | Speedup |
+|---|---|---|---|
+| int | 105 ns | 67 ns | **1.6x** |
+| uint | 122 ns | 63 ns | **1.9x** |
+| float | 2,330 ns | 92 ns | **25x** |
+
+> **Note:** These results are from an AMD EPYC 9V74 on GitHub Actions
+> (ubuntu-latest), which double-pumps 512-bit operations through 256-bit
+> execution ports. Intel CPUs with native 512-bit execution units (e.g.,
+> Sapphire Rapids) may see additional gains.
 
 ### ARM64 (Apple M1, AdvSimd/NEON)
 
