@@ -962,6 +962,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_float(span);
+                else
+                    SortSimd28_float(span);
+                return;
+            }
+
             if (AdvSimd.Arm64.IsSupported)
             {
                 if (n == 27)
@@ -1049,6 +1058,15 @@ public static partial class NetworkSort
                     SortSimd27_double(span);
                 else
                     SortSimd28_double(span);
+                return;
+            }
+
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdAvx2_27_double(span);
+                else
+                    SortSimdAvx2_28_double(span);
                 return;
             }
 
