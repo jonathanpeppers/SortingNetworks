@@ -386,6 +386,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx512F.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_512_int(span);
+                else
+                    SortSimd28_512_int(span);
+                return;
+            }
+
             if (Avx2.IsSupported)
             {
                 if (n == 27)
@@ -476,6 +485,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx512F.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_512_uint(span);
+                else
+                    SortSimd28_512_uint(span);
+                return;
+            }
+
             if (Avx2.IsSupported)
             {
                 if (n == 27)
@@ -962,6 +980,15 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
+            if (Avx512F.IsSupported)
+            {
+                if (n == 27)
+                    SortSimd27_512_float(span);
+                else
+                    SortSimd28_512_float(span);
+                return;
+            }
+
             if (Avx2.IsSupported)
             {
                 if (n == 27)

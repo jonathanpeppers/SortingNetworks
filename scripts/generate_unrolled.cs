@@ -322,6 +322,25 @@ string MaxExpr32(string typeName, string v, string s) => typeName switch
     _ => $"Avx2.Max({v}, {s})",
 };
 
+string FmtVec512_Int(int[] values) =>
+    $"Vector512.Create({string.Join(", ", values)})";
+
+string MinExpr32_512(string typeName, string v, string s) => typeName switch
+{
+    "int" => $"Avx512F.Min({v}, {s})",
+    "uint" => $"Avx512F.Min({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()",
+    "float" => $"Avx512F.Min({v}.AsSingle(), {s}.AsSingle()).AsInt32()",
+    _ => throw new ArgumentException($"Unsupported 32-bit type: {typeName}"),
+};
+
+string MaxExpr32_512(string typeName, string v, string s) => typeName switch
+{
+    "int" => $"Avx512F.Max({v}, {s})",
+    "uint" => $"Avx512F.Max({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()",
+    "float" => $"Avx512F.Max({v}.AsSingle(), {s}.AsSingle()).AsInt32()",
+    _ => throw new ArgumentException($"Unsupported 32-bit type: {typeName}"),
+};
+
 string MinExpr64(string typeName, string v, string s) => typeName switch
 {
     "long" => $"Avx512F.Min({v}, {s})",
@@ -1143,6 +1162,128 @@ void WriteSimdSortMethodDouble(StreamWriter w, int n, List<List<(int A, int B)>>
     w.WriteLine("    }");
 }
 
+void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
+{
+    int totalSlots = 32;
+
+    string refCast = typeName switch
+    {
+        "uint" => "Unsafe.As<uint, int>(ref ",
+        "float" => "Unsafe.As<float, int>(ref ",
+        _ => "",
+    };
+    string refCastEnd = typeName != "int" ? ")" : "";
+
+    w.WriteLine($$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static void SortSimd{{n}}_512_{{typeName}}(Span<{{typeName}}> span)
+        {
+            ref int first = ref {{refCast}}MemoryMarshal.GetReference(span){{refCastEnd}};
+
+            // Load: vec0 = elements [0..15], vec1 = elements [16..{{n - 1}}] padded with int.MaxValue
+            var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+            var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+            var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+    """);
+
+    if (n == 27)
+    {
+        w.WriteLine("""
+                var lastThree = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)));
+                var q2 = Sse2.ShiftRightLogical128BitLane(lastThree, 4);
+                var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+        """);
+    }
+    else
+    {
+        w.WriteLine("""
+                var q2 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)));
+                var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+        """);
+    }
+
+    for (int stepIdx = 0; stepIdx < steps.Count; stepIdx++)
+    {
+        var step = steps[stepIdx];
+
+        int[] permA = new int[totalSlots];
+        int[] permB = new int[totalSlots];
+
+        for (int i = 0; i < totalSlots; i++)
+        {
+            permA[i] = i;
+            permB[i] = i;
+        }
+
+        foreach (var (a, b) in step)
+        {
+            permA[a] = b;
+            permA[b] = a;
+            permB[a] = b;
+            permB[b] = a;
+        }
+
+        int[] indicesVec0 = permA.Take(16).ToArray();
+        int[] indicesVec1 = permA.Skip(16).Take(16).ToArray();
+
+        w.WriteLine();
+        w.WriteLine($"            // Step {stepIdx}");
+
+        string varDecl = stepIdx == 0 ? "var " : "";
+        w.WriteLine($"            {varDecl}s0 = Avx512F.PermuteVar16x32x2(vec0, {FmtVec512_Int(indicesVec0)}, vec1);");
+        w.WriteLine($"            {varDecl}s1 = Avx512F.PermuteVar16x32x2(vec0, {FmtVec512_Int(indicesVec1)}, vec1);");
+
+        w.WriteLine($"            {varDecl}min0 = {MinExpr32_512(typeName, "vec0", "s0")};");
+        w.WriteLine($"            {varDecl}max0 = {MaxExpr32_512(typeName, "vec0", "s0")};");
+        w.WriteLine($"            {varDecl}min1 = {MinExpr32_512(typeName, "vec1", "s1")};");
+        w.WriteLine($"            {varDecl}max1 = {MaxExpr32_512(typeName, "vec1", "s1")};");
+
+        int[] blendMask0 = new int[16];
+        int[] blendMask1 = new int[16];
+
+        for (int i = 0; i < 16; i++)
+        {
+            foreach (var (a, b) in step)
+            {
+                if (b == i) { blendMask0[i] = -1; break; }
+            }
+        }
+
+        for (int i = 0; i < 16; i++)
+        {
+            int globalIdx = i + 16;
+            foreach (var (a, b) in step)
+            {
+                if (b == globalIdx) { blendMask1[i] = -1; break; }
+            }
+        }
+
+        w.WriteLine($"            vec0 = Vector512.ConditionalSelect({FmtVec512_Int(blendMask0)}, max0, min0);");
+        w.WriteLine($"            vec1 = Vector512.ConditionalSelect({FmtVec512_Int(blendMask1)}, max1, min1);");
+    }
+
+    w.WriteLine();
+    w.WriteLine("            // Store results");
+    if (n == 27)
+    {
+        w.WriteLine("""
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
+                    Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+        """);
+    }
+    else
+    {
+        w.WriteLine("""
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+                Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+        """);
+    }
+    w.WriteLine("    }");
+}
+
 void WriteSimdFile(StreamWriter w)
 {
     w.Write("""
@@ -1192,6 +1333,16 @@ void WriteSimdFile(StreamWriter w)
             var steps = GetNetworkSteps(n);
             w.WriteLine();
             WriteSimdSortMethod32_Avx2(w, n, steps, typeName);
+        }
+    }
+
+    foreach (string typeName in new[] { "int", "uint", "float" })
+    {
+        foreach (int n in new[] { 27, 28 })
+        {
+            var steps = GetNetworkSteps(n);
+            w.WriteLine();
+            WriteSimdSortMethod32_Avx512(w, n, steps, typeName);
         }
     }
 
@@ -1528,6 +1679,7 @@ void WritePublicApi(StreamWriter w, string t)
     bool hasSimd8 = t == "byte" || t == "sbyte";
     bool hasSimd16 = t == "short" || t == "ushort" || t == "char";
     bool hasSimd32 = t == "int" || t == "uint";
+    bool hasSimd32_512 = t == "int" || t == "uint" || t == "float";
     bool hasArmSimd32 = t == "int" || t == "uint" || t == "float";
     bool hasSimd64 = t == "long" || t == "ulong" || t == "double";
     bool hasAvx2Float = t == "float" || t == "double";
@@ -1540,37 +1692,20 @@ void WritePublicApi(StreamWriter w, string t)
     w.WriteLine("        int n = span.Length;");
     w.WriteLine("        if (n == 27 || n == 28)");
     w.WriteLine("        {");
-    if (hasSimd8 || hasSimd16 || hasSimd32)
+    if (hasSimd32_512)
     {
-        string isaCheck = hasSimd8 || hasSimd32 ? "Avx2.IsSupported" : "Avx512BW.IsSupported";
-        w.WriteLine($"            if ({isaCheck})");
+        w.WriteLine("            if (Avx512F.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimd27{suffix}(span);");
+        w.WriteLine($"                    SortSimd27_512{suffix}(span);");
         w.WriteLine("                else");
-        w.WriteLine($"                    SortSimd28{suffix}(span);");
+        w.WriteLine($"                    SortSimd28_512{suffix}(span);");
         w.WriteLine("                return;");
         w.WriteLine("            }");
         w.WriteLine();
-        if (hasSimd8 || hasSimd16 || hasArmSimd32)
+        if (hasSimd32)
         {
-            w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
-            w.WriteLine("            {");
-            w.WriteLine($"                if (n == 27)");
-            w.WriteLine($"                    SortSimdArm27{suffix}(span);");
-            w.WriteLine("                else");
-            w.WriteLine($"                    SortSimdArm28{suffix}(span);");
-            w.WriteLine("                return;");
-            w.WriteLine("            }");
-            w.WriteLine();
-        }
-    }
-    else if (hasArmSimd32)
-    {
-        // float: AVX2 first, then ARM fallback
-        if (hasAvx2Float)
-        {
-            w.WriteLine($"            if (Avx2.IsSupported)");
+            w.WriteLine("            if (Avx2.IsSupported)");
             w.WriteLine("            {");
             w.WriteLine($"                if (n == 27)");
             w.WriteLine($"                    SortSimd27{suffix}(span);");
@@ -1580,6 +1715,40 @@ void WritePublicApi(StreamWriter w, string t)
             w.WriteLine("            }");
             w.WriteLine();
         }
+        else if (hasAvx2Float)
+        {
+            w.WriteLine("            if (Avx2.IsSupported)");
+            w.WriteLine("            {");
+            w.WriteLine($"                if (n == 27)");
+            w.WriteLine($"                    SortSimd27{suffix}(span);");
+            w.WriteLine("                else");
+            w.WriteLine($"                    SortSimd28{suffix}(span);");
+            w.WriteLine("                return;");
+            w.WriteLine("            }");
+            w.WriteLine();
+        }
+        w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
+        w.WriteLine("            {");
+        w.WriteLine($"                if (n == 27)");
+        w.WriteLine($"                    SortSimdArm27{suffix}(span);");
+        w.WriteLine("                else");
+        w.WriteLine($"                    SortSimdArm28{suffix}(span);");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine();
+    }
+    else if (hasSimd8 || hasSimd16)
+    {
+        string isaCheck = hasSimd8 ? "Avx2.IsSupported" : "Avx512BW.IsSupported";
+        w.WriteLine($"            if ({isaCheck})");
+        w.WriteLine("            {");
+        w.WriteLine($"                if (n == 27)");
+        w.WriteLine($"                    SortSimd27{suffix}(span);");
+        w.WriteLine("                else");
+        w.WriteLine($"                    SortSimd28{suffix}(span);");
+        w.WriteLine("                return;");
+        w.WriteLine("            }");
+        w.WriteLine();
         w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine($"                if (n == 27)");

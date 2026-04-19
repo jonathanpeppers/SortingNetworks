@@ -2770,6 +2770,900 @@ public static partial class NetworkSort
         v0.AsByte().StoreUnsafe(ref first);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void SortSimd27_512_int(Span<int> span)
+    {
+        ref int first = ref MemoryMarshal.GetReference(span);
+
+        // Load: vec0 = elements [0..15], vec1 = elements [16..26] padded with int.MaxValue
+        var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+        var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+        var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+        var lastThree = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)));
+        var q2 = Sse2.ShiftRightLogical128BitLane(lastThree, 4);
+        var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+
+            // Step 0
+            var s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 26, 25, 24, 23, 22, 21, 20, 9, 8, 11, 10, 15, 14, 13, 12), vec1);
+            var s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 19, 18, 7, 6, 5, 4, 3, 2, 1, 27, 28, 29, 30, 31), vec1);
+            var min0 = Avx512F.Min(vec0, s0);
+            var max0 = Avx512F.Max(vec0, s0);
+            var min1 = Avx512F.Min(vec1, s1);
+            var max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 1
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(1, 0, 3, 2, 5, 4, 7, 6, 10, 11, 8, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 19, 16, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 2
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(2, 3, 0, 1, 6, 7, 4, 5, 19, 12, 14, 16, 9, 17, 10, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 13, 15, 8, 22, 23, 20, 21, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, -1, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 3
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(4, 5, 20, 21, 0, 1, 24, 25, 13, 11, 17, 9, 15, 8, 19, 12), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 10, 16, 14, 2, 3, 26, 23, 6, 7, 22, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 4
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 2, 1, 24, 6, 22, 4, 20, 9, 8, 12, 13, 10, 11, 16, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 15, 19, 18, 7, 23, 5, 21, 3, 26, 25, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, -1, 0, -1, -1, -1, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 5
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(8, 4, 6, 9, 1, 7, 2, 5, 0, 3, 11, 10, 13, 12, 15, 14), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 24, 19, 22, 25, 20, 26, 18, 21, 23, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, 0, 0, 0, -1, 0, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 6
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 10, 13, 3, 8, 12, 9, 20, 4, 6, 1, 11, 5, 2, 25, 22), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(16, 26, 21, 23, 7, 18, 15, 19, 24, 14, 17, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, -1, -1, 0, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 7
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 5, 14, 11, 15, 17, 18, 7, 19, 21, 6, 8), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(20, 9, 10, 12, 16, 13, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 8
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 4, 3, 2, 6, 5, 8, 7, 13, 10, 15, 16, 9, 18, 11), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(12, 17, 14, 20, 19, 22, 21, 25, 24, 23, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 9
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 7, 3, 8, 5, 10, 2, 4, 11, 6, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 21, 16, 23, 25, 17, 22, 19, 24, 20, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, -1, -1, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 10
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 3, 2, 1, 7, 6, 5, 4, 9, 8, 12, 16, 10, 14, 13, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 15, 19, 18, 23, 22, 21, 20, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, 0, -1, -1, 0, -1, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 11
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 3, 2, 5, 4, 7, 6, 10, 12, 8, 13, 9, 11, 16, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 19, 15, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 12
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(15, 18, 17, 20, 19, 22, 21, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Store results
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
+            Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void SortSimd28_512_int(Span<int> span)
+    {
+        ref int first = ref MemoryMarshal.GetReference(span);
+
+        // Load: vec0 = elements [0..15], vec1 = elements [16..27] padded with int.MaxValue
+        var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+        var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+        var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+        var q2 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)));
+        var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+
+            // Step 0
+            var s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(27, 26, 25, 24, 23, 22, 21, 20, 9, 8, 11, 10, 15, 14, 13, 12), vec1);
+            var s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 19, 18, 7, 6, 5, 4, 3, 2, 1, 0, 28, 29, 30, 31), vec1);
+            var min0 = Avx512F.Min(vec0, s0);
+            var max0 = Avx512F.Max(vec0, s0);
+            var min1 = Avx512F.Min(vec1, s1);
+            var max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 1
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(1, 0, 3, 2, 5, 4, 7, 6, 10, 11, 8, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 19, 16, 17, 21, 20, 23, 22, 25, 24, 27, 26, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 2
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(2, 3, 0, 1, 6, 7, 4, 5, 19, 12, 14, 16, 9, 17, 10, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 13, 15, 8, 22, 23, 20, 21, 26, 27, 24, 25, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, -1, -1, 0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 3
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(4, 5, 20, 21, 0, 1, 24, 25, 13, 11, 17, 9, 15, 8, 19, 12), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 10, 16, 14, 2, 3, 26, 27, 6, 7, 22, 23, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 4
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 2, 1, 24, 6, 22, 4, 20, 9, 8, 12, 13, 10, 11, 16, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 15, 19, 18, 7, 23, 5, 21, 3, 26, 25, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, -1, 0, -1, -1, -1, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 5
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(8, 4, 6, 9, 1, 7, 2, 5, 0, 3, 11, 10, 13, 12, 15, 14), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 24, 27, 22, 25, 20, 26, 18, 21, 23, 19, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 6
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 10, 13, 3, 8, 12, 9, 20, 4, 6, 1, 11, 5, 2, 25, 22), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(16, 26, 21, 23, 7, 18, 15, 19, 24, 14, 17, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, -1, -1, 0, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 7
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 5, 14, 11, 15, 17, 18, 7, 19, 21, 6, 8), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(20, 9, 10, 12, 16, 13, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 8
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 4, 3, 2, 6, 5, 8, 7, 13, 10, 15, 16, 9, 18, 11), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(12, 17, 14, 20, 19, 22, 21, 25, 24, 23, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 9
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 7, 3, 8, 5, 10, 2, 4, 11, 6, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 21, 16, 23, 25, 17, 22, 19, 24, 20, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, -1, -1, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 10
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 3, 2, 1, 7, 6, 5, 4, 9, 8, 12, 16, 10, 14, 13, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 15, 19, 18, 23, 22, 21, 20, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, 0, -1, -1, 0, -1, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 11
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 3, 2, 5, 4, 7, 6, 10, 12, 8, 13, 9, 11, 16, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 19, 15, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 12
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(15, 18, 17, 20, 19, 22, 21, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0, s0);
+            max0 = Avx512F.Max(vec0, s0);
+            min1 = Avx512F.Min(vec1, s1);
+            max1 = Avx512F.Max(vec1, s1);
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Store results
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void SortSimd27_512_uint(Span<uint> span)
+    {
+        ref int first = ref Unsafe.As<uint, int>(ref MemoryMarshal.GetReference(span));
+
+        // Load: vec0 = elements [0..15], vec1 = elements [16..26] padded with int.MaxValue
+        var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+        var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+        var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+        var lastThree = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)));
+        var q2 = Sse2.ShiftRightLogical128BitLane(lastThree, 4);
+        var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+
+            // Step 0
+            var s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 26, 25, 24, 23, 22, 21, 20, 9, 8, 11, 10, 15, 14, 13, 12), vec1);
+            var s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 19, 18, 7, 6, 5, 4, 3, 2, 1, 27, 28, 29, 30, 31), vec1);
+            var min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 1
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(1, 0, 3, 2, 5, 4, 7, 6, 10, 11, 8, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 19, 16, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 2
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(2, 3, 0, 1, 6, 7, 4, 5, 19, 12, 14, 16, 9, 17, 10, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 13, 15, 8, 22, 23, 20, 21, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, -1, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 3
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(4, 5, 20, 21, 0, 1, 24, 25, 13, 11, 17, 9, 15, 8, 19, 12), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 10, 16, 14, 2, 3, 26, 23, 6, 7, 22, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 4
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 2, 1, 24, 6, 22, 4, 20, 9, 8, 12, 13, 10, 11, 16, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 15, 19, 18, 7, 23, 5, 21, 3, 26, 25, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, -1, 0, -1, -1, -1, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 5
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(8, 4, 6, 9, 1, 7, 2, 5, 0, 3, 11, 10, 13, 12, 15, 14), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 24, 19, 22, 25, 20, 26, 18, 21, 23, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, 0, 0, 0, -1, 0, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 6
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 10, 13, 3, 8, 12, 9, 20, 4, 6, 1, 11, 5, 2, 25, 22), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(16, 26, 21, 23, 7, 18, 15, 19, 24, 14, 17, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, -1, -1, 0, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 7
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 5, 14, 11, 15, 17, 18, 7, 19, 21, 6, 8), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(20, 9, 10, 12, 16, 13, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 8
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 4, 3, 2, 6, 5, 8, 7, 13, 10, 15, 16, 9, 18, 11), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(12, 17, 14, 20, 19, 22, 21, 25, 24, 23, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 9
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 7, 3, 8, 5, 10, 2, 4, 11, 6, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 21, 16, 23, 25, 17, 22, 19, 24, 20, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, -1, -1, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 10
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 3, 2, 1, 7, 6, 5, 4, 9, 8, 12, 16, 10, 14, 13, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 15, 19, 18, 23, 22, 21, 20, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, 0, -1, -1, 0, -1, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 11
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 3, 2, 5, 4, 7, 6, 10, 12, 8, 13, 9, 11, 16, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 19, 15, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 12
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(15, 18, 17, 20, 19, 22, 21, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Store results
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
+            Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void SortSimd28_512_uint(Span<uint> span)
+    {
+        ref int first = ref Unsafe.As<uint, int>(ref MemoryMarshal.GetReference(span));
+
+        // Load: vec0 = elements [0..15], vec1 = elements [16..27] padded with int.MaxValue
+        var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+        var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+        var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+        var q2 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)));
+        var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+
+            // Step 0
+            var s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(27, 26, 25, 24, 23, 22, 21, 20, 9, 8, 11, 10, 15, 14, 13, 12), vec1);
+            var s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 19, 18, 7, 6, 5, 4, 3, 2, 1, 0, 28, 29, 30, 31), vec1);
+            var min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            var min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            var max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 1
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(1, 0, 3, 2, 5, 4, 7, 6, 10, 11, 8, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 19, 16, 17, 21, 20, 23, 22, 25, 24, 27, 26, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 2
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(2, 3, 0, 1, 6, 7, 4, 5, 19, 12, 14, 16, 9, 17, 10, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 13, 15, 8, 22, 23, 20, 21, 26, 27, 24, 25, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, -1, -1, 0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 3
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(4, 5, 20, 21, 0, 1, 24, 25, 13, 11, 17, 9, 15, 8, 19, 12), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 10, 16, 14, 2, 3, 26, 27, 6, 7, 22, 23, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 4
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 2, 1, 24, 6, 22, 4, 20, 9, 8, 12, 13, 10, 11, 16, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 15, 19, 18, 7, 23, 5, 21, 3, 26, 25, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, -1, 0, -1, -1, -1, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 5
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(8, 4, 6, 9, 1, 7, 2, 5, 0, 3, 11, 10, 13, 12, 15, 14), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 24, 27, 22, 25, 20, 26, 18, 21, 23, 19, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 6
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 10, 13, 3, 8, 12, 9, 20, 4, 6, 1, 11, 5, 2, 25, 22), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(16, 26, 21, 23, 7, 18, 15, 19, 24, 14, 17, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, -1, -1, 0, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 7
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 5, 14, 11, 15, 17, 18, 7, 19, 21, 6, 8), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(20, 9, 10, 12, 16, 13, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 8
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 4, 3, 2, 6, 5, 8, 7, 13, 10, 15, 16, 9, 18, 11), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(12, 17, 14, 20, 19, 22, 21, 25, 24, 23, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 9
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 7, 3, 8, 5, 10, 2, 4, 11, 6, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 21, 16, 23, 25, 17, 22, 19, 24, 20, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, -1, -1, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 10
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 3, 2, 1, 7, 6, 5, 4, 9, 8, 12, 16, 10, 14, 13, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 15, 19, 18, 23, 22, 21, 20, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, 0, -1, -1, 0, -1, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 11
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 3, 2, 5, 4, 7, 6, 10, 12, 8, 13, 9, 11, 16, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 19, 15, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 12
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(15, 18, 17, 20, 19, 22, 21, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsUInt32(), s0.AsUInt32()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsUInt32(), s1.AsUInt32()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Store results
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void SortSimd27_512_float(Span<float> span)
+    {
+        ref int first = ref Unsafe.As<float, int>(ref MemoryMarshal.GetReference(span));
+
+        // Load: vec0 = elements [0..15], vec1 = elements [16..26] padded with int.MaxValue
+        var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+        var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+        var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+        var lastThree = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)));
+        var q2 = Sse2.ShiftRightLogical128BitLane(lastThree, 4);
+        var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+
+            // Step 0
+            var s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 26, 25, 24, 23, 22, 21, 20, 9, 8, 11, 10, 15, 14, 13, 12), vec1);
+            var s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 19, 18, 7, 6, 5, 4, 3, 2, 1, 27, 28, 29, 30, 31), vec1);
+            var min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            var max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            var min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            var max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 1
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(1, 0, 3, 2, 5, 4, 7, 6, 10, 11, 8, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 19, 16, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 2
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(2, 3, 0, 1, 6, 7, 4, 5, 19, 12, 14, 16, 9, 17, 10, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 13, 15, 8, 22, 23, 20, 21, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, -1, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 3
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(4, 5, 20, 21, 0, 1, 24, 25, 13, 11, 17, 9, 15, 8, 19, 12), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 10, 16, 14, 2, 3, 26, 23, 6, 7, 22, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 4
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 2, 1, 24, 6, 22, 4, 20, 9, 8, 12, 13, 10, 11, 16, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 15, 19, 18, 7, 23, 5, 21, 3, 26, 25, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, -1, 0, -1, -1, -1, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 5
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(8, 4, 6, 9, 1, 7, 2, 5, 0, 3, 11, 10, 13, 12, 15, 14), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 24, 19, 22, 25, 20, 26, 18, 21, 23, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, 0, 0, 0, -1, 0, -1, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 6
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 10, 13, 3, 8, 12, 9, 20, 4, 6, 1, 11, 5, 2, 25, 22), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(16, 26, 21, 23, 7, 18, 15, 19, 24, 14, 17, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, -1, -1, 0, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 7
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 5, 14, 11, 15, 17, 18, 7, 19, 21, 6, 8), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(20, 9, 10, 12, 16, 13, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 8
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 4, 3, 2, 6, 5, 8, 7, 13, 10, 15, 16, 9, 18, 11), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(12, 17, 14, 20, 19, 22, 21, 25, 24, 23, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 9
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 7, 3, 8, 5, 10, 2, 4, 11, 6, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 21, 16, 23, 25, 17, 22, 19, 24, 20, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, -1, -1, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 10
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 3, 2, 1, 7, 6, 5, 4, 9, 8, 12, 16, 10, 14, 13, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 15, 19, 18, 23, 22, 21, 20, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, 0, -1, -1, 0, -1, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 11
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 3, 2, 5, 4, 7, 6, 10, 12, 8, 13, 9, 11, 16, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 19, 15, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 12
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(15, 18, 17, 20, 19, 22, 21, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Store results
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 23)),
+            Sse2.ShiftLeftLogical128BitLane(vec1.GetUpper().GetLower(), 4));
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static void SortSimd28_512_float(Span<float> span)
+    {
+        ref int first = ref Unsafe.As<float, int>(ref MemoryMarshal.GetReference(span));
+
+        // Load: vec0 = elements [0..15], vec1 = elements [16..27] padded with int.MaxValue
+        var vec0 = Unsafe.ReadUnaligned<Vector512<int>>(ref Unsafe.As<int, byte>(ref first));
+        var q0 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)));
+        var q1 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 20)));
+        var q2 = Unsafe.ReadUnaligned<Vector128<int>>(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)));
+        var vec1 = Vector512.Create(Vector256.Create(q0, q1), Vector256.Create(q2, Vector128.Create(int.MaxValue)));
+
+            // Step 0
+            var s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(27, 26, 25, 24, 23, 22, 21, 20, 9, 8, 11, 10, 15, 14, 13, 12), vec1);
+            var s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 19, 18, 7, 6, 5, 4, 3, 2, 1, 0, 28, 29, 30, 31), vec1);
+            var min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            var max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            var min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            var max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 1
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(1, 0, 3, 2, 5, 4, 7, 6, 10, 11, 8, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 19, 16, 17, 21, 20, 23, 22, 25, 24, 27, 26, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 2
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(2, 3, 0, 1, 6, 7, 4, 5, 19, 12, 14, 16, 9, 17, 10, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 13, 15, 8, 22, 23, 20, 21, 26, 27, 24, 25, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, -1, -1, 0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 3
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(4, 5, 20, 21, 0, 1, 24, 25, 13, 11, 17, 9, 15, 8, 19, 12), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 10, 16, 14, 2, 3, 26, 27, 6, 7, 22, 23, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 4
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 2, 1, 24, 6, 22, 4, 20, 9, 8, 12, 13, 10, 11, 16, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 15, 19, 18, 7, 23, 5, 21, 3, 26, 25, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, -1, 0, -1, -1, -1, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 5
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(8, 4, 6, 9, 1, 7, 2, 5, 0, 3, 11, 10, 13, 12, 15, 14), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(17, 16, 24, 27, 22, 25, 20, 26, 18, 21, 23, 19, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, 0, 0, 0, 0, -1, 0, -1, -1, -1, -1, 0, 0, 0, 0), max1, min1);
+
+            // Step 6
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 10, 13, 3, 8, 12, 9, 20, 4, 6, 1, 11, 5, 2, 25, 22), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(16, 26, 21, 23, 7, 18, 15, 19, 24, 14, 17, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, -1, -1, -1, 0, -1, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 7
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 5, 14, 11, 15, 17, 18, 7, 19, 21, 6, 8), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(20, 9, 10, 12, 16, 13, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, -1, -1, -1, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 8
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 4, 3, 2, 6, 5, 8, 7, 13, 10, 15, 16, 9, 18, 11), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(12, 17, 14, 20, 19, 22, 21, 25, 24, 23, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 9
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 7, 3, 8, 5, 10, 2, 4, 11, 6, 9, 14, 15, 12, 13), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(18, 21, 16, 23, 25, 17, 22, 19, 24, 20, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, 0, 0, 0, -1, -1, 0, -1, -1, 0, 0, -1, -1), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(0, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 10
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 3, 2, 1, 7, 6, 5, 4, 9, 8, 12, 16, 10, 14, 13, 17), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(11, 15, 19, 18, 23, 22, 21, 20, 26, 25, 24, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, 0, -1, -1, 0, -1, 0, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, -1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 11
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 3, 2, 5, 4, 7, 6, 10, 12, 8, 13, 9, 11, 16, 18), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(14, 19, 15, 17, 21, 20, 23, 22, 25, 24, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, -1, 0, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Step 12
+            s0 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16), vec1);
+            s1 = Avx512F.PermuteVar16x32x2(vec0, Vector512.Create(15, 18, 17, 20, 19, 22, 21, 24, 23, 25, 26, 27, 28, 29, 30, 31), vec1);
+            min0 = Avx512F.Min(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            max0 = Avx512F.Max(vec0.AsSingle(), s0.AsSingle()).AsInt32();
+            min1 = Avx512F.Min(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            max1 = Avx512F.Max(vec1.AsSingle(), s1.AsSingle()).AsInt32();
+            vec0 = Vector512.ConditionalSelect(Vector512.Create(0, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0), max0, min0);
+            vec1 = Vector512.ConditionalSelect(Vector512.Create(-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0), max1, min1);
+
+            // Store results
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 24)), vec1.GetUpper().GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref Unsafe.Add(ref first, 16)), vec1.GetLower());
+        Unsafe.WriteUnaligned(ref Unsafe.As<int, byte>(ref first), vec0);
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static void SortSimd27_long(Span<long> span)
     {
