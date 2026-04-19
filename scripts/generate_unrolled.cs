@@ -1162,6 +1162,189 @@ void WriteSimdSortMethodDouble(StreamWriter w, int n, List<List<(int A, int B)>>
     w.WriteLine("    }");
 }
 
+void WriteSimdSortMethodLong_Avx2(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
+{
+    int regSize = 4;
+    int numRegs = (n + regSize - 1) / regSize;
+    int lastRegElems = n - (numRegs - 1) * regSize;
+    int lastRegOffset = (numRegs - 1) * 32;
+    bool isUnsigned = typeName == "ulong";
+
+    w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
+    w.WriteLine($"    private static void SortSimdAvx2_{n}_{typeName}(Span<{typeName}> span)");
+    w.WriteLine("    {");
+    w.WriteLine($"        ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));");
+
+    for (int ri = 0; ri < numRegs - 1; ri++)
+    {
+        if (ri == 0)
+            w.WriteLine("        var v0 = Unsafe.ReadUnaligned<Vector256<long>>(ref first);");
+        else
+            w.WriteLine($"        var v{ri} = Unsafe.ReadUnaligned<Vector256<long>>(ref Unsafe.Add(ref first, {ri * 32}));");
+    }
+
+    if (lastRegElems == regSize)
+    {
+        w.WriteLine($"        var v{numRegs - 1} = Unsafe.ReadUnaligned<Vector256<long>>(ref Unsafe.Add(ref first, {lastRegOffset}));");
+    }
+    else
+    {
+        int overlapOffset = (n - regSize) * 8;
+        int shift = regSize - lastRegElems;
+        byte control = 0;
+        for (int d = 0; d < 4; d++)
+        {
+            int s = (d + shift) % 4;
+            control |= (byte)(s << (d * 2));
+        }
+        w.WriteLine($"        var v{numRegs - 1} = Avx2.Permute4x64(");
+        w.WriteLine($"            Unsafe.ReadUnaligned<Vector256<long>>(ref Unsafe.Add(ref first, {overlapOffset})),");
+        w.WriteLine($"            0x{control:X2});");
+    }
+
+    if (isUnsigned)
+    {
+        w.WriteLine("        var signFlip = Vector256.Create(long.MinValue);");
+    }
+
+    int totalSlots = numRegs * regSize;
+
+    for (int si = 0; si < steps.Count; si++)
+    {
+        var step = steps[si];
+        int[] perm = Enumerable.Range(0, totalSlots).ToArray();
+        foreach (var (a, b) in step) { perm[a] = b; perm[b] = a; }
+        bool[] isMax = new bool[totalSlots];
+        foreach (var (a, b) in step) isMax[Math.Max(a, b)] = true;
+
+        string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+        w.WriteLine();
+        w.WriteLine($"        // Step {si}: {pairStr}");
+        w.WriteLine("        {");
+
+        // Identify active registers
+        var activeRegs = new List<int>();
+        for (int tri = 0; tri < numRegs; tri++)
+        {
+            int baseElem = tri * regSize;
+            bool hasWork = false;
+            for (int lane = 0; lane < regSize; lane++)
+                if (perm[baseElem + lane] != baseElem + lane) { hasWork = true; break; }
+            if (hasWork) activeRegs.Add(tri);
+        }
+
+        // Pass 1: compute all shuffled vectors from unmodified registers
+        foreach (int tri in activeRegs)
+        {
+            int baseElem = tri * regSize;
+            var sourceGroups = new Dictionary<int, List<(int destLane, int srcLane)>>();
+            for (int lane = 0; lane < regSize; lane++)
+            {
+                int srcElem = perm[baseElem + lane];
+                int srcReg = srcElem / regSize;
+                int srcLane = srcElem % regSize;
+                if (!sourceGroups.ContainsKey(srcReg))
+                    sourceGroups[srcReg] = [];
+                sourceGroups[srcReg].Add((lane, srcLane));
+            }
+
+            var sortedSources = sourceGroups.Keys.OrderBy(k => k).ToList();
+
+            if (sortedSources.Count == 1 && sortedSources[0] == tri)
+            {
+                int[] srcLanes = new int[regSize];
+                for (int lane = 0; lane < regSize; lane++)
+                    srcLanes[lane] = perm[baseElem + lane] % regSize;
+                byte ctrl = (byte)(srcLanes[0] | (srcLanes[1] << 2) | (srcLanes[2] << 4) | (srcLanes[3] << 6));
+                w.WriteLine($"            var shuffled{tri} = Avx2.Permute4x64(v{tri}, 0x{ctrl:X2});");
+            }
+            else
+            {
+                foreach (int srcReg in sortedSources)
+                {
+                    int[] srcLanes = new int[regSize];
+                    for (int lane = 0; lane < regSize; lane++)
+                        srcLanes[lane] = lane;
+                    foreach (var (destLane, srcLane) in sourceGroups[srcReg])
+                        srcLanes[destLane] = srcLane;
+                    byte ctrl = (byte)(srcLanes[0] | (srcLanes[1] << 2) | (srcLanes[2] << 4) | (srcLanes[3] << 6));
+                    w.WriteLine($"            var from{tri}_{srcReg} = Avx2.Permute4x64(v{srcReg}, 0x{ctrl:X2});");
+                }
+
+                if (sortedSources.Count == 1)
+                {
+                    w.WriteLine($"            var shuffled{tri} = from{tri}_{sortedSources[0]};");
+                }
+                else
+                {
+                    string prev = $"from{tri}_{sortedSources[0]}";
+                    for (int bi = 1; bi < sortedSources.Count; bi++)
+                    {
+                        int srcReg = sortedSources[bi];
+                        long[] blendMask = new long[regSize];
+                        foreach (var (destLane, _) in sourceGroups[srcReg])
+                            blendMask[destLane] = -1L;
+                        string next = bi < sortedSources.Count - 1 ? $"blend{tri}_{bi}" : $"shuffled{tri}";
+                        w.WriteLine($"            var {next} = Avx2.BlendVariable({prev}.AsByte(), from{tri}_{srcReg}.AsByte(), {FmtVec256_Long(blendMask)}.AsByte()).AsInt64();");
+                        prev = next;
+                    }
+                }
+            }
+        }
+
+        // Pass 2: apply compare-and-blend min/max
+        foreach (int tri in activeRegs)
+        {
+            int baseElem = tri * regSize;
+            long[] maxMask = new long[regSize];
+            for (int lane = 0; lane < regSize; lane++)
+                if (isMax[baseElem + lane]) maxMask[lane] = -1L;
+
+            if (isUnsigned)
+            {
+                w.WriteLine($"            var gt{tri} = Avx2.CompareGreaterThan(Vector256.Xor(v{tri}, signFlip), Vector256.Xor(shuffled{tri}, signFlip));");
+            }
+            else
+            {
+                w.WriteLine($"            var gt{tri} = Avx2.CompareGreaterThan(v{tri}, shuffled{tri});");
+            }
+            w.WriteLine($"            var mins{tri} = Avx2.BlendVariable(v{tri}.AsByte(), shuffled{tri}.AsByte(), gt{tri}.AsByte()).AsInt64();");
+            w.WriteLine($"            var maxs{tri} = Avx2.BlendVariable(shuffled{tri}.AsByte(), v{tri}.AsByte(), gt{tri}.AsByte()).AsInt64();");
+            w.WriteLine($"            v{tri} = Avx2.BlendVariable(mins{tri}.AsByte(), maxs{tri}.AsByte(), {FmtVec256_Long(maxMask)}.AsByte()).AsInt64();");
+        }
+
+        w.WriteLine("        }");
+    }
+
+    w.WriteLine();
+    if (lastRegElems < regSize)
+    {
+        int overlapOffset = (n - regSize) * 8;
+        int shift = regSize - lastRegElems;
+        byte control = 0;
+        for (int d = 0; d < 4; d++)
+        {
+            int s = (d - shift + 4) % 4;
+            control |= (byte)(s << (d * 2));
+        }
+        w.WriteLine($"        Avx2.Permute4x64(v{numRegs - 1}, 0x{control:X2}).AsByte()");
+        w.WriteLine($"            .StoreUnsafe(ref Unsafe.Add(ref first, {overlapOffset}));");
+    }
+    else
+    {
+        w.WriteLine($"        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, {lastRegOffset}), v{numRegs - 1});");
+    }
+
+    for (int ri = numRegs - 2; ri >= 0; ri--)
+    {
+        if (ri == 0)
+            w.WriteLine("        Unsafe.WriteUnaligned(ref first, v0);");
+        else
+            w.WriteLine($"        Unsafe.WriteUnaligned(ref Unsafe.Add(ref first, {ri * 32}), v{ri});");
+    }
+    w.WriteLine("    }");
+}
+
 void WriteSimdSortMethod32_Avx512(StreamWriter w, int n, List<List<(int A, int B)>> steps, string typeName)
 {
     int totalSlots = 32;
@@ -1368,6 +1551,16 @@ void WriteSimdFile(StreamWriter w)
         var steps = GetNetworkSteps(n);
         w.WriteLine();
         WriteSimdSortMethodDouble(w, n, steps, "SortSimdAvx2_");
+    }
+
+    foreach (string typeName in new[] { "long", "ulong" })
+    {
+        foreach (int n in new[] { 27, 28 })
+        {
+            var steps = GetNetworkSteps(n);
+            w.WriteLine();
+            WriteSimdSortMethodLong_Avx2(w, n, steps, typeName);
+        }
     }
 
     w.WriteLine("}");
@@ -1700,6 +1893,7 @@ void WritePublicApi(StreamWriter w, string t)
     bool hasSimd32_512 = t == "int" || t == "uint" || t == "float";
     bool hasSimd64 = t == "long" || t == "ulong" || t == "double";
     bool hasAvx2Float = t == "float" || t == "double";
+    bool hasAvx2Long = t == "long" || t == "ulong";
 
     w.WriteLine("    /// <summary>");
     w.WriteLine($"    /// Sorts a span of {t} using a sorting network when possible.");
@@ -1787,8 +1981,8 @@ void WritePublicApi(StreamWriter w, string t)
         w.WriteLine("                return;");
         w.WriteLine("            }");
         w.WriteLine();
-        // double: AVX2 fallback after AVX-512F
-        if (hasAvx2Float)
+        // double/long/ulong: AVX2 fallback after AVX-512F
+        if (hasAvx2Float || hasAvx2Long)
         {
             w.WriteLine("            if (Avx2.IsSupported)");
             w.WriteLine("            {");

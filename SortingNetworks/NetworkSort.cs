@@ -593,6 +593,15 @@ public static partial class NetworkSort
                 return;
             }
 
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdAvx2_27_long(span);
+                else
+                    SortSimdAvx2_28_long(span);
+                return;
+            }
+
             ref long first = ref MemoryMarshal.GetReference(span);
             if (n == 27)
                 Sort27(ref first);
@@ -671,6 +680,15 @@ public static partial class NetworkSort
                     SortSimd27_ulong(span);
                 else
                     SortSimd28_ulong(span);
+                return;
+            }
+
+            if (Avx2.IsSupported)
+            {
+                if (n == 27)
+                    SortSimdAvx2_27_ulong(span);
+                else
+                    SortSimdAvx2_28_ulong(span);
                 return;
             }
 
