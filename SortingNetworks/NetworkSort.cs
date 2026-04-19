@@ -27,7 +27,7 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
-            if (Vector256.IsHardwareAccelerated)
+            if (Avx2.IsSupported)
             {
                 if (n == 27)
                     SortSimd27(span);
@@ -36,7 +36,7 @@ public static partial class NetworkSort
                 return;
             }
 
-            if (Vector128.IsHardwareAccelerated)
+            if (Ssse3.IsSupported || AdvSimd.IsSupported)
             {
                 if (n == 27)
                     SortSimd128_27(span);
@@ -117,7 +117,7 @@ public static partial class NetworkSort
         int n = span.Length;
         if (n == 27 || n == 28)
         {
-            if (Vector256.IsHardwareAccelerated)
+            if (Avx2.IsSupported)
             {
                 if (n == 27)
                     SortSimd27_sbyte(span);
@@ -126,7 +126,7 @@ public static partial class NetworkSort
                 return;
             }
 
-            if (Vector128.IsHardwareAccelerated)
+            if (Ssse3.IsSupported || AdvSimd.IsSupported)
             {
                 if (n == 27)
                     SortSimd128_27_sbyte(span);

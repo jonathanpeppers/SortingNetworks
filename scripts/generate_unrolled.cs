@@ -463,7 +463,6 @@ void WriteUnifiedByteSortMethod128(StreamWriter w, int n, List<List<(int A, int 
 {
     int loadOffset = n - 16;
     int shiftAmount = 32 - n;
-    int storeShift = 16 - shiftAmount;
     string suffix = typeName != "byte" ? $"_{typeName}" : "";
     string refCast = typeName == "sbyte"
         ? $"ref byte first = ref Unsafe.As<{typeName}, byte>(ref MemoryMarshal.GetReference(span));"
@@ -1882,7 +1881,8 @@ void WritePublicApi(StreamWriter w, string t)
     }
     else if (hasSimd8)
     {
-        w.WriteLine("            if (Vector256.IsHardwareAccelerated)");
+        // Vector256.Shuffle<byte> requires AVX2 (VPSHUFB) on x86
+        w.WriteLine("            if (Avx2.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine($"                if (n == 27)");
         w.WriteLine($"                    SortSimd27{suffix}(span);");
@@ -1891,7 +1891,8 @@ void WritePublicApi(StreamWriter w, string t)
         w.WriteLine("                return;");
         w.WriteLine("            }");
         w.WriteLine();
-        w.WriteLine("            if (Vector128.IsHardwareAccelerated)");
+        // Vector128.Shuffle<byte> requires SSSE3 (PSHUFB) on x86 or AdvSimd (TBL) on ARM
+        w.WriteLine("            if (Ssse3.IsSupported || AdvSimd.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine($"                if (n == 27)");
         w.WriteLine($"                    SortSimd128_27{suffix}(span);");
