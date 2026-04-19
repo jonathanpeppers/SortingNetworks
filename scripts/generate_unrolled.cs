@@ -1616,7 +1616,7 @@ void WriteArmSimdSortMethod16(StreamWriter w, int n, List<List<(int A, int B)>> 
             {
                 w.WriteLine($"            var mins{vi} = {ArmMinExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
                 w.WriteLine($"            var maxs{vi} = {ArmMaxExpr16(typeName, $"v{vi}", $"shuffled{vi}")};");
-                w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+                w.WriteLine($"            v{vi} = Vector128.ConditionalSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
             }
         }
 
@@ -1749,7 +1749,7 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
                 }
                 w.WriteLine($"            var mins{vi} = {ArmMinExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
                 w.WriteLine($"            var maxs{vi} = {ArmMaxExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
-                w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+                w.WriteLine($"            v{vi} = Vector128.ConditionalSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
             }
         }
 
