@@ -1396,6 +1396,19 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
 
         for (int vi = 0; vi < 7; vi++)
         {
+            // Skip vectors where all elements map to themselves
+            bool isIdentity = true;
+            for (int ei = 0; ei < 4; ei++)
+            {
+                if (perm[vi * 4 + ei] != vi * 4 + ei)
+                {
+                    isIdentity = false;
+                    break;
+                }
+            }
+            if (isIdentity) continue;
+
+            // Shuffle
             byte[] idxA = new byte[16];
             byte[] idxB = new byte[16];
             bool needsA = false, needsB = false;
@@ -1432,20 +1445,36 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
             {
                 w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableB, {FmtVec128(idxB)});");
             }
-        }
 
-        for (int vi = 0; vi < 7; vi++)
-        {
-            byte[] blendMask = new byte[16];
+            // Blend — eliminate trivial all-min or all-max cases
+            bool allMin = true, allMax = true;
             for (int ei = 0; ei < 4; ei++)
             {
-                byte val = blend[vi * 4 + ei];
-                for (int bi = 0; bi < 4; bi++)
-                    blendMask[ei * 4 + bi] = val;
+                if (blend[vi * 4 + ei] != 0x00) allMin = false;
+                if (blend[vi * 4 + ei] != 0xFF) allMax = false;
             }
-            w.WriteLine($"            var mins{vi} = {ArmMinExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
-            w.WriteLine($"            var maxs{vi} = {ArmMaxExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
-            w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+
+            if (allMin)
+            {
+                w.WriteLine($"            v{vi} = {ArmMinExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
+            }
+            else if (allMax)
+            {
+                w.WriteLine($"            v{vi} = {ArmMaxExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
+            }
+            else
+            {
+                byte[] blendMask = new byte[16];
+                for (int ei = 0; ei < 4; ei++)
+                {
+                    byte val = blend[vi * 4 + ei];
+                    for (int bi = 0; bi < 4; bi++)
+                        blendMask[ei * 4 + bi] = val;
+                }
+                w.WriteLine($"            var mins{vi} = {ArmMinExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
+                w.WriteLine($"            var maxs{vi} = {ArmMaxExpr32(typeName, $"v{vi}", $"shuffled{vi}")};");
+                w.WriteLine($"            v{vi} = AdvSimd.BitwiseSelect({FmtVec128(blendMask)}, maxs{vi}, mins{vi});");
+            }
         }
 
         w.WriteLine("        }");
