@@ -1643,6 +1643,21 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
     w.WriteLine($"    [MethodImpl(MethodImplOptions.AggressiveOptimization)]");
     w.WriteLine($"    private static void SortSimdArm{n}{suffix}(Span<{typeName}> span)");
     w.WriteLine("    {");
+
+    // Early-exit: skip the SIMD sort if the input is already sorted
+    w.WriteLine($"        // Early exit if already sorted");
+    w.WriteLine("        {");
+    w.WriteLine($"            ref {typeName} r = ref MemoryMarshal.GetReference(span);");
+    w.WriteLine($"            for (int i = 0; i < {n - 1}; i++)");
+    w.WriteLine("            {");
+    w.WriteLine("                if (Unsafe.Add(ref r, i) > Unsafe.Add(ref r, i + 1))");
+    w.WriteLine("                    goto notSorted;");
+    w.WriteLine("            }");
+    w.WriteLine("            return;");
+    w.WriteLine("            notSorted:;");
+    w.WriteLine("        }");
+    w.WriteLine();
+
     w.WriteLine($"        {refCast}");
     for (int i = 0; i < 6; i++)
     {
@@ -1678,51 +1693,107 @@ void WriteArmSimdSortMethod32(StreamWriter w, int n, List<List<(int A, int B)>> 
         w.WriteLine();
         w.WriteLine($"        // Step {si}: {pairStr}");
         w.WriteLine("        {");
-        w.WriteLine("            var tableA = (v0, v1, v2, v3);");
-        w.WriteLine("            var tableB = (v4, v5, v6, Vector128<byte>.Zero);");
+
+        // Pre-analyze each shuffled vector: detect single-source-register cases
+        // and determine which tables are actually needed
+        bool stepNeedsTableA = false, stepNeedsTableB = false;
+        int[] singleSrc = new int[7]; // -1 = multi-source (needs table), 0-6 = single source register
+        bool[] vecIsIdentity = new bool[7];
 
         for (int vi = 0; vi < 7; vi++)
         {
-            byte[] idxA = new byte[16];
-            byte[] idxB = new byte[16];
-            bool needsA = false, needsB = false;
+            bool identity = true;
+            var srcRegs = new HashSet<int>();
             for (int ei = 0; ei < 4; ei++)
             {
                 int srcElem = perm[vi * 4 + ei];
-                for (int bi = 0; bi < 4; bi++)
-                {
-                    if (srcElem < 16)
-                    {
-                        idxA[ei * 4 + bi] = (byte)(srcElem * 4 + bi);
-                        idxB[ei * 4 + bi] = 0xFF;
-                        needsA = true;
-                    }
-                    else
-                    {
-                        idxA[ei * 4 + bi] = 0xFF;
-                        idxB[ei * 4 + bi] = (byte)((srcElem - 16) * 4 + bi);
-                        needsB = true;
-                    }
-                }
+                srcRegs.Add(srcElem / 4);
+                if (srcElem != vi * 4 + ei) identity = false;
             }
+            vecIsIdentity[vi] = identity;
 
-            if (needsA && needsB)
+            if (identity || srcRegs.Count == 1)
             {
-                w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableA, {FmtVec128(idxA)});");
-                w.WriteLine($"            shuffled{vi} = AdvSimd.Arm64.VectorTableLookupExtension(shuffled{vi}, tableB, {FmtVec128(idxB)});");
-            }
-            else if (needsA)
-            {
-                w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableA, {FmtVec128(idxA)});");
+                singleSrc[vi] = srcRegs.Single();
             }
             else
             {
-                w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableB, {FmtVec128(idxB)});");
+                singleSrc[vi] = -1;
+                if (srcRegs.Any(r => r < 4)) stepNeedsTableA = true;
+                if (srcRegs.Any(r => r >= 4)) stepNeedsTableB = true;
             }
         }
 
+        if (stepNeedsTableA)
+            w.WriteLine("            var tableA = (v0, v1, v2, v3);");
+        if (stepNeedsTableB)
+            w.WriteLine("            var tableB = (v4, v5, v6, Vector128<byte>.Zero);");
+
+        // Emit shuffles
         for (int vi = 0; vi < 7; vi++)
         {
+            if (vecIsIdentity[vi]) continue; // no elements move → skip shuffle and min/max
+
+            if (singleSrc[vi] >= 0)
+            {
+                // All elements come from one register → Vector128.Shuffle (TBL1)
+                int srcReg = singleSrc[vi];
+                byte[] indices = new byte[16];
+                for (int ei = 0; ei < 4; ei++)
+                {
+                    int localElem = perm[vi * 4 + ei] % 4;
+                    for (int bi = 0; bi < 4; bi++)
+                        indices[ei * 4 + bi] = (byte)(localElem * 4 + bi);
+                }
+                w.WriteLine($"            var shuffled{vi} = Vector128.Shuffle(v{srcReg}, {FmtVec128(indices)});");
+            }
+            else
+            {
+                // Multi-register: use tableA/tableB with TBL4/TBX
+                byte[] idxA = new byte[16];
+                byte[] idxB = new byte[16];
+                bool needsA = false, needsB = false;
+                for (int ei = 0; ei < 4; ei++)
+                {
+                    int srcElem = perm[vi * 4 + ei];
+                    for (int bi = 0; bi < 4; bi++)
+                    {
+                        if (srcElem < 16)
+                        {
+                            idxA[ei * 4 + bi] = (byte)(srcElem * 4 + bi);
+                            idxB[ei * 4 + bi] = 0xFF;
+                            needsA = true;
+                        }
+                        else
+                        {
+                            idxA[ei * 4 + bi] = 0xFF;
+                            idxB[ei * 4 + bi] = (byte)((srcElem - 16) * 4 + bi);
+                            needsB = true;
+                        }
+                    }
+                }
+
+                if (needsA && needsB)
+                {
+                    w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableA, {FmtVec128(idxA)});");
+                    w.WriteLine($"            shuffled{vi} = AdvSimd.Arm64.VectorTableLookupExtension(shuffled{vi}, tableB, {FmtVec128(idxB)});");
+                }
+                else if (needsA)
+                {
+                    w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableA, {FmtVec128(idxA)});");
+                }
+                else
+                {
+                    w.WriteLine($"            var shuffled{vi} = AdvSimd.Arm64.VectorTableLookup(tableB, {FmtVec128(idxB)});");
+                }
+            }
+        }
+
+        // Min/Max/Blend
+        for (int vi = 0; vi < 7; vi++)
+        {
+            if (vecIsIdentity[vi]) continue; // no elements move → skip
+
             bool allMin = true, allMax = true;
             for (int ei = 0; ei < 4; ei++)
             {

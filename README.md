@@ -198,9 +198,11 @@ support, this falls back to the scalar unrolled sort.
 
 For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is used when
 available. The 27-28 elements require seven `Vector128` registers — exceeding
-TBL4's 4-register table limit. This is solved with a two-stage TBL/TBX lookup:
-elements 0-15 are in Table A and elements 16-27 are in Table B, with
-`VectorTableLookupExtension` (TBX) chaining the results.
+TBL4's 4-register table limit. When all elements of a shuffled vector come from
+a single source register, `Vector128.Shuffle` (TBL1) is used directly; otherwise
+a two-stage TBL/TBX lookup splits elements into Table A (0-15) and Table B
+(16-27) with `VectorTableLookupExtension` (TBX) chaining. An early-exit check
+detects already-sorted input and skips the SIMD path entirely.
 
 For `float`, AVX2 SIMD uses four `Vector256<float>` registers
 (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
@@ -328,11 +330,12 @@ cross-vector shuffles are used:
 | ushort | 1,254 ns | 54 ns | **23x** |
 
 For `int`, `uint`, and `float`, seven `Vector128` registers with two-stage
-TBL/TBX cross-vector shuffles are used:
+TBL/TBX cross-vector shuffles are used (with TBL1 optimization for single-register
+shuffles and early-exit for sorted input):
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,464 ns | 84 ns | **17x** |
+| float | 1,363 ns | 78 ns | **17x** |
 
 > **Note:** `float` benefits enormously because .NET's `Array.Sort` does not
 > have a SIMD-accelerated path for `float` on ARM64.
@@ -344,9 +347,9 @@ NetworkSort's NEON path still provides improvements:
 
 | Type | ArraySort (27) | NetworkSort (27) | Speedup |
 |---|---|---|---|
-| char | 121 ns | 51 ns | **2.4x** |
-| int | 105 ns | 88 ns | **1.2x** |
-| uint | 112 ns | 85 ns | **1.3x** |
+| char | 98 ns | 50 ns | **2.0x** |
+| int | 98 ns | 78 ns | **1.3x** |
+| uint | 108 ns | 75 ns | **1.4x** |
 
 #### Other types (scalar unrolled network)
 
@@ -375,16 +378,16 @@ speedup over `Array.Sort` as on x86:
 
 | Size | Kind | NetworkSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 88 ns | **0.84x** (16% faster) |
-| 27 | Sorted | 88 ns | 1.54x |
-| 27 | Reversed | 85 ns | 1.38x |
-| 27 | Duplicates | 85 ns | **0.65x** (35% faster) |
-| 28 | Random | 84 ns | **0.68x** (32% faster) |
-| 28 | Sorted | 83 ns | 1.41x |
-| 28 | Reversed | 84 ns | 1.28x |
-| 28 | Duplicates | 83 ns | **0.75x** (25% faster) |
+| 27 | Random | 78 ns | **0.80x** (20% faster) |
+| 27 | Sorted | 29 ns | **0.51x** (49% faster) |
+| 27 | Reversed | 79 ns | 1.33x |
+| 27 | Duplicates | 79 ns | **0.81x** (19% faster) |
+| 28 | Random | 78 ns | **0.66x** (34% faster) |
+| 28 | Sorted | 30 ns | **0.54x** (46% faster) |
+| 28 | Reversed | 75 ns | 1.21x |
+| 28 | Duplicates | 76 ns | **0.73x** (27% faster) |
 
-> With AVX2 SIMD, NetworkSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the SIMD path wins for random and duplicate-heavy inputs, while sorted/reversed inputs are slower for both sizes 27 and 28 (the fixed comparison sequence can't exploit pre-sorted data).
+> With AVX2 SIMD, NetworkSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the early-exit sorted check eliminates the previous 1.5x regression on sorted data (now 2x faster), and TBL1 optimization improves random/duplicate performance ~10%. Reversed input remains slightly slower due to the overhead of cross-vector TBL/TBX shuffles with 7 registers.
 
 ## Building
 
