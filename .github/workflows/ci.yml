@@ -5,6 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      disassembly:
+        description: 'Enable DisassemblyDiagnoser for benchmarks'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build:
@@ -54,6 +61,8 @@ jobs:
 
       - name: Benchmarks
         shell: bash
+        env:
+          DISASSEMBLY_DIAGNOSER: ${{ inputs.disassembly && '1' || '0' }}
         run: |
           dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter '*' --exporters GitHub
           for f in BenchmarkDotNet.Artifacts/results/*-report-github.md; do
@@ -67,6 +76,17 @@ jobs:
             cat "$f" >> benchmark-summary.md
             echo "" >> benchmark-summary.md
           done
+          if [ "$DISASSEMBLY_DIAGNOSER" = "1" ]; then
+            for f in BenchmarkDotNet.Artifacts/results/*-asm.md; do
+              [ -f "$f" ] || continue
+              name=$(basename "$f" -asm.md)
+              name=${name##*.}
+              echo "# Disassembly: $name" >> disassembly-summary.md
+              echo "" >> disassembly-summary.md
+              cat "$f" >> disassembly-summary.md
+              echo "" >> disassembly-summary.md
+            done
+          fi
 
       - name: Upload benchmark summary
         uses: actions/upload-artifact@v7
@@ -74,6 +94,16 @@ jobs:
         with:
           name: benchmark-summary-${{ matrix.os }}
           path: benchmark-summary.md
+          if-no-files-found: ignore
+
+      - name: Upload disassembly
+        uses: actions/upload-artifact@v7
+        if: inputs.disassembly
+        with:
+          name: disassembly-${{ matrix.os }}
+          path: |
+            disassembly-summary.md
+            BenchmarkDotNet.Artifacts/results/*-asm.md
           if-no-files-found: ignore
 
   summarize:
