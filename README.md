@@ -53,8 +53,8 @@ A [sorting network](https://en.wikipedia.org/wiki/Sorting_network) is a fixed
 sequence of **compare-and-swap** operations that sorts any input of a given
 size. Unlike comparison-based algorithms such as quicksort, the sequence of
 comparisons is determined entirely by the input length — not by the data values
-— which eliminates branches and enables predictable, data-oblivious
-performance.
+— which eliminates input-dependent control flow and enables predictable,
+data-oblivious performance and branchless implementations.
 
 Each compare-and-swap takes two elements and puts the smaller one first:
 
@@ -63,10 +63,10 @@ if a > b
     swap(a, b)
 ```
 
-A sorting network arranges these operations into **layers** (also called
-*depth*). Comparators within the same layer operate on independent pairs, so
-they can execute in parallel. The **depth** of a network is the number of
-layers — fewer layers means lower latency.
+A sorting network arranges these operations into **layers** (or stages).
+Comparators within the same layer operate on independent pairs, so they can
+execute in parallel. The **depth** of a network is the number of layers —
+fewer layers means lower latency.
 
 ### The paper
 
@@ -155,11 +155,11 @@ vec = Vector256.ConditionalSelect(layerMask, maxs, mins);
 StoreVector256(ref first, vec);
 ```
 
-Each layer becomes three SIMD instructions — **shuffle**, **min/max**, and
-**blend** — instead of many individual branches. For `byte`, this produces a
-**33-41x** speedup over `Array.Sort`. The same pattern extends to wider types
-(`int`, `float`, `double`) using multiple SIMD registers with cross-vector
-shuffles.
+Each layer becomes a small handful of SIMD instructions — **shuffle**,
+**min**, **max**, and **blend/select** — instead of many individual branches.
+For `byte`, this produces a **33-41x** speedup over `Array.Sort`. The same
+pattern extends to wider types (`int`, `float`, `double`) using multiple SIMD
+registers with cross-vector shuffles.
 
 ## Design
 
