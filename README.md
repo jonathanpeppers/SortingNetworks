@@ -412,7 +412,7 @@ dotnet run scripts/generate_unrolled.cs
 - **SortingNetworks** -- class library (future NuGet package)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering lengths 27-28
   across all 13 primitive types, plus string via the specialized `Sort(string[])`
-  overload, with stress tests using 100 random seeds (135 tests)
+  overload, with stress tests using 100 random seeds (161 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   `NetworkSort.Sort` vs `Array.Sort` for sizes 27 and 28 across all primitive
   types
