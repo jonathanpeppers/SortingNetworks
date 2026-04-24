@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SortingNetworks\SortingNetworks.csproj" />
+    <ProjectReference Include="..\SortingNetworks.Generators\SortingNetworks.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
