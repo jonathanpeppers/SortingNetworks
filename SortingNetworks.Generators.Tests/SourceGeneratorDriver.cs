@@ -19,24 +19,67 @@ public static class SourceGeneratorDriver
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
-        string dotNetAssemblyPath = System.IO.Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+        // Use ref assemblies from the SDK - these have the complete public API surface
+        // The runtime assemblies may have forwarded types that don't resolve correctly
+        var refAssemblyDir = FindRefAssemblyDirectory();
 
-        var references = new[]
-        {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(System.IO.Path.Combine(dotNetAssemblyPath, "System.Runtime.dll")),
-            MetadataReference.CreateFromFile(System.IO.Path.Combine(dotNetAssemblyPath, "System.Private.CoreLib.dll")),
-            MetadataReference.CreateFromFile(typeof(System.Runtime.CompilerServices.Unsafe).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(System.Runtime.InteropServices.MemoryMarshal).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(System.Span<>).Assembly.Location),
-        };
+        var references = System.IO.Directory.GetFiles(refAssemblyDir, "*.dll")
+            .Select(f =>
+            {
+                try { return (MetadataReference)MetadataReference.CreateFromFile(f); }
+                catch { return null; }
+            })
+            .Where(r => r != null)
+            .ToArray()!;
 
         return CSharpCompilation.Create(
             assemblyName,
             new[] { syntaxTree },
-            references,
+            references!,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithNullableContextOptions(NullableContextOptions.Enable));
+                .WithNullableContextOptions(NullableContextOptions.Enable)
+                .WithAllowUnsafe(true));
+    }
+
+    private static string FindRefAssemblyDirectory()
+    {
+        // The runtime directory from .NET runtime should be something like:
+        // C:\Program Files\dotnet\shared\Microsoft.NETCore.App\10.0.5\
+        // We need: C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\10.0.5\ref\net10.0\
+        string runtimeDir = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory()
+            .TrimEnd(System.IO.Path.DirectorySeparatorChar);
+
+        // Navigate up from shared/Microsoft.NETCore.App/10.0.x to the dotnet root
+        string? dotnetRoot = System.IO.Path.GetDirectoryName(
+            System.IO.Path.GetDirectoryName(
+                System.IO.Path.GetDirectoryName(runtimeDir)));
+
+        if (dotnetRoot != null)
+        {
+            string packsDir = System.IO.Path.Combine(dotnetRoot, "packs", "Microsoft.NETCore.App.Ref");
+            if (System.IO.Directory.Exists(packsDir))
+            {
+                var versions = System.IO.Directory.GetDirectories(packsDir)
+                    .OrderByDescending(d => d)
+                    .ToArray();
+
+                foreach (var versionDir in versions)
+                {
+                    string refParent = System.IO.Path.Combine(versionDir, "ref");
+                    if (System.IO.Directory.Exists(refParent))
+                    {
+                        var refDirs = System.IO.Directory.GetDirectories(refParent)
+                            .OrderByDescending(d => d)
+                            .ToArray();
+                        if (refDirs.Length > 0)
+                            return refDirs[0];
+                    }
+                }
+            }
+        }
+
+        // Fallback: use runtime directory (may produce warnings for native DLLs)
+        return runtimeDir;
     }
 
     /// <summary>

@@ -131,6 +131,7 @@ namespace SortingNetworks.Generators
                 }
 
                 // Emit the public Sort method with scalar path
+                // TODO: Add SIMD dispatch when SimdX86Emitter is stable
                 sb.AppendLine($"        /// <summary>Sorts exactly {request.Size} elements of type {request.TypeName} using an optimal sorting network.</summary>");
                 sb.AppendLine($"        public static void Sort{request.Size}(System.Span<{request.TypeName}> span)");
                 sb.AppendLine("        {");
