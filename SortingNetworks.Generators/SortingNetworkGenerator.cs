@@ -97,6 +97,22 @@ namespace SortingNetworks.Generators
             sb.AppendLine("#nullable enable");
             sb.AppendLine();
 
+            // Check if any request will use SIMD
+            bool needsSimdUsing = false;
+            foreach (var request in info.Requests)
+            {
+                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
+                {
+                    needsSimdUsing = true;
+                    break;
+                }
+            }
+            if (needsSimdUsing)
+            {
+                sb.AppendLine("using System.Runtime.Intrinsics;");
+                sb.AppendLine();
+            }
+
             if (info.Namespace != null)
             {
                 sb.AppendLine($"namespace {info.Namespace}");
@@ -130,15 +146,45 @@ namespace SortingNetworks.Generators
                     network = BatcherNetworkBuilder.Generate(request.Size);
                 }
 
-                // Emit the public Sort method with scalar path
-                // TODO: Add SIMD dispatch when SimdX86Emitter is stable
+                // Get SIMD steps if SIMD emission is possible
+                List<List<(int A, int B)>>? simdSteps = null;
+                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
+                {
+                    simdSteps = SimdX86Emitter.DecomposeIntoSteps(network);
+                }
+
+                // Emit the public Sort method
                 sb.AppendLine($"        /// <summary>Sorts exactly {request.Size} elements of type {request.TypeName} using an optimal sorting network.</summary>");
                 sb.AppendLine($"        public static void Sort{request.Size}(System.Span<{request.TypeName}> span)");
                 sb.AppendLine("        {");
                 sb.AppendLine($"            if (span.Length != {request.Size})");
                 sb.AppendLine($"                throw new System.ArgumentException($\"Span must have exactly {request.Size} elements, but was {{span.Length}}.\", nameof(span));");
-                sb.AppendLine($"            SortScalar{request.Size}(span);");
-                sb.AppendLine("        }");
+
+                // SIMD dispatch
+                if (simdSteps != null)
+                {
+                    var (simdMethod, dispatchCode) = SimdX86Emitter.Emit(request.Size, request.TypeName, simdSteps);
+                    if (!string.IsNullOrEmpty(simdMethod))
+                    {
+                        sb.Append(dispatchCode);
+                        // Fallback to scalar
+                        sb.AppendLine($"            SortScalar{request.Size}(span);");
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
+                        // Emit SIMD method
+                        sb.AppendLine(simdMethod);
+                    }
+                    else
+                    {
+                        sb.AppendLine($"            SortScalar{request.Size}(span);");
+                        sb.AppendLine("        }");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine($"            SortScalar{request.Size}(span);");
+                    sb.AppendLine("        }");
+                }
                 sb.AppendLine();
 
                 // Emit the scalar implementation

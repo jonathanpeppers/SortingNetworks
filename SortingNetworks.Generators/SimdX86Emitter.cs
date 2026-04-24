@@ -20,7 +20,10 @@ namespace SortingNetworks.Generators
             if (elemBytes <= 0) return false;
             // Max elements we can handle: 4 vectors worth
             int maxElements = MaxElements(elemBytes);
-            return size <= maxElements;
+            if (size > maxElements) return false;
+            // Min size for SIMD to be worthwhile
+            int minSize = MinSimdSize(elemBytes);
+            return size >= minSize;
         }
 
         /// <summary>
@@ -43,36 +46,31 @@ namespace SortingNetworks.Generators
 
         /// <summary>
         /// Decomposes a flat network array into layers (steps) of disjoint comparator pairs.
+        /// Uses a depth-tracking algorithm that respects the ordering of comparators:
+        /// each pair is placed in the earliest layer AFTER the last layer where any of
+        /// its indices was used. This ensures data dependencies are preserved.
         /// </summary>
         internal static List<List<(int A, int B)>> DecomposeIntoSteps(int[] network)
         {
             var steps = new List<List<(int A, int B)>>();
+            // Track the last layer where each index was involved
+            var lastUsed = new Dictionary<int, int>();
+
             for (int i = 0; i < network.Length; i += 2)
             {
                 int a = network[i], b = network[i + 1];
-                bool placed = false;
-                foreach (var step in steps)
-                {
-                    bool conflict = false;
-                    foreach (var (sa, sb) in step)
-                    {
-                        if (sa == a || sa == b || sb == a || sb == b)
-                        {
-                            conflict = true;
-                            break;
-                        }
-                    }
-                    if (!conflict)
-                    {
-                        step.Add((a, b));
-                        placed = true;
-                        break;
-                    }
-                }
-                if (!placed)
-                {
-                    steps.Add(new List<(int A, int B)> { (a, b) });
-                }
+
+                // Find the earliest valid layer: must be after both a and b were last used
+                int lastA = lastUsed.ContainsKey(a) ? lastUsed[a] : -1;
+                int lastB = lastUsed.ContainsKey(b) ? lastUsed[b] : -1;
+                int depth = Math.Max(lastA, lastB) + 1;
+
+                while (steps.Count <= depth)
+                    steps.Add(new List<(int A, int B)>());
+
+                steps[depth].Add((a, b));
+                lastUsed[a] = depth;
+                lastUsed[b] = depth;
             }
             return steps;
         }
@@ -318,7 +316,7 @@ namespace SortingNetworks.Generators
                 {
                     // Partial last vector - read overlapping and shift
                     int readOffset = (size - 4) * 4; // read last 4 elements (one Vector128 worth)
-                    int shiftBytes = (regSize - elemsInThisVec) * 4;
+                    int shiftBytes = (vi * regSize - (size - 4)) * 4; // how many bytes to skip from the overlapping read
                     if (shiftBytes == 0)
                     {
                         sb.AppendLine($"            var v{vi} = System.Runtime.Intrinsics.Vector256.Create(");
@@ -497,7 +495,7 @@ namespace SortingNetworks.Generators
                 {
                     // Partial last vector - write back with shift
                     int readOffset = (size - 4) * 4;
-                    int shiftBytes = (regSize - elemsInThisVec) * 4;
+                    int shiftBytes = (vi * regSize - (size - 4)) * 4;
                     if (shiftBytes == 0)
                     {
                         sb.AppendLine($"            v{vi}.GetLower().AsByte().StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {readOffset}));");
@@ -749,6 +747,19 @@ namespace SortingNetworks.Generators
                 case 4: return 32;   // 4x Vector256<int>
                 case 8: return 32;   // 4x Vector512<long>
                 default: return 0;
+            }
+        }
+
+        private static int MinSimdSize(int elemBytes)
+        {
+            // Minimum size for SIMD to be worthwhile and correct
+            switch (elemBytes)
+            {
+                case 1: return 8;    // Need enough bytes for Vector128
+                case 2: return 8;    // Need enough shorts for Vector128
+                case 4: return 8;    // One full Vector256<int>
+                case 8: return 8;    // One full Vector512<long>
+                default: return int.MaxValue;
             }
         }
 

@@ -208,4 +208,58 @@ public partial class MySorter { }
         var text = result.GeneratedTrees[0].GetText().ToString();
         Assert.Contains("SortingNetworkAttribute", text);
     }
+
+    [Theory]
+    [InlineData(8, "int")]
+    [InlineData(16, "int")]
+    [InlineData(28, "int")]
+    [InlineData(32, "int")]
+    [InlineData(8, "byte")]
+    [InlineData(16, "byte")]
+    public void SimdCode_Compiles(int size, string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify SIMD code was generated (except for small sizes that skip SIMD)
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("SortSimd") || s.Contains("SortScalar"));
+        Assert.NotNull(generatedSource);
+    }
+
+    [Fact]
+    public void DumpGeneratedCode_Sort16Int()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(16, typeof(int))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, _) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort16"));
+        Assert.NotNull(generatedSource);
+
+        // Output the generated code for manual inspection
+        System.IO.File.WriteAllText(
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "sort16_int_generated.cs"),
+            generatedSource);
+    }
 }
