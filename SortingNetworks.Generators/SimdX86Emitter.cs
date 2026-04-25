@@ -66,12 +66,13 @@ namespace SortingNetworks.Generators
         internal static bool CanEmitAvx2Fallback(string typeName, int size)
         {
             // Only double has AVX2 fallback using Permute4x64 on Vector256<double>.
-            // long/ulong lack AVX2 min/max for 64-bit integers.
+            // long/ulong have no AVX2 min/max intrinsics for 64-bit integers,
+            // so they require AVX-512F and cannot use this fallback.
             if (typeName != "double") return false;
             int regSize = 4; // Vector256<double> holds 4 elements
             int maxRegs = 7;
             int maxElements = regSize * maxRegs; // 28
-            int minSize = 8; // Match the primary SIMD minimum
+            int minSize = 8; // Match the AVX-512 minimum for consistency
             return size >= minSize && size <= maxElements;
         }
 
