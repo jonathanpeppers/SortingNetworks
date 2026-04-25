@@ -15,13 +15,12 @@ namespace SortingNetworks.Generators
         internal static string EmitSortMethod(int size, string typeName, int[] network)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-            sb.AppendLine($"        private static void SortScalar{size}(System.Span<{typeName}> span)");
+            sb.AppendLine($"        private static void Sort{size}(ref {typeName} first)");
             sb.AppendLine($"        {{");
-            sb.AppendLine($"            ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
 
-            // Load elements into local variables
-            for (int i = 0; i < size; i++)
+            // Load elements into local variables — e0 = first, rest use Unsafe.Add
+            sb.AppendLine($"            {typeName} e0 = first;");
+            for (int i = 1; i < size; i++)
             {
                 sb.AppendLine($"            {typeName} e{i} = System.Runtime.CompilerServices.Unsafe.Add(ref first, {i});");
             }
@@ -32,12 +31,13 @@ namespace SortingNetworks.Generators
             {
                 int a = network[i];
                 int b = network[i + 1];
-                sb.AppendLine($"            if (e{a} > e{b}) {{ {typeName} t = e{a}; e{a} = e{b}; e{b} = t; }}");
+                sb.AppendLine($"            if (e{a} > e{b}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
             }
             sb.AppendLine();
 
             // Write back
-            for (int i = 0; i < size; i++)
+            sb.AppendLine($"            first = e0;");
+            for (int i = 1; i < size; i++)
             {
                 sb.AppendLine($"            System.Runtime.CompilerServices.Unsafe.Add(ref first, {i}) = e{i};");
             }

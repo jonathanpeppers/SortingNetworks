@@ -27,6 +27,22 @@ namespace SortingNetworks.Generators
         }
 
         /// <summary>
+        /// Returns the SIMD guard condition string for the given element type.
+        /// </summary>
+        internal static string GetGuardCondition(string typeName)
+        {
+            int elemBytes = ElementSize(typeName);
+            switch (elemBytes)
+            {
+                case 1: return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
+                case 2: return "System.Runtime.Intrinsics.X86.Avx512BW.IsSupported";
+                case 4: return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
+                case 8: return "System.Runtime.Intrinsics.X86.Avx512F.IsSupported";
+                default: return "false";
+            }
+        }
+
+        /// <summary>
         /// Emits a SIMD sort method + dispatch from the public Sort method.
         /// Returns the SIMD method source and the dispatch check to insert into Sort.
         /// </summary>
@@ -82,7 +98,7 @@ namespace SortingNetworks.Generators
             if (size > 32) return ("", "");
 
             var sb = new StringBuilder();
-            string suffix = typeName == "byte" ? "" : $"_{typeName}";
+            string suffix = $"_{typeName}";
 
             // Method signature
             sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");

@@ -158,72 +158,121 @@ namespace SortingNetworks.Generators
                 list.Add(request);
             }
 
-            // Emit one public Sort overload per type, dispatching by span.Length
+            // Pre-compute networks and SIMD info for each request
+            var networksByRequest = new Dictionary<string, int[]>();
+            var simdStepsByRequest = new Dictionary<string, List<List<(int A, int B)>>>();
+            foreach (var request in validRequests)
+            {
+                var key = $"{request.TypeName}_{request.Size}";
+                var network = NetworkDatabase.GetNetwork(request.Size);
+                if (network == null)
+                {
+                    network = BatcherNetworkBuilder.Generate(request.Size);
+                }
+                networksByRequest[key] = network;
+
+                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
+                {
+                    simdStepsByRequest[key] = SimdX86Emitter.DecomposeIntoSteps(network);
+                }
+            }
+
+            // Emit one public Sort overload per type with flattened dispatch
+            // Pattern matches the library: SIMD check → scalar fallback, all inline
             foreach (var kvp in byType)
             {
                 var typeName = kvp.Key;
                 var sizes = kvp.Value;
                 sizes.Sort((a, b) => a.Size.CompareTo(b.Size));
 
+                // Check which sizes have SIMD support
+                var simdSizes = new List<NetworkRequest>();
+                foreach (var request in sizes)
+                {
+                    var key = $"{request.TypeName}_{request.Size}";
+                    if (simdStepsByRequest.ContainsKey(key))
+                        simdSizes.Add(request);
+                }
+
+                // Determine the SIMD guard condition string
+                string? simdGuard = null;
+                if (simdSizes.Count > 0)
+                {
+                    simdGuard = SimdX86Emitter.GetGuardCondition(typeName);
+                }
+
                 sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network based on span length.</summary>");
                 sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span)");
                 sb.AppendLine("        {");
-                sb.AppendLine("            switch (span.Length)");
+                sb.AppendLine("            int n = span.Length;");
+
+                // Build the size check condition
+                var sizeChecks = string.Join(" || ", sizes.Select(s => $"n == {s.Size}"));
+                sb.AppendLine($"            if ({sizeChecks})");
                 sb.AppendLine("            {");
-                foreach (var request in sizes)
+
+                // SIMD dispatch block (if any sizes support SIMD)
+                if (simdGuard != null && simdSizes.Count > 0)
                 {
-                    sb.AppendLine($"                case {request.Size}: Sort{request.Size}(span); break;");
+                    sb.AppendLine($"                if ({simdGuard})");
+                    sb.AppendLine("                {");
+                    if (simdSizes.Count == 1)
+                    {
+                        // Single SIMD size: guard by length check
+                        sb.AppendLine($"                    if (n == {simdSizes[0].Size})");
+                        sb.AppendLine("                    {");
+                        sb.AppendLine($"                        SortSimd{simdSizes[0].Size}_{typeName}(span);");
+                        sb.AppendLine("                        return;");
+                        sb.AppendLine("                    }");
+                    }
+                    else
+                    {
+                        foreach (var request in simdSizes)
+                        {
+                            sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimd{request.Size}_{typeName}(span); return; }}");
+                        }
+                    }
+                    sb.AppendLine("                }");
                 }
-                sb.AppendLine($"                default: throw new System.ArgumentException($\"No sorting network for length {{span.Length}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+
+                // Scalar fallback: get ref and dispatch
+                sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
+                if (sizes.Count == 1)
+                {
+                    sb.AppendLine($"                Sort{sizes[0].Size}(ref first);");
+                }
+                else
+                {
+                    foreach (var request in sizes)
+                    {
+                        sb.AppendLine($"                if (n == {request.Size}) {{ Sort{request.Size}(ref first); return; }}");
+                    }
+                }
+                sb.AppendLine("                return;");
                 sb.AppendLine("            }");
+                sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
                 sb.AppendLine("        }");
                 sb.AppendLine();
             }
 
-            // Emit private Sort{size} and SortScalar{size} for each request
+            // Emit private SIMD methods and scalar Sort{size} methods
             foreach (var request in validRequests)
             {
-                var network = NetworkDatabase.GetNetwork(request.Size);
-                if (network == null)
-                {
-                    network = BatcherNetworkBuilder.Generate(request.Size);
-                }
+                var key = $"{request.TypeName}_{request.Size}";
+                var network = networksByRequest[key];
 
-                List<List<(int A, int B)>>? simdSteps = null;
-                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
+                // Emit SIMD method if applicable
+                if (simdStepsByRequest.TryGetValue(key, out var simdSteps))
                 {
-                    simdSteps = SimdX86Emitter.DecomposeIntoSteps(network);
-                }
-
-                // Emit the private Sort{size} dispatcher
-                sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
-                sb.AppendLine($"        private static void Sort{request.Size}(System.Span<{request.TypeName}> span)");
-                sb.AppendLine("        {");
-
-                if (simdSteps != null)
-                {
-                    var (simdMethod, dispatchCode) = SimdX86Emitter.Emit(request.Size, request.TypeName, simdSteps);
+                    var (simdMethod, _) = SimdX86Emitter.Emit(request.Size, request.TypeName, simdSteps);
                     if (!string.IsNullOrEmpty(simdMethod))
                     {
-                        sb.Append(dispatchCode);
-                        sb.AppendLine($"            SortScalar{request.Size}(span);");
-                        sb.AppendLine("        }");
-                        sb.AppendLine();
                         sb.AppendLine(simdMethod);
-                    }
-                    else
-                    {
-                        sb.AppendLine($"            SortScalar{request.Size}(span);");
-                        sb.AppendLine("        }");
+                        sb.AppendLine();
                     }
                 }
-                else
-                {
-                    sb.AppendLine($"            SortScalar{request.Size}(span);");
-                    sb.AppendLine("        }");
-                }
-                sb.AppendLine();
 
+                // Emit scalar method (takes ref T first, matches library pattern)
                 sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
                 sb.AppendLine();
             }
