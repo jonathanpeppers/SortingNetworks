@@ -1,6 +1,6 @@
 # SortingNetworks
 
-[![YouTube](https://img.shields.io/badge/YouTube-Building%20a%2041x%20Faster%20Sort%20in%20C%23-red?logo=youtube)](https://www.youtube.com/watch?v=FoRRWCkMsFc)
+[![Building a 41x Faster Sort in C# -- From Research Paper to SIMD, Powered by AI](https://i.ytimg.com/vi/FoRRWCkMsFc/hqdefault.jpg)](https://www.youtube.com/watch?v=FoRRWCkMsFc)
 
 A .NET library that uses sorting-network-based specializations for small
 arrays of sizes 27 and 28 -- using depth-13 networks from the paper
