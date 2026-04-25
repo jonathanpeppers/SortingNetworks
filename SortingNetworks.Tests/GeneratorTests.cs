@@ -216,6 +216,12 @@ public partial class MySorter { }
     [InlineData(32, "int")]
     [InlineData(8, "byte")]
     [InlineData(16, "byte")]
+    [InlineData(8, "ushort")]
+    [InlineData(16, "ushort")]
+    [InlineData(8, "short")]
+    [InlineData(16, "short")]
+    [InlineData(12, "ushort")]
+    [InlineData(12, "short")]
     [InlineData(8, "double")]
     [InlineData(16, "double")]
     [InlineData(28, "double")]
@@ -323,5 +329,40 @@ public partial class MySorter { }
         System.IO.File.WriteAllText(
             System.IO.Path.Combine(System.IO.Path.GetTempPath(), "sort16_int_generated.cs"),
             generatedSource);
+    }
+
+    [Theory]
+    [InlineData(8, "ushort")]
+    [InlineData(16, "ushort")]
+    [InlineData(12, "ushort")]
+    [InlineData(8, "short")]
+    [InlineData(16, "short")]
+    [InlineData(12, "short")]
+    public void SimdCode_16Bit_HasAvx2Fallback(int size, string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify both AVX-512 and AVX2 methods were generated
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains($"SortSimd{size}_{typeName}") && s.Contains($"SortSimdAvx2_{size}_{typeName}"));
+        Assert.NotNull(generatedSource);
+
+        // Verify dispatch cascades from AVX-512 BW to AVX2
+        Assert.Contains("Avx512BW.IsSupported", generatedSource);
+        Assert.Contains("Avx2.IsSupported", generatedSource);
     }
 }

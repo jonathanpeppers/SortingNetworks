@@ -15,4 +15,10 @@ namespace SortingNetworks.Tests;
 [SortingNetwork(28, typeof(double))]
 [SortingNetwork(16, typeof(byte))]
 [SortingNetwork(16, typeof(long))]
+[SortingNetwork(8, typeof(ushort))]
+[SortingNetwork(16, typeof(ushort))]
+[SortingNetwork(8, typeof(short))]
+[SortingNetwork(16, typeof(short))]
+[SortingNetwork(12, typeof(ushort))]
+[SortingNetwork(12, typeof(short))]
 partial class GeneratedSorters { }
