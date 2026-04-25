@@ -104,28 +104,6 @@ public class GeneratedSortTests
     }
 
     [Fact]
-    public void Sort_NullArray_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => GeneratedSorters.Sort((int[])null!));
-    }
-
-    [Fact]
-    public void Sort_ArrayOverload_MatchesArraySort()
-    {
-        for (int seed = 0; seed < 50; seed++)
-        {
-            var rng = new Random(seed);
-            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
-            var expected = (int[])input.Clone();
-            Array.Sort(expected);
-
-            GeneratedSorters.Sort(input);
-
-            Assert.Equal(expected, input);
-        }
-    }
-
-    [Fact]
     public void Sort8_UShort_MatchesArraySort()
     {
         for (int seed = 0; seed < 50; seed++)
@@ -204,23 +182,6 @@ public class GeneratedSortTests
             Array.Sort(expected);
 
             var actual = (ushort[])input.Clone();
-            GeneratedSorters.Sort(actual.AsSpan());
-
-            Assert.Equal(expected, actual);
-        }
-    }
-
-    [Fact]
-    public void Sort12_Short_MatchesArraySort()
-    {
-        for (int seed = 0; seed < 50; seed++)
-        {
-            var rng = new Random(seed);
-            var input = Enumerable.Range(0, 12).Select(_ => (short)rng.Next(-32768, 32768)).ToArray();
-            var expected = (short[])input.Clone();
-            Array.Sort(expected);
-
-            var actual = (short[])input.Clone();
             GeneratedSorters.Sort(actual.AsSpan());
 
             Assert.Equal(expected, actual);

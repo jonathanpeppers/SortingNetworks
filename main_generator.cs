@@ -125,8 +125,7 @@ namespace SortingNetworks.Generators
             bool needsSimdUsing = false;
             foreach (var request in validRequests)
             {
-                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size) ||
-                    SimdX86Emitter.CanEmitAvx2Fallback(request.TypeName, request.Size))
+                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
                 {
                     needsSimdUsing = true;
                     break;
@@ -162,7 +161,6 @@ namespace SortingNetworks.Generators
             // Pre-compute networks and SIMD info for each request
             var networksByRequest = new Dictionary<string, int[]>();
             var simdStepsByRequest = new Dictionary<string, List<List<(int A, int B)>>>();
-            var avx2FallbackStepsByRequest = new Dictionary<string, List<List<(int A, int B)>>>();
             foreach (var request in validRequests)
             {
                 var key = $"{request.TypeName}_{request.Size}";
@@ -173,21 +171,14 @@ namespace SortingNetworks.Generators
                 }
                 networksByRequest[key] = network;
 
-                bool canEmitSimd = SimdX86Emitter.CanEmit(request.TypeName, request.Size);
-                bool canEmitAvx2Fallback = SimdX86Emitter.CanEmitAvx2Fallback(request.TypeName, request.Size);
-
-                if (canEmitSimd || canEmitAvx2Fallback)
+                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
                 {
-                    var steps = SimdX86Emitter.DecomposeIntoSteps(network);
-                    if (canEmitSimd)
-                        simdStepsByRequest[key] = steps;
-                    if (canEmitAvx2Fallback)
-                        avx2FallbackStepsByRequest[key] = steps;
+                    simdStepsByRequest[key] = SimdX86Emitter.DecomposeIntoSteps(network);
                 }
             }
 
             // Emit one public Sort overload per type with flattened dispatch
-            // Pattern matches the library: SIMD check → scalar fallback, all inline
+            // Pattern matches the library: SIMD check ΓåÆ scalar fallback, all inline
             foreach (var kvp in byType)
             {
                 var typeName = kvp.Key;
@@ -196,14 +187,11 @@ namespace SortingNetworks.Generators
 
                 // Check which sizes have SIMD support
                 var simdSizes = new List<NetworkRequest>();
-                var avx2FallbackSizes = new List<NetworkRequest>();
                 foreach (var request in sizes)
                 {
                     var key = $"{request.TypeName}_{request.Size}";
                     if (simdStepsByRequest.ContainsKey(key))
                         simdSizes.Add(request);
-                    if (avx2FallbackStepsByRequest.ContainsKey(key))
-                        avx2FallbackSizes.Add(request);
                 }
 
                 // Determine the SIMD guard condition string
@@ -242,32 +230,6 @@ namespace SortingNetworks.Generators
                         foreach (var request in simdSizes)
                         {
                             sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimd{request.Size}_{typeName}(span); return; }}");
-                        }
-                    }
-                    sb.AppendLine("                }");
-                }
-
-                // AVX2 fallback dispatch block (for 16-bit types that have AVX-512 primary + AVX2 fallback)
-                if (avx2FallbackSizes.Count > 0)
-                {
-                    string avx2Guard = SimdX86Emitter.GetAvx2FallbackGuardCondition();
-                    // Use "else if" when there's a primary SIMD block above, plain "if" otherwise
-                    string prefix = (simdGuard != null && simdSizes.Count > 0) ? "else if" : "if";
-                    sb.AppendLine($"                {prefix} ({avx2Guard})");
-                    sb.AppendLine("                {");
-                    if (avx2FallbackSizes.Count == 1)
-                    {
-                        sb.AppendLine($"                    if (n == {avx2FallbackSizes[0].Size})");
-                        sb.AppendLine("                    {");
-                        sb.AppendLine($"                        SortSimdAvx2{avx2FallbackSizes[0].Size}_{typeName}(span);");
-                        sb.AppendLine("                        return;");
-                        sb.AppendLine("                    }");
-                    }
-                    else
-                    {
-                        foreach (var request in avx2FallbackSizes)
-                        {
-                            sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimdAvx2{request.Size}_{typeName}(span); return; }}");
                         }
                     }
                     sb.AppendLine("                }");
@@ -315,17 +277,6 @@ namespace SortingNetworks.Generators
                     if (!string.IsNullOrEmpty(simdMethod))
                     {
                         sb.AppendLine(simdMethod);
-                        sb.AppendLine();
-                    }
-                }
-
-                // Emit AVX2 fallback SIMD method if applicable
-                if (avx2FallbackStepsByRequest.TryGetValue(key, out var avx2Steps))
-                {
-                    var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(request.Size, request.TypeName, avx2Steps);
-                    if (!string.IsNullOrEmpty(avx2Method))
-                    {
-                        sb.AppendLine(avx2Method);
                         sb.AppendLine();
                     }
                 }
