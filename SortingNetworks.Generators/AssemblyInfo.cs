@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("SortingNetworks.Generators.Tests")]
+[assembly: InternalsVisibleTo("SortingNetworks.Tests")]

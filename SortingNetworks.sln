@@ -11,8 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingNetworks.Benchmarks"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingNetworks.Generators", "SortingNetworks.Generators\SortingNetworks.Generators.csproj", "{FAB82CB9-2521-4600-A21D-FEC91DD6CB16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingNetworks.Generators.Tests", "SortingNetworks.Generators.Tests\SortingNetworks.Generators.Tests.csproj", "{63511A6E-3536-40DA-A1F2-100B6E5CB44E}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,18 +70,6 @@ Global
 		{FAB82CB9-2521-4600-A21D-FEC91DD6CB16}.Release|x64.Build.0 = Release|Any CPU
 		{FAB82CB9-2521-4600-A21D-FEC91DD6CB16}.Release|x86.ActiveCfg = Release|Any CPU
 		{FAB82CB9-2521-4600-A21D-FEC91DD6CB16}.Release|x86.Build.0 = Release|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Debug|x64.Build.0 = Debug|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Debug|x86.Build.0 = Debug|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Release|x64.ActiveCfg = Release|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Release|x64.Build.0 = Release|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Release|x86.ActiveCfg = Release|Any CPU
-		{63511A6E-3536-40DA-A1F2-100B6E5CB44E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

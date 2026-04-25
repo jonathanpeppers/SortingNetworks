@@ -4,7 +4,9 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace SortingNetworks.Generators.Tests;
+using SortingNetworks.Generators;
+
+namespace SortingNetworks.Tests;
 
 /// <summary>
 /// Test helper for running source generators in-memory.

@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SortingNetworks.Generators.Tests;
+using SortingNetworks.Generators;
+
+namespace SortingNetworks.Tests;
 
 public class NetworkDatabaseTests
 {

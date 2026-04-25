@@ -1,7 +1,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace SortingNetworks.Generators.Tests;
+namespace SortingNetworks.Tests;
 
 public class GeneratorTests
 {
