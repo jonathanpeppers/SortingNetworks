@@ -401,7 +401,7 @@ namespace SortingNetworks.Generators
             // Size 27: depth-13 network from arXiv:2511.04107 (already in the repo)
             // Derived from Network28 by filtering pairs where both indices < 27
             Networks[27] = DeriveNetwork27FromNetwork28();
-            LayerSizes[27] = new[] { 13, 14, 14, 13, 12, 14, 10, 10, 10, 10, 11, 12, 11 };
+            LayerSizes[27] = new[] { 13, 13, 13, 13, 13, 13, 11, 10, 10, 10, 12, 12, 11 };
 
             // Size 28: depth-13 network from arXiv:2511.04107
             Networks[28] = new[] {
