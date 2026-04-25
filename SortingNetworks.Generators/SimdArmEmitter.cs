@@ -75,6 +75,7 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
             sb.AppendLine($"        private static void SortSimdArm{size}{suffix}(System.Span<{typeName}> span)");
             sb.AppendLine("        {");
+            EmitEarlyExit(sb, size, typeName);
             sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
 
             // Load
@@ -238,6 +239,7 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
             sb.AppendLine($"        private static void SortSimdArm{size}{suffix}(System.Span<{typeName}> span)");
             sb.AppendLine("        {");
+            EmitEarlyExit(sb, size, typeName);
             sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
 
             // Load
@@ -317,6 +319,7 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
             sb.AppendLine($"        private static void SortSimdArm{size}{suffix}(System.Span<{typeName}> span)");
             sb.AppendLine("        {");
+            EmitEarlyExit(sb, size, typeName);
             sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
 
             // Load
@@ -746,11 +749,31 @@ namespace SortingNetworks.Generators
         {
             switch (elemBytes)
             {
-                case 1: return 8;
+                case 1: return 16;  // Vector128 is 16 bytes; sizes < 16 would over-read
                 case 2: return 8;
                 case 4: return 8;
                 default: return int.MaxValue;
             }
+        }
+
+        /// <summary>
+        /// Emits an early-exit check that returns immediately if the input is already sorted.
+        /// Matches the pattern used in the hand-written generate_unrolled.cs ARM SIMD code.
+        /// </summary>
+        private static void EmitEarlyExit(StringBuilder sb, int size, string typeName)
+        {
+            sb.AppendLine($"            // Early exit if already sorted");
+            sb.AppendLine("            {");
+            sb.AppendLine($"                ref {typeName} r = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
+            sb.AppendLine($"                for (int i = 0; i < {size - 1}; i++)");
+            sb.AppendLine("                {");
+            sb.AppendLine($"                    if (System.Runtime.CompilerServices.Unsafe.Add(ref r, i) > System.Runtime.CompilerServices.Unsafe.Add(ref r, i + 1))");
+            sb.AppendLine("                        goto notSorted;");
+            sb.AppendLine("                }");
+            sb.AppendLine("                return;");
+            sb.AppendLine("                notSorted:;");
+            sb.AppendLine("            }");
+            sb.AppendLine();
         }
 
         // --- Formatting helpers ---
