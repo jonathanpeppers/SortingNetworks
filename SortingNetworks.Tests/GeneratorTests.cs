@@ -222,6 +222,9 @@ public partial class MySorter { }
     [InlineData(16, "short")]
     [InlineData(12, "ushort")]
     [InlineData(12, "short")]
+    [InlineData(8, "double")]
+    [InlineData(16, "double")]
+    [InlineData(28, "double")]
     public void SimdCode_Compiles(int size, string typeName)
     {
         var source = $@"
@@ -244,6 +247,38 @@ public partial class MySorter {{ }}
             .Select(t => t.GetText().ToString())
             .FirstOrDefault(s => s.Contains("SortSimd") || s.Contains("SortScalar"));
         Assert.NotNull(generatedSource);
+    }
+
+    [Theory]
+    [InlineData(8)]
+    [InlineData(16)]
+    [InlineData(28)]
+    public void Sort_Double_GeneratesAvx2Fallback(int size)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof(double))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify AVX2 fallback method was generated
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains($"SortSimdAvx2_{size}_double"));
+        Assert.NotNull(generatedSource);
+
+        // Verify dispatch includes both AVX-512 and AVX2 paths
+        Assert.Contains("Avx512F.IsSupported", generatedSource);
+        Assert.Contains("Avx2.IsSupported", generatedSource);
     }
 
     [Fact]
@@ -323,7 +358,7 @@ public partial class MySorter {{ }}
         // Verify both AVX-512 and AVX2 methods were generated
         var generatedSource = result.GeneratedTrees
             .Select(t => t.GetText().ToString())
-            .FirstOrDefault(s => s.Contains($"SortSimd{size}_{typeName}") && s.Contains($"SortSimdAvx2{size}_{typeName}"));
+            .FirstOrDefault(s => s.Contains($"SortSimd{size}_{typeName}") && s.Contains($"SortSimdAvx2_{size}_{typeName}"));
         Assert.NotNull(generatedSource);
 
         // Verify dispatch cascades from AVX-512 BW to AVX2

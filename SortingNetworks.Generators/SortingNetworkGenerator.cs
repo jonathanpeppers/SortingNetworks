@@ -247,7 +247,7 @@ namespace SortingNetworks.Generators
                     sb.AppendLine("                }");
                 }
 
-                // AVX2 fallback dispatch block (for 16-bit types that have AVX-512 primary + AVX2 fallback)
+                // AVX2 fallback dispatch block (16-bit types and double)
                 if (avx2FallbackSizes.Count > 0)
                 {
                     string avx2Guard = SimdX86Emitter.GetAvx2FallbackGuardCondition();
@@ -259,7 +259,7 @@ namespace SortingNetworks.Generators
                     {
                         sb.AppendLine($"                    if (n == {avx2FallbackSizes[0].Size})");
                         sb.AppendLine("                    {");
-                        sb.AppendLine($"                        SortSimdAvx2{avx2FallbackSizes[0].Size}_{typeName}(span);");
+                        sb.AppendLine($"                        SortSimdAvx2_{avx2FallbackSizes[0].Size}_{typeName}(span);");
                         sb.AppendLine("                        return;");
                         sb.AppendLine("                    }");
                     }
@@ -267,7 +267,7 @@ namespace SortingNetworks.Generators
                     {
                         foreach (var request in avx2FallbackSizes)
                         {
-                            sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimdAvx2{request.Size}_{typeName}(span); return; }}");
+                            sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimdAvx2_{request.Size}_{typeName}(span); return; }}");
                         }
                     }
                     sb.AppendLine("                }");
@@ -319,7 +319,7 @@ namespace SortingNetworks.Generators
                     }
                 }
 
-                // Emit AVX2 fallback SIMD method if applicable
+                // Emit AVX2 fallback SIMD method if applicable (16-bit types and double)
                 if (avx2FallbackStepsByRequest.TryGetValue(key, out var avx2Steps))
                 {
                     var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(request.Size, request.TypeName, avx2Steps);
