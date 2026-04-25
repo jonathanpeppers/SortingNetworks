@@ -61,5 +61,13 @@ public class FloatSortingBenchmarks
     {
         for (int i = 0; i < OpsPerInvoke; i++)
             SortingNetworks.NetworkSort.Sort(_batch[i].AsSpan());
-    }}
+    }
+
+    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
+    public void GeneratedSort()
+    {
+        for (int i = 0; i < OpsPerInvoke; i++)
+            GeneratedSorters.Sort(_batch[i].AsSpan());
+    }
+}
 
