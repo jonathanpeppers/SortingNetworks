@@ -43,6 +43,30 @@ namespace SortingNetworks.Generators
         }
 
         /// <summary>
+        /// Returns true if this type/size can use an AVX2 fallback path (currently 16-bit types, sizes 8-16).
+        /// </summary>
+        internal static bool CanEmitAvx2Fallback(string typeName, int size)
+        {
+            return ElementSize(typeName) == 2 && size >= 8 && size <= 16;
+        }
+
+        /// <summary>
+        /// Returns the AVX2 fallback guard condition string.
+        /// </summary>
+        internal static string GetAvx2FallbackGuardCondition()
+        {
+            return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
+        }
+
+        /// <summary>
+        /// Emits an AVX2 fallback SIMD sort method for 16-bit types.
+        /// </summary>
+        internal static (string MethodSource, string DispatchCode) EmitAvx2Fallback(int size, string typeName, List<List<(int A, int B)>> steps)
+        {
+            return EmitShortAvx2(size, typeName, steps);
+        }
+
+        /// <summary>
         /// Emits a SIMD sort method + dispatch from the public Sort method.
         /// Returns the SIMD method source and the dispatch check to insert into Sort.
         /// </summary>
@@ -293,6 +317,124 @@ namespace SortingNetworks.Generators
                 $"            if (System.Runtime.Intrinsics.X86.Avx512BW.IsSupported)\n" +
                 $"            {{\n" +
                 $"                SortSimd{size}{suffix}(span);\n" +
+                $"                return;\n" +
+                $"            }}\n";
+
+            return (sb.ToString(), dispatchSb);
+        }
+
+        // --- 16-bit types: single Vector256 with AVX2 fallback (sizes 8-16) ---
+
+        private static (string, string) EmitShortAvx2(int size, string typeName, List<List<(int A, int B)>> steps)
+        {
+            // AVX2: single Vector256<ushort> for ≤ 16 elements
+            if (size > 16) return ("", "");
+
+            var sb = new StringBuilder();
+            string suffix = $"_{typeName}";
+            int totalBytes = size * 2;
+
+            sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
+            sb.AppendLine($"        private static void SortSimdAvx2{size}{suffix}(System.Span<{typeName}> span)");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
+
+            // Load into Vector256<ushort>
+            if (size <= 8)
+            {
+                // 8 elements = 16 bytes → lower Vector128
+                sb.AppendLine("            var lo = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref first);");
+                sb.AppendLine("            var vec = System.Runtime.Intrinsics.Vector256.Create(lo, System.Runtime.Intrinsics.Vector128<byte>.Zero).AsUInt16();");
+            }
+            else if (size == 16)
+            {
+                // 16 elements = 32 bytes → full Vector256
+                sb.AppendLine("            var vec = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<byte>>(ref first).AsUInt16();");
+            }
+            else
+            {
+                // 9-15 elements: load lower 128 bits + overlapping upper with shift
+                int hiReadOffset = totalBytes - 16;
+                int shiftBytes = 32 - totalBytes;
+                sb.AppendLine("            var lo = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref first);");
+                sb.AppendLine($"            var hi = System.Runtime.Intrinsics.Vector128.Shuffle(");
+                sb.AppendLine($"                System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset})),");
+                // Build shift-right mask
+                var shiftMask = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    int src = i + shiftBytes;
+                    shiftMask[i] = src < 16 ? (byte)src : (byte)0x80;
+                }
+                sb.AppendLine($"                {FmtVec128(shiftMask)});");
+                sb.AppendLine("            var vec = System.Runtime.Intrinsics.Vector256.Create(lo, hi).AsUInt16();");
+            }
+
+            // Emit each step
+            for (int si = 0; si < steps.Count; si++)
+            {
+                var step = steps[si];
+
+                // Build ushort permutation for 16 elements
+                ushort[] ushortPerm = new ushort[16];
+                for (int i = 0; i < 16; i++) ushortPerm[i] = (ushort)i;
+                foreach (var (a, b) in step) { ushortPerm[a] = (ushort)b; ushortPerm[b] = (ushort)a; }
+
+                // Convert to byte permutation for Vector256.Shuffle on bytes
+                byte[] bytePerm = new byte[32];
+                for (int i = 0; i < 16; i++)
+                {
+                    bytePerm[i * 2] = (byte)(ushortPerm[i] * 2);
+                    bytePerm[i * 2 + 1] = (byte)(ushortPerm[i] * 2 + 1);
+                }
+
+                // Build ushort blend mask
+                ushort[] blend = new ushort[16];
+                foreach (var (a, b) in step) blend[Math.Max(a, b)] = 0xFFFF;
+
+                string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+
+                sb.AppendLine();
+                sb.AppendLine($"            // Step {si}: {pairStr}");
+                sb.AppendLine("            {");
+                sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.Vector256.Shuffle(vec.AsByte(), {FmtVec256(bytePerm)}).AsUInt16();");
+                sb.AppendLine($"                var mins = {MinExprShortAvx2(typeName, "vec", "shuffled")};");
+                sb.AppendLine($"                var maxs = {MaxExprShortAvx2(typeName, "vec", "shuffled")};");
+                sb.AppendLine($"                vec = System.Runtime.Intrinsics.Vector256.ConditionalSelect({FmtVec256UShort(blend)}, maxs, mins);");
+                sb.AppendLine("            }");
+            }
+
+            // Store results
+            sb.AppendLine();
+            if (size <= 8)
+            {
+                sb.AppendLine("            vec.AsByte().GetLower().StoreUnsafe(ref first);");
+            }
+            else if (size == 16)
+            {
+                sb.AppendLine("            vec.AsByte().StoreUnsafe(ref first);");
+            }
+            else
+            {
+                // Partial store: write upper first (with shift), then lower (overwrites overlap)
+                int hiReadOffset = totalBytes - 16;
+                int shiftBytes = 32 - totalBytes;
+                var storeMask = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    int src = i - shiftBytes;
+                    storeMask[i] = src >= 0 ? (byte)src : (byte)0x80;
+                }
+                sb.AppendLine($"            System.Runtime.Intrinsics.Vector128.Shuffle(vec.AsByte().GetUpper(), {FmtVec128(storeMask)})");
+                sb.AppendLine($"                .StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset}));");
+                sb.AppendLine("            vec.AsByte().GetLower().StoreUnsafe(ref first);");
+            }
+            sb.AppendLine("        }");
+
+            string dispatchSb =
+                $"            if (System.Runtime.Intrinsics.X86.Avx2.IsSupported)\n" +
+                $"            {{\n" +
+                $"                SortSimdAvx2{size}{suffix}(span);\n" +
                 $"                return;\n" +
                 $"            }}\n";
 
@@ -791,6 +933,9 @@ namespace SortingNetworks.Generators
         private static string FmtVec512UShort(ushort[] values) =>
             $"System.Runtime.Intrinsics.Vector512.Create((ushort){string.Join(", ", values.Select(v => $"0x{v:X4}"))})";
 
+        private static string FmtVec256UShort(ushort[] values) =>
+            $"System.Runtime.Intrinsics.Vector256.Create((ushort){string.Join(", ", values.Select(v => $"0x{v:X4}"))})";
+
         private static string FmtVec512Long(long[] values) =>
             $"System.Runtime.Intrinsics.Vector512.Create({string.Join(", ", values.Select(v => $"{v}L"))})";
 
@@ -813,6 +958,16 @@ namespace SortingNetworks.Generators
             typeName == "short"
                 ? $"System.Runtime.Intrinsics.X86.Avx512BW.Max({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
                 : $"System.Runtime.Intrinsics.X86.Avx512BW.Max({v}, {s})";
+
+        private static string MinExprShortAvx2(string typeName, string v, string s) =>
+            typeName == "short"
+                ? $"System.Runtime.Intrinsics.Vector256.Min({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
+                : $"System.Runtime.Intrinsics.Vector256.Min({v}, {s})";
+
+        private static string MaxExprShortAvx2(string typeName, string v, string s) =>
+            typeName == "short"
+                ? $"System.Runtime.Intrinsics.Vector256.Max({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
+                : $"System.Runtime.Intrinsics.Vector256.Max({v}, {s})";
 
         private static string MinExprInt(string typeName, string v, string s)
         {
