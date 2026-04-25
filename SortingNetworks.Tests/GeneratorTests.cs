@@ -241,6 +241,33 @@ public partial class MySorter {{ }}
     }
 
     [Fact]
+    public void ArrayOverload_GeneratesCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Should contain the array overload with null-checking
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort(int[] array)"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("ArgumentNullException.ThrowIfNull", generatedSource);
+        Assert.Contains("Sort((System.Span<int>)array)", generatedSource);
+    }
+
+    [Fact]
     public void DumpGeneratedCode_Sort16Int()
     {
         var source = @"

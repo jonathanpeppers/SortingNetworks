@@ -102,4 +102,26 @@ public class GeneratedSortTests
         var arr = new int[5];
         Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr));
     }
+
+    [Fact]
+    public void Sort_NullArray_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => GeneratedSorters.Sort((int[])null!));
+    }
+
+    [Fact]
+    public void Sort_ArrayOverload_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            GeneratedSorters.Sort(input);
+
+            Assert.Equal(expected, input);
+        }
+    }
 }

@@ -253,6 +253,15 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
                 sb.AppendLine("        }");
                 sb.AppendLine();
+
+                // Emit matching array overload with null-checking
+                sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network based on array length.</summary>");
+                sb.AppendLine($"        public static void Sort({typeName}[] array)");
+                sb.AppendLine("        {");
+                sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
+                sb.AppendLine($"            Sort((System.Span<{typeName}>)array);");
+                sb.AppendLine("        }");
+                sb.AppendLine();
             }
 
             // Emit private SIMD methods and scalar Sort{size} methods
