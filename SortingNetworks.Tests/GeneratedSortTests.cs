@@ -61,6 +61,25 @@ public class GeneratedSortTests
         }
     }
 
+    [Theory]
+    [InlineData(27)]
+    [InlineData(28)]
+    public void Sort_Double_MatchesArraySort(int size)
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, size).Select(_ => rng.NextDouble() * 2000 - 1000).ToArray();
+            var expected = (double[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (double[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
     [Fact]
     public void Sort16_Byte_MatchesArraySort()
     {
