@@ -235,6 +235,35 @@ namespace SortingNetworks.Generators
                     sb.AppendLine("                }");
                 }
 
+                // AVX2 fallback dispatch block (e.g., double uses Permute4x64 on Vector256)
+                var avx2FallbackSizes = new List<NetworkRequest>();
+                foreach (var request in sizes)
+                {
+                    if (SimdX86Emitter.CanEmitAvx2Fallback(request.TypeName, request.Size))
+                        avx2FallbackSizes.Add(request);
+                }
+                if (avx2FallbackSizes.Count > 0)
+                {
+                    sb.AppendLine($"                if (System.Runtime.Intrinsics.X86.Avx2.IsSupported)");
+                    sb.AppendLine("                {");
+                    if (avx2FallbackSizes.Count == 1)
+                    {
+                        sb.AppendLine($"                    if (n == {avx2FallbackSizes[0].Size})");
+                        sb.AppendLine("                    {");
+                        sb.AppendLine($"                        SortSimdAvx2_{avx2FallbackSizes[0].Size}_{typeName}(span);");
+                        sb.AppendLine("                        return;");
+                        sb.AppendLine("                    }");
+                    }
+                    else
+                    {
+                        foreach (var request in avx2FallbackSizes)
+                        {
+                            sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimdAvx2_{request.Size}_{typeName}(span); return; }}");
+                        }
+                    }
+                    sb.AppendLine("                }");
+                }
+
                 // Scalar fallback: get ref and dispatch
                 sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
                 if (sizes.Count == 1)
@@ -269,6 +298,17 @@ namespace SortingNetworks.Generators
                     {
                         sb.AppendLine(simdMethod);
                         sb.AppendLine();
+                    }
+
+                    // Emit AVX2 fallback method if applicable (e.g., double)
+                    if (SimdX86Emitter.CanEmitAvx2Fallback(request.TypeName, request.Size))
+                    {
+                        var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(request.Size, request.TypeName, simdSteps);
+                        if (!string.IsNullOrEmpty(avx2Method))
+                        {
+                            sb.AppendLine(avx2Method);
+                            sb.AppendLine();
+                        }
                     }
                 }
 

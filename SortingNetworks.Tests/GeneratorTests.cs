@@ -216,6 +216,9 @@ public partial class MySorter { }
     [InlineData(32, "int")]
     [InlineData(8, "byte")]
     [InlineData(16, "byte")]
+    [InlineData(8, "double")]
+    [InlineData(16, "double")]
+    [InlineData(28, "double")]
     public void SimdCode_Compiles(int size, string typeName)
     {
         var source = $@"
@@ -238,6 +241,38 @@ public partial class MySorter {{ }}
             .Select(t => t.GetText().ToString())
             .FirstOrDefault(s => s.Contains("SortSimd") || s.Contains("SortScalar"));
         Assert.NotNull(generatedSource);
+    }
+
+    [Theory]
+    [InlineData(8)]
+    [InlineData(16)]
+    [InlineData(28)]
+    public void Sort_Double_GeneratesAvx2Fallback(int size)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof(double))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify AVX2 fallback method was generated
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains($"SortSimdAvx2_{size}_double"));
+        Assert.NotNull(generatedSource);
+
+        // Verify dispatch includes both AVX-512 and AVX2 paths
+        Assert.Contains("Avx512F.IsSupported", generatedSource);
+        Assert.Contains("Avx2.IsSupported", generatedSource);
     }
 
     [Fact]

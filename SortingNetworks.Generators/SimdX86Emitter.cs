@@ -61,6 +61,31 @@ namespace SortingNetworks.Generators
         }
 
         /// <summary>
+        /// Returns true if this type has an AVX2 fallback path (double only).
+        /// </summary>
+        internal static bool CanEmitAvx2Fallback(string typeName, int size)
+        {
+            // Only double has AVX2 fallback using Permute4x64 on Vector256<double>.
+            // long/ulong lack AVX2 min/max for 64-bit integers.
+            if (typeName != "double") return false;
+            int regSize = 4; // Vector256<double> holds 4 elements
+            int maxRegs = 7;
+            int maxElements = regSize * maxRegs; // 28
+            int minSize = 8; // Match the primary SIMD minimum
+            return size >= minSize && size <= maxElements;
+        }
+
+        /// <summary>
+        /// Emits an AVX2 fallback SIMD sort method for double.
+        /// Returns the method source and dispatch code.
+        /// </summary>
+        internal static (string MethodSource, string DispatchCode) EmitAvx2Fallback(int size, string typeName, List<List<(int A, int B)>> steps)
+        {
+            if (typeName == "double") return EmitDoubleAvx2(size, steps);
+            return ("", "");
+        }
+
+        /// <summary>
         /// Decomposes a flat network array into layers (steps) of disjoint comparator pairs.
         /// Uses a depth-tracking algorithm that respects the ordering of comparators:
         /// each pair is placed in the earliest layer AFTER the last layer where any of
@@ -739,6 +764,211 @@ namespace SortingNetworks.Generators
             return (sb.ToString(), dispatch);
         }
 
+        // --- AVX2 path for double using Vector256<double> and Permute4x64 ---
+
+        private static (string, string) EmitDoubleAvx2(int size, List<List<(int A, int B)>> steps)
+        {
+            if (size > 28) return ("", "");
+
+            int regSize = 4; // Vector256<double> holds 4 elements
+            int numRegs = (size + regSize - 1) / regSize;
+            int lastRegElems = size - (numRegs - 1) * regSize;
+            int totalSlots = numRegs * regSize;
+            int lastRegOffset = (numRegs - 1) * 32;
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
+            sb.AppendLine($"        private static void SortSimdAvx2_{size}_double(System.Span<double> span)");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<double, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
+
+            // Load registers
+            for (int ri = 0; ri < numRegs - 1; ri++)
+            {
+                int offset = ri * 32;
+                if (ri == 0)
+                    sb.AppendLine("            var v0 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<double>>(ref first);");
+                else
+                    sb.AppendLine($"            var v{ri} = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<double>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {offset}));");
+            }
+
+            // Last register
+            if (lastRegElems == regSize)
+            {
+                sb.AppendLine($"            var v{numRegs - 1} = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<double>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {lastRegOffset}));");
+            }
+            else
+            {
+                // Partial last register: read overlapping and rotate with Permute4x64
+                int overlapOffset = (size - regSize) * 8;
+                int shift = regSize - lastRegElems;
+                byte control = 0;
+                for (int d = 0; d < 4; d++)
+                {
+                    int s = (d + shift) % 4;
+                    control |= (byte)(s << (d * 2));
+                }
+                sb.AppendLine($"            var v{numRegs - 1} = System.Runtime.Intrinsics.X86.Avx2.Permute4x64(");
+                sb.AppendLine($"                System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<double>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {overlapOffset})),");
+                sb.AppendLine($"                0x{control:X2});");
+            }
+
+            // Emit steps
+            for (int si = 0; si < steps.Count; si++)
+            {
+                var step = steps[si];
+                int[] perm = Enumerable.Range(0, totalSlots).ToArray();
+                foreach (var (a, b) in step) { perm[a] = b; perm[b] = a; }
+                bool[] isMax = new bool[totalSlots];
+                foreach (var (a, b) in step) isMax[Math.Max(a, b)] = true;
+
+                string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+                sb.AppendLine();
+                sb.AppendLine($"            // Step {si}: {pairStr}");
+                sb.AppendLine("            {");
+
+                // Identify active registers
+                var activeRegs = new List<int>();
+                for (int tri = 0; tri < numRegs; tri++)
+                {
+                    int baseElem = tri * regSize;
+                    bool hasWork = false;
+                    for (int lane = 0; lane < regSize; lane++)
+                        if (perm[baseElem + lane] != baseElem + lane) { hasWork = true; break; }
+                    if (hasWork) activeRegs.Add(tri);
+                }
+
+                // Pass 1: compute shuffled vectors from unmodified registers
+                foreach (int tri in activeRegs)
+                {
+                    int baseElem = tri * regSize;
+                    var sourceGroups = new Dictionary<int, List<(int destLane, int srcLane)>>();
+                    for (int lane = 0; lane < regSize; lane++)
+                    {
+                        int srcElem = perm[baseElem + lane];
+                        int srcReg = srcElem / regSize;
+                        int srcLane = srcElem % regSize;
+                        if (!sourceGroups.ContainsKey(srcReg))
+                            sourceGroups[srcReg] = new List<(int, int)>();
+                        sourceGroups[srcReg].Add((lane, srcLane));
+                    }
+
+                    var sortedSources = sourceGroups.Keys.OrderBy(k => k).ToList();
+
+                    if (sortedSources.Count == 1 && sortedSources[0] == tri)
+                    {
+                        // Intra-vector permute
+                        int[] srcLanes = new int[regSize];
+                        for (int lane = 0; lane < regSize; lane++)
+                            srcLanes[lane] = perm[baseElem + lane] % regSize;
+                        byte ctrl = (byte)(srcLanes[0] | (srcLanes[1] << 2) | (srcLanes[2] << 4) | (srcLanes[3] << 6));
+                        sb.AppendLine($"                var shuffled{tri} = System.Runtime.Intrinsics.X86.Avx2.Permute4x64(v{tri}, 0x{ctrl:X2});");
+                    }
+                    else
+                    {
+                        // Cross-vector shuffle: permute each source, then blend
+                        foreach (int srcReg in sortedSources)
+                        {
+                            int[] srcLanes = new int[regSize];
+                            for (int lane = 0; lane < regSize; lane++)
+                                srcLanes[lane] = lane; // identity default
+                            foreach (var (destLane, srcLane) in sourceGroups[srcReg])
+                                srcLanes[destLane] = srcLane;
+                            byte ctrl = (byte)(srcLanes[0] | (srcLanes[1] << 2) | (srcLanes[2] << 4) | (srcLanes[3] << 6));
+                            sb.AppendLine($"                var from{tri}_{srcReg} = System.Runtime.Intrinsics.X86.Avx2.Permute4x64(v{srcReg}, 0x{ctrl:X2});");
+                        }
+
+                        if (sortedSources.Count == 1)
+                        {
+                            sb.AppendLine($"                var shuffled{tri} = from{tri}_{sortedSources[0]};");
+                        }
+                        else
+                        {
+                            // Blend multiple sources using Avx.BlendVariable
+                            string prev = $"from{tri}_{sortedSources[0]}";
+                            for (int bi = 1; bi < sortedSources.Count; bi++)
+                            {
+                                int srcReg = sortedSources[bi];
+                                long[] blendMask = new long[regSize];
+                                foreach (var (destLane, _) in sourceGroups[srcReg])
+                                    blendMask[destLane] = -1L;
+                                string next = bi < sortedSources.Count - 1 ? $"blend{tri}_{bi}" : $"shuffled{tri}";
+                                sb.AppendLine($"                var {next} = System.Runtime.Intrinsics.X86.Avx.BlendVariable({prev}, from{tri}_{srcReg}, {FmtVec256Long(blendMask)}.AsDouble());");
+                                prev = next;
+                            }
+                        }
+                    }
+                }
+
+                // Pass 2: apply min/max/blend using shuffled vectors
+                foreach (int tri in activeRegs)
+                {
+                    int baseElem = tri * regSize;
+                    long[] maxMask = new long[regSize];
+                    for (int lane = 0; lane < regSize; lane++)
+                        if (isMax[baseElem + lane]) maxMask[lane] = -1L;
+                    bool allMin = maxMask.All(v => v == 0);
+                    bool allMax = maxMask.All(v => v == -1L);
+                    if (allMin)
+                    {
+                        sb.AppendLine($"                v{tri} = System.Runtime.Intrinsics.X86.Avx.Min(v{tri}, shuffled{tri});");
+                    }
+                    else if (allMax)
+                    {
+                        sb.AppendLine($"                v{tri} = System.Runtime.Intrinsics.X86.Avx.Max(v{tri}, shuffled{tri});");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"                var mins{tri} = System.Runtime.Intrinsics.X86.Avx.Min(v{tri}, shuffled{tri});");
+                        sb.AppendLine($"                var maxs{tri} = System.Runtime.Intrinsics.X86.Avx.Max(v{tri}, shuffled{tri});");
+                        sb.AppendLine($"                v{tri} = System.Runtime.Intrinsics.X86.Avx.BlendVariable(mins{tri}, maxs{tri}, {FmtVec256Long(maxMask)}.AsDouble());");
+                    }
+                }
+
+                sb.AppendLine("            }");
+            }
+
+            // Store results (reverse order for overlapping writes)
+            sb.AppendLine();
+            if (lastRegElems < regSize)
+            {
+                // Reverse the load rotation for the partial last register
+                int overlapOffset = (size - regSize) * 8;
+                int shift = regSize - lastRegElems;
+                byte control = 0;
+                for (int d = 0; d < 4; d++)
+                {
+                    int s = (d - shift + 4) % 4;
+                    control |= (byte)(s << (d * 2));
+                }
+                sb.AppendLine($"            System.Runtime.Intrinsics.X86.Avx2.Permute4x64(v{numRegs - 1}, 0x{control:X2}).AsByte()");
+                sb.AppendLine($"                .StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {overlapOffset}));");
+            }
+            else
+            {
+                sb.AppendLine($"            System.Runtime.CompilerServices.Unsafe.WriteUnaligned(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {lastRegOffset}), v{numRegs - 1});");
+            }
+
+            for (int ri = numRegs - 2; ri >= 0; ri--)
+            {
+                if (ri == 0)
+                    sb.AppendLine("            System.Runtime.CompilerServices.Unsafe.WriteUnaligned(ref first, v0);");
+                else
+                    sb.AppendLine($"            System.Runtime.CompilerServices.Unsafe.WriteUnaligned(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {ri * 32}), v{ri});");
+            }
+            sb.AppendLine("        }");
+
+            string dispatch =
+                $"            if (System.Runtime.Intrinsics.X86.Avx2.IsSupported)\n" +
+                $"            {{\n" +
+                $"                SortSimdAvx2_{size}_double(span);\n" +
+                $"                return;\n" +
+                $"            }}\n";
+
+            return (sb.ToString(), dispatch);
+        }
+
         // --- Helper methods ---
 
         private static int ElementSize(string typeName)
@@ -787,6 +1017,9 @@ namespace SortingNetworks.Generators
 
         private static string FmtVec256Int(int[] values) =>
             $"System.Runtime.Intrinsics.Vector256.Create({string.Join(", ", values)})";
+
+        private static string FmtVec256Long(long[] values) =>
+            $"System.Runtime.Intrinsics.Vector256.Create({string.Join(", ", values.Select(v => $"{v}L"))})";
 
         private static string FmtVec512UShort(ushort[] values) =>
             $"System.Runtime.Intrinsics.Vector512.Create((ushort){string.Join(", ", values.Select(v => $"0x{v:X4}"))})";
