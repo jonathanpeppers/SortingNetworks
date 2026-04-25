@@ -4,7 +4,7 @@ namespace SortingNetworks.Tests;
 
 public class GeneratedSortTests
 {
-    private static void VerifyGeneratedSort(int size, Action<int[]> sort)
+    private static void VerifyGeneratedSort(int size)
     {
         for (int seed = 0; seed < 50; seed++)
         {
@@ -14,43 +14,35 @@ public class GeneratedSortTests
             Array.Sort(expected);
 
             var actual = (int[])input.Clone();
-            sort(actual);
+            GeneratedSorters.Sort(actual);
 
             Assert.Equal(expected, actual);
         }
     }
 
     [Fact]
-    public void Sort4_MatchesArraySort() =>
-        VerifyGeneratedSort(4, a => GeneratedSorters.Sort4(a));
+    public void Sort4_MatchesArraySort() => VerifyGeneratedSort(4);
 
     [Fact]
-    public void Sort8_MatchesArraySort() =>
-        VerifyGeneratedSort(8, a => GeneratedSorters.Sort8(a));
+    public void Sort8_MatchesArraySort() => VerifyGeneratedSort(8);
 
     [Fact]
-    public void Sort16_MatchesArraySort() =>
-        VerifyGeneratedSort(16, a => GeneratedSorters.Sort16(a));
+    public void Sort16_MatchesArraySort() => VerifyGeneratedSort(16);
 
     [Fact]
-    public void Sort27_MatchesArraySort() =>
-        VerifyGeneratedSort(27, a => GeneratedSorters.Sort27(a));
+    public void Sort27_MatchesArraySort() => VerifyGeneratedSort(27);
 
     [Fact]
-    public void Sort28_MatchesArraySort() =>
-        VerifyGeneratedSort(28, a => GeneratedSorters.Sort28(a));
+    public void Sort28_MatchesArraySort() => VerifyGeneratedSort(28);
 
     [Fact]
-    public void Sort32_MatchesArraySort() =>
-        VerifyGeneratedSort(32, a => GeneratedSorters.Sort32(a));
+    public void Sort32_MatchesArraySort() => VerifyGeneratedSort(32);
 
     [Fact]
-    public void Sort48_MatchesArraySort() =>
-        VerifyGeneratedSort(48, a => GeneratedSorters.Sort48(a));
+    public void Sort48_MatchesArraySort() => VerifyGeneratedSort(48);
 
     [Fact]
-    public void Sort64_MatchesArraySort() =>
-        VerifyGeneratedSort(64, a => GeneratedSorters.Sort64(a));
+    public void Sort64_MatchesArraySort() => VerifyGeneratedSort(64);
 
     [Fact]
     public void Sort16_Double_MatchesArraySort()
@@ -63,7 +55,7 @@ public class GeneratedSortTests
             Array.Sort(expected);
 
             var actual = (double[])input.Clone();
-            GeneratedSorters.Sort16(actual.AsSpan());
+            GeneratedSorters.Sort(actual.AsSpan());
 
             Assert.Equal(expected, actual);
         }
@@ -81,7 +73,7 @@ public class GeneratedSortTests
             Array.Sort(expected);
 
             var actual = (byte[])input.Clone();
-            GeneratedSorters.Sort16(actual.AsSpan());
+            GeneratedSorters.Sort(actual.AsSpan());
 
             Assert.Equal(expected, actual);
         }
@@ -98,7 +90,7 @@ public class GeneratedSortTests
             Array.Sort(expected);
 
             var actual = (long[])input.Clone();
-            GeneratedSorters.Sort16(actual.AsSpan());
+            GeneratedSorters.Sort(actual.AsSpan());
 
             Assert.Equal(expected, actual);
         }
@@ -108,6 +100,6 @@ public class GeneratedSortTests
     public void Sort_ThrowsOnWrongSize()
     {
         var arr = new int[5];
-        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort4(arr));
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr));
     }
 }

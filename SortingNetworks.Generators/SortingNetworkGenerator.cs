@@ -97,9 +97,33 @@ namespace SortingNetworks.Generators
             sb.AppendLine("#nullable enable");
             sb.AppendLine();
 
+            // Validate all requests and collect valid ones, grouped by type
+            var validRequests = new List<NetworkRequest>();
+            foreach (var request in info.Requests)
+            {
+                if (request.Size < MinSize || request.Size > MaxSize)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.InvalidSize, Location.None, request.Size, MinSize, MaxSize));
+                    continue;
+                }
+
+                if (!SupportedTypes.Contains(request.TypeName))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.UnsupportedType, Location.None, request.TypeName));
+                    continue;
+                }
+
+                validRequests.Add(request);
+            }
+
+            if (validRequests.Count == 0)
+                return null;
+
             // Check if any request will use SIMD
             bool needsSimdUsing = false;
-            foreach (var request in info.Requests)
+            foreach (var request in validRequests)
             {
                 if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
                 {
@@ -122,56 +146,69 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"    partial class {info.ClassName}");
             sb.AppendLine("    {");
 
-            bool anyGenerated = false;
-            foreach (var request in info.Requests)
+            // Group requests by type to emit one public Sort(Span<T>) per type
+            var byType = new Dictionary<string, List<NetworkRequest>>();
+            foreach (var request in validRequests)
             {
-                if (request.Size < MinSize || request.Size > MaxSize)
+                if (!byType.TryGetValue(request.TypeName, out var list))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptors.InvalidSize, Location.None, request.Size, MinSize, MaxSize));
-                    continue;
+                    list = new List<NetworkRequest>();
+                    byType[request.TypeName] = list;
                 }
+                list.Add(request);
+            }
 
-                if (!SupportedTypes.Contains(request.TypeName))
+            // Emit one public Sort overload per type, dispatching by span.Length
+            foreach (var kvp in byType)
+            {
+                var typeName = kvp.Key;
+                var sizes = kvp.Value;
+                sizes.Sort((a, b) => a.Size.CompareTo(b.Size));
+
+                sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network based on span length.</summary>");
+                sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span)");
+                sb.AppendLine("        {");
+                sb.AppendLine("            switch (span.Length)");
+                sb.AppendLine("            {");
+                foreach (var request in sizes)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptors.UnsupportedType, Location.None, request.TypeName));
-                    continue;
+                    sb.AppendLine($"                case {request.Size}: Sort{request.Size}(span); break;");
                 }
+                sb.AppendLine($"                default: throw new System.ArgumentException($\"No sorting network for length {{span.Length}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                sb.AppendLine("            }");
+                sb.AppendLine("        }");
+                sb.AppendLine();
+            }
 
-                // Get the network (from database or Batcher)
+            // Emit private Sort{size} and SortScalar{size} for each request
+            foreach (var request in validRequests)
+            {
                 var network = NetworkDatabase.GetNetwork(request.Size);
                 if (network == null)
                 {
                     network = BatcherNetworkBuilder.Generate(request.Size);
                 }
 
-                // Get SIMD steps if SIMD emission is possible
                 List<List<(int A, int B)>>? simdSteps = null;
                 if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
                 {
                     simdSteps = SimdX86Emitter.DecomposeIntoSteps(network);
                 }
 
-                // Emit the public Sort method
-                sb.AppendLine($"        /// <summary>Sorts exactly {request.Size} elements of type {request.TypeName} using an optimal sorting network.</summary>");
-                sb.AppendLine($"        public static void Sort{request.Size}(System.Span<{request.TypeName}> span)");
+                // Emit the private Sort{size} dispatcher
+                sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+                sb.AppendLine($"        private static void Sort{request.Size}(System.Span<{request.TypeName}> span)");
                 sb.AppendLine("        {");
-                sb.AppendLine($"            if (span.Length != {request.Size})");
-                sb.AppendLine($"                throw new System.ArgumentException($\"Span must have exactly {request.Size} elements, but was {{span.Length}}.\", nameof(span));");
 
-                // SIMD dispatch
                 if (simdSteps != null)
                 {
                     var (simdMethod, dispatchCode) = SimdX86Emitter.Emit(request.Size, request.TypeName, simdSteps);
                     if (!string.IsNullOrEmpty(simdMethod))
                     {
                         sb.Append(dispatchCode);
-                        // Fallback to scalar
                         sb.AppendLine($"            SortScalar{request.Size}(span);");
                         sb.AppendLine("        }");
                         sb.AppendLine();
-                        // Emit SIMD method
                         sb.AppendLine(simdMethod);
                     }
                     else
@@ -187,10 +224,8 @@ namespace SortingNetworks.Generators
                 }
                 sb.AppendLine();
 
-                // Emit the scalar implementation
                 sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
                 sb.AppendLine();
-                anyGenerated = true;
             }
 
             sb.AppendLine("    }");
@@ -200,7 +235,7 @@ namespace SortingNetworks.Generators
                 sb.AppendLine("}");
             }
 
-            return anyGenerated ? sb.ToString() : null;
+            return sb.ToString();
         }
 
         private const string AttributeSource = @"// <auto-generated />

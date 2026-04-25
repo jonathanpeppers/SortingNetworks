@@ -74,12 +74,7 @@ public class IntSortingBenchmarks
     public void GeneratedSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
-        {
-            if (Length == 27)
-                GeneratedSorters.Sort27(_batch[i].AsSpan());
-            else
-                GeneratedSorters.Sort28(_batch[i].AsSpan());
-        }
+            GeneratedSorters.Sort(_batch[i].AsSpan());
     }
 }
 
