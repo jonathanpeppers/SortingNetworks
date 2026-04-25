@@ -102,4 +102,89 @@ public class GeneratedSortTests
         var arr = new int[5];
         Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr));
     }
+
+    [Fact]
+    public void Sort8_UShort_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 8).Select(_ => (ushort)rng.Next(0, 65536)).ToArray();
+            var expected = (ushort[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (ushort[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort16_UShort_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => (ushort)rng.Next(0, 65536)).ToArray();
+            var expected = (ushort[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (ushort[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort8_Short_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 8).Select(_ => (short)rng.Next(-32768, 32768)).ToArray();
+            var expected = (short[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (short[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort16_Short_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => (short)rng.Next(-32768, 32768)).ToArray();
+            var expected = (short[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (short[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort12_UShort_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 12).Select(_ => (ushort)rng.Next(0, 65536)).ToArray();
+            var expected = (ushort[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (ushort[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }
