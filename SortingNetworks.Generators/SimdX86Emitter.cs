@@ -388,7 +388,10 @@ namespace SortingNetworks.Generators
                 sb.AppendLine("            var vec = System.Runtime.Intrinsics.Vector256.Create(lo, hi).AsUInt16();");
             }
 
-            // Emit each step
+            // Emit each step using hardware AVX2 intrinsics for better codegen:
+            // - Avx2.Shuffle (vpshufb) for lane-local shuffles (1 instruction vs multi-instruction Vector256.Shuffle)
+            // - Avx2.Permute2x128 + dual Shuffle + Or for cross-lane swaps
+            // - Avx2.BlendVariable (vpblendvb, 1 instruction) instead of ConditionalSelect (vpand+vpandn+vpor, 3 instructions)
             for (int si = 0; si < steps.Count; si++)
             {
                 var step = steps[si];
@@ -398,27 +401,71 @@ namespace SortingNetworks.Generators
                 for (int i = 0; i < 16; i++) ushortPerm[i] = (ushort)i;
                 foreach (var (a, b) in step) { ushortPerm[a] = (ushort)b; ushortPerm[b] = (ushort)a; }
 
-                // Convert to byte permutation for Vector256.Shuffle on bytes
-                byte[] bytePerm = new byte[32];
-                for (int i = 0; i < 16; i++)
-                {
-                    bytePerm[i * 2] = (byte)(ushortPerm[i] * 2);
-                    bytePerm[i * 2 + 1] = (byte)(ushortPerm[i] * 2 + 1);
-                }
+                // Check if any swap crosses the 128-bit lane boundary (elements 0-7 vs 8-15)
+                bool hasCrossLane = size > 8 && step.Any(p => (p.A < 8) != (p.B < 8));
 
-                // Build ushort blend mask
-                ushort[] blend = new ushort[16];
-                foreach (var (a, b) in step) blend[Math.Max(a, b)] = 0xFFFF;
+                // Build blend mask as bytes for Avx2.BlendVariable (0xFF = select max, 0x00 = select min)
+                byte[] blendBytes = new byte[32];
+                foreach (var (a, b) in step)
+                {
+                    int maxIdx = Math.Max(a, b);
+                    blendBytes[maxIdx * 2] = 0xFF;
+                    blendBytes[maxIdx * 2 + 1] = 0xFF;
+                }
 
                 string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
 
                 sb.AppendLine();
                 sb.AppendLine($"            // Step {si}: {pairStr}");
                 sb.AppendLine("            {");
-                sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.Vector256.Shuffle(vec.AsByte(), {FmtVec256(bytePerm)}).AsUInt16();");
+
+                if (!hasCrossLane)
+                {
+                    // All swaps are within the same 128-bit lane — single vpshufb
+                    byte[] bytePerm = new byte[32];
+                    for (int i = 0; i < 16; i++)
+                    {
+                        bytePerm[i * 2] = (byte)((ushortPerm[i] % 8) * 2);
+                        bytePerm[i * 2 + 1] = (byte)((ushortPerm[i] % 8) * 2 + 1);
+                    }
+                    sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.X86.Avx2.Shuffle(vec.AsByte(), {FmtVec256(bytePerm)}).AsUInt16();");
+                }
+                else
+                {
+                    // Cross-lane: swap lanes with Permute2x128, then use two lane-local shuffles + Or
+                    byte[] sameMask = new byte[32];
+                    byte[] crossMask = new byte[32];
+                    for (int i = 0; i < 16; i++)
+                    {
+                        int srcUshort = ushortPerm[i];
+                        int elemLane = i / 8;
+                        int srcLane = srcUshort / 8;
+                        int srcLocalByte = (srcUshort % 8) * 2;
+
+                        if (srcLane == elemLane)
+                        {
+                            sameMask[i * 2] = (byte)srcLocalByte;
+                            sameMask[i * 2 + 1] = (byte)(srcLocalByte + 1);
+                            crossMask[i * 2] = 0x80; // vpshufb zeros when high bit set
+                            crossMask[i * 2 + 1] = 0x80;
+                        }
+                        else
+                        {
+                            sameMask[i * 2] = 0x80;
+                            sameMask[i * 2 + 1] = 0x80;
+                            crossMask[i * 2] = (byte)srcLocalByte;
+                            crossMask[i * 2 + 1] = (byte)(srcLocalByte + 1);
+                        }
+                    }
+                    sb.AppendLine($"                var swapped = System.Runtime.Intrinsics.X86.Avx2.Permute2x128(vec.AsByte(), vec.AsByte(), 0x01);");
+                    sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.X86.Avx2.Or(");
+                    sb.AppendLine($"                    System.Runtime.Intrinsics.X86.Avx2.Shuffle(vec.AsByte(), {FmtVec256(sameMask)}),");
+                    sb.AppendLine($"                    System.Runtime.Intrinsics.X86.Avx2.Shuffle(swapped, {FmtVec256(crossMask)})).AsUInt16();");
+                }
+
                 sb.AppendLine($"                var mins = {MinExprShortAvx2(typeName, "vec", "shuffled")};");
                 sb.AppendLine($"                var maxs = {MaxExprShortAvx2(typeName, "vec", "shuffled")};");
-                sb.AppendLine($"                vec = System.Runtime.Intrinsics.Vector256.ConditionalSelect({FmtVec256UShort(blend)}, maxs, mins);");
+                sb.AppendLine($"                vec = System.Runtime.Intrinsics.X86.Avx2.BlendVariable(mins.AsByte(), maxs.AsByte(), {FmtVec256(blendBytes)}).AsUInt16();");
                 sb.AppendLine("            }");
             }
 
