@@ -1,5 +1,7 @@
 # SortingNetworks
 
+[![Building a 41x Faster Sort in C# -- From Research Paper to SIMD, Powered by AI](https://i.ytimg.com/vi/FoRRWCkMsFc/hqdefault.jpg)](https://www.youtube.com/watch?v=FoRRWCkMsFc)
+
 A .NET library that uses sorting-network-based specializations for small
 arrays of sizes 27 and 28 -- using depth-13 networks from the paper
 ["Depth-13 Sorting Networks for 28 Channels"](https://arxiv.org/abs/2511.04107).
