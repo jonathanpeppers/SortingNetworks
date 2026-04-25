@@ -173,17 +173,16 @@ namespace SortingNetworks.Generators
                 }
                 networksByRequest[key] = network;
 
-                // Decompose once, reuse for both emitters
-                List<List<(int A, int B)>>? steps = null;
-                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size))
+                // Decompose the network into steps once, shared by both emitters
+                bool x86CanEmit = SimdX86Emitter.CanEmit(request.TypeName, request.Size);
+                bool armCanEmit = SimdArmEmitter.CanEmit(request.TypeName, request.Size);
+                if (x86CanEmit || armCanEmit)
                 {
-                    steps = steps ?? SimdX86Emitter.DecomposeIntoSteps(network);
-                    simdStepsByRequest[key] = steps;
-                }
-                if (SimdArmEmitter.CanEmit(request.TypeName, request.Size))
-                {
-                    steps = steps ?? SimdX86Emitter.DecomposeIntoSteps(network);
-                    simdArmStepsByRequest[key] = steps;
+                    var decomposedSteps = SimdX86Emitter.DecomposeIntoSteps(network);
+                    if (x86CanEmit)
+                        simdStepsByRequest[key] = decomposedSteps;
+                    if (armCanEmit)
+                        simdArmStepsByRequest[key] = decomposedSteps;
                 }
             }
 
