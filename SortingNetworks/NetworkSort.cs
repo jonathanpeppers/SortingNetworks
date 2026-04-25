@@ -13,8 +13,9 @@ namespace SortingNetworks;
 
 /// <summary>
 /// Provides sorting-network-based sorting for small collections.
-/// Uses fixed compare-and-swap networks for sizes up to 28, including
-/// depth-13 networks for 27 and 28 channels from arXiv:2511.04107.
+/// Uses fixed compare-and-swap networks for sizes up to 32, including
+/// depth-13 networks for 27 and 28 channels from arXiv:2511.04107
+/// and Dobbelaere SorterHunter networks for sizes 23–26 and 29–32.
 /// Falls back to the default .NET sort for larger inputs.
 /// </summary>
 public static partial class NetworkSort
@@ -25,32 +26,43 @@ public static partial class NetworkSort
     public static void Sort(Span<byte> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx2.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27(span);
-                else
-                    SortSimd28(span);
-                return;
-            }
+                if (Avx2.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27(span);
+                    else
+                        SortSimd28(span);
+                    return;
+                }
 
-            if (Ssse3.IsSupported || AdvSimd.IsSupported)
-            {
-                if (n == 27)
-                    SortSimd128_27(span);
-                else
-                    SortSimd128_28(span);
-                return;
+                if (Ssse3.IsSupported || AdvSimd.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd128_27(span);
+                    else
+                        SortSimd128_28(span);
+                    return;
+                }
             }
 
             ref byte first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -73,7 +85,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<byte>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -115,32 +127,43 @@ public static partial class NetworkSort
     public static void Sort(Span<sbyte> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx2.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_sbyte(span);
-                else
-                    SortSimd28_sbyte(span);
-                return;
-            }
+                if (Avx2.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_sbyte(span);
+                    else
+                        SortSimd28_sbyte(span);
+                    return;
+                }
 
-            if (Ssse3.IsSupported || AdvSimd.IsSupported)
-            {
-                if (n == 27)
-                    SortSimd128_27_sbyte(span);
-                else
-                    SortSimd128_28_sbyte(span);
-                return;
+                if (Ssse3.IsSupported || AdvSimd.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd128_27_sbyte(span);
+                    else
+                        SortSimd128_28_sbyte(span);
+                    return;
+                }
             }
 
             ref sbyte first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -163,7 +186,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<sbyte>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -205,32 +228,43 @@ public static partial class NetworkSort
     public static void Sort(Span<short> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512BW.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_short(span);
-                else
-                    SortSimd28_short(span);
-                return;
-            }
+                if (Avx512BW.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_short(span);
+                    else
+                        SortSimd28_short(span);
+                    return;
+                }
 
-            if (AdvSimd.Arm64.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdArm27_short(span);
-                else
-                    SortSimdArm28_short(span);
-                return;
+                if (AdvSimd.Arm64.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdArm27_short(span);
+                    else
+                        SortSimdArm28_short(span);
+                    return;
+                }
             }
 
             ref short first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -253,7 +287,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<short>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -295,32 +329,43 @@ public static partial class NetworkSort
     public static void Sort(Span<ushort> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512BW.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_ushort(span);
-                else
-                    SortSimd28_ushort(span);
-                return;
-            }
+                if (Avx512BW.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_ushort(span);
+                    else
+                        SortSimd28_ushort(span);
+                    return;
+                }
 
-            if (AdvSimd.Arm64.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdArm27_ushort(span);
-                else
-                    SortSimdArm28_ushort(span);
-                return;
+                if (AdvSimd.Arm64.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdArm27_ushort(span);
+                    else
+                        SortSimdArm28_ushort(span);
+                    return;
+                }
             }
 
             ref ushort first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -343,7 +388,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<ushort>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -385,41 +430,52 @@ public static partial class NetworkSort
     public static void Sort(Span<int> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512F.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_512_int(span);
-                else
-                    SortSimd28_512_int(span);
-                return;
-            }
+                if (Avx512F.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_512_int(span);
+                    else
+                        SortSimd28_512_int(span);
+                    return;
+                }
 
-            if (Avx2.IsSupported)
-            {
-                if (n == 27)
-                    SortSimd27_int(span);
-                else
-                    SortSimd28_int(span);
-                return;
-            }
+                if (Avx2.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_int(span);
+                    else
+                        SortSimd28_int(span);
+                    return;
+                }
 
-            if (AdvSimd.Arm64.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdArm27_int(span);
-                else
-                    SortSimdArm28_int(span);
-                return;
+                if (AdvSimd.Arm64.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdArm27_int(span);
+                    else
+                        SortSimdArm28_int(span);
+                    return;
+                }
             }
 
             ref int first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -442,7 +498,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<int>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -484,41 +540,52 @@ public static partial class NetworkSort
     public static void Sort(Span<uint> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512F.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_512_uint(span);
-                else
-                    SortSimd28_512_uint(span);
-                return;
-            }
+                if (Avx512F.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_512_uint(span);
+                    else
+                        SortSimd28_512_uint(span);
+                    return;
+                }
 
-            if (Avx2.IsSupported)
-            {
-                if (n == 27)
-                    SortSimd27_uint(span);
-                else
-                    SortSimd28_uint(span);
-                return;
-            }
+                if (Avx2.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_uint(span);
+                    else
+                        SortSimd28_uint(span);
+                    return;
+                }
 
-            if (AdvSimd.Arm64.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdArm27_uint(span);
-                else
-                    SortSimdArm28_uint(span);
-                return;
+                if (AdvSimd.Arm64.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdArm27_uint(span);
+                    else
+                        SortSimdArm28_uint(span);
+                    return;
+                }
             }
 
             ref uint first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -541,7 +608,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<uint>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -583,23 +650,35 @@ public static partial class NetworkSort
     public static void Sort(Span<long> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512F.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_long(span);
-                else
-                    SortSimd28_long(span);
-                return;
+                if (Avx512F.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_long(span);
+                    else
+                        SortSimd28_long(span);
+                    return;
+                }
+
             }
 
             ref long first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -622,7 +701,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<long>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -664,23 +743,35 @@ public static partial class NetworkSort
     public static void Sort(Span<ulong> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512F.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_ulong(span);
-                else
-                    SortSimd28_ulong(span);
-                return;
+                if (Avx512F.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_ulong(span);
+                    else
+                        SortSimd28_ulong(span);
+                    return;
+                }
+
             }
 
             ref ulong first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -703,7 +794,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<ulong>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -745,7 +836,7 @@ public static partial class NetworkSort
     public static void Sort(Span<nint> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             if (nint.Size == 8 && Avx512F.IsSupported)
             {
@@ -759,11 +850,19 @@ public static partial class NetworkSort
             }
 
             ref nint first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -786,7 +885,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<nint>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -828,7 +927,7 @@ public static partial class NetworkSort
     public static void Sort(Span<nuint> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             if (nuint.Size == 8 && Avx512F.IsSupported)
             {
@@ -842,11 +941,19 @@ public static partial class NetworkSort
             }
 
             ref nuint first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -869,7 +976,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<nuint>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -911,32 +1018,43 @@ public static partial class NetworkSort
     public static void Sort(Span<char> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512BW.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_char(span);
-                else
-                    SortSimd28_char(span);
-                return;
-            }
+                if (Avx512BW.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_char(span);
+                    else
+                        SortSimd28_char(span);
+                    return;
+                }
 
-            if (AdvSimd.Arm64.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdArm27_char(span);
-                else
-                    SortSimdArm28_char(span);
-                return;
+                if (AdvSimd.Arm64.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdArm27_char(span);
+                    else
+                        SortSimdArm28_char(span);
+                    return;
+                }
             }
 
             ref char first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -959,7 +1077,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<char>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -1001,41 +1119,52 @@ public static partial class NetworkSort
     public static void Sort(Span<float> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512F.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_512_float(span);
-                else
-                    SortSimd28_512_float(span);
-                return;
-            }
+                if (Avx512F.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_512_float(span);
+                    else
+                        SortSimd28_512_float(span);
+                    return;
+                }
 
-            if (Avx2.IsSupported)
-            {
-                if (n == 27)
-                    SortSimd27_float(span);
-                else
-                    SortSimd28_float(span);
-                return;
-            }
+                if (Avx2.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_float(span);
+                    else
+                        SortSimd28_float(span);
+                    return;
+                }
 
-            if (AdvSimd.Arm64.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdArm27_float(span);
-                else
-                    SortSimdArm28_float(span);
-                return;
+                if (AdvSimd.Arm64.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdArm27_float(span);
+                    else
+                        SortSimdArm28_float(span);
+                    return;
+                }
             }
 
             ref float first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -1058,7 +1187,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<float>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -1100,32 +1229,43 @@ public static partial class NetworkSort
     public static void Sort(Span<double> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
-            if (Avx512F.IsSupported)
+            if (n == 27 || n == 28)
             {
-                if (n == 27)
-                    SortSimd27_double(span);
-                else
-                    SortSimd28_double(span);
-                return;
-            }
+                if (Avx512F.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimd27_double(span);
+                    else
+                        SortSimd28_double(span);
+                    return;
+                }
 
-            if (Avx2.IsSupported)
-            {
-                if (n == 27)
-                    SortSimdAvx2_27_double(span);
-                else
-                    SortSimdAvx2_28_double(span);
-                return;
+                if (Avx2.IsSupported)
+                {
+                    if (n == 27)
+                        SortSimdAvx2_27_double(span);
+                    else
+                        SortSimdAvx2_28_double(span);
+                    return;
+                }
             }
 
             ref double first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort();
@@ -1148,7 +1288,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<double>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -1191,14 +1331,22 @@ public static partial class NetworkSort
     public static void Sort(Span<string> span)
     {
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ref string first = ref MemoryMarshal.GetReference(span);
-            if (n == 27)
-                Sort27(ref first);
-            else
-                Sort28(ref first);
-            return;
+            switch (n)
+            {
+                case 23: Sort23(ref first); return;
+                case 24: Sort24(ref first); return;
+                case 25: Sort25(ref first); return;
+                case 26: Sort26(ref first); return;
+                case 27: Sort27(ref first); return;
+                case 28: Sort28(ref first); return;
+                case 29: Sort29(ref first); return;
+                case 30: Sort30(ref first); return;
+                case 31: Sort31(ref first); return;
+                case 32: Sort32(ref first); return;
+            }
         }
 
         span.Sort(StringComparer.Ordinal);
@@ -1222,7 +1370,7 @@ public static partial class NetworkSort
     {
         comparer ??= Comparer<string>.Default;
         int n = span.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
             return;
@@ -1266,7 +1414,7 @@ public static partial class NetworkSort
         ArgumentNullException.ThrowIfNull(array);
         ArgumentNullException.ThrowIfNull(comparer);
         int n = array.Length;
-        if (n == 27 || n == 28)
+        if (n >= 23 && n <= 32)
         {
             int[] network = NetworkData.GetNetwork(n);
             for (int i = 0; i < network.Length; i += 2)
