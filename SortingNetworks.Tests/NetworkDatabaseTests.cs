@@ -30,8 +30,16 @@ public class NetworkDatabaseTests
     [InlineData(20)]
     [InlineData(21)]
     [InlineData(22)]
+    [InlineData(23)]
+    [InlineData(24)]
+    [InlineData(25)]
+    [InlineData(26)]
     [InlineData(27)]
     [InlineData(28)]
+    [InlineData(29)]
+    [InlineData(30)]
+    [InlineData(31)]
+    [InlineData(32)]
     public void Network_SortsCorrectly(int size)
     {
         var network = NetworkDatabase.GetNetwork(size);
@@ -71,7 +79,15 @@ public class NetworkDatabaseTests
     [InlineData(4)]
     [InlineData(8)]
     [InlineData(16)]
+    [InlineData(23)]
+    [InlineData(24)]
+    [InlineData(25)]
+    [InlineData(26)]
     [InlineData(28)]
+    [InlineData(29)]
+    [InlineData(30)]
+    [InlineData(31)]
+    [InlineData(32)]
     public void Network_HasValidLayerSizes(int size)
     {
         var network = NetworkDatabase.GetNetwork(size);
@@ -89,7 +105,15 @@ public class NetworkDatabaseTests
     [InlineData(4)]
     [InlineData(8)]
     [InlineData(16)]
+    [InlineData(23)]
+    [InlineData(24)]
+    [InlineData(25)]
+    [InlineData(26)]
     [InlineData(28)]
+    [InlineData(29)]
+    [InlineData(30)]
+    [InlineData(31)]
+    [InlineData(32)]
     public void Network_LayersAreDisjointMatchings(int size)
     {
         var network = NetworkDatabase.GetNetwork(size);
@@ -115,10 +139,6 @@ public class NetworkDatabaseTests
     }
 
     [Theory]
-    [InlineData(23)]
-    [InlineData(24)]
-    [InlineData(25)]
-    [InlineData(26)]
     [InlineData(33)]
     [InlineData(48)]
     [InlineData(64)]
