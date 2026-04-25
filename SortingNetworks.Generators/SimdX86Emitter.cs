@@ -82,8 +82,8 @@ namespace SortingNetworks.Generators
         /// </summary>
         internal static (string MethodSource, string DispatchCode) EmitAvx2Fallback(int size, string typeName, List<List<(int A, int B)>> steps)
         {
-            if (typeName == "double") return EmitDoubleAvx2(size, steps);
-            return ("", "");
+            if (!CanEmitAvx2Fallback(typeName, size)) return ("", "");
+            return EmitDoubleAvx2(size, steps);
         }
 
         /// <summary>
@@ -769,7 +769,7 @@ namespace SortingNetworks.Generators
 
         private static (string, string) EmitDoubleAvx2(int size, List<List<(int A, int B)>> steps)
         {
-            if (size > 28) return ("", "");
+            if (size < 8 || size > 28) return ("", "");
 
             int regSize = 4; // Vector256<double> holds 4 elements
             int numRegs = (size + regSize - 1) / regSize;
