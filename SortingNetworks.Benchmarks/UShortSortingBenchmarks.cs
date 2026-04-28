@@ -9,7 +9,7 @@ public class UShortSortingBenchmarks
 {
     private const int OpsPerInvoke = 1000;
 
-    [Params(8, 16, 27, 28)]
+    [Params(8, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)]
     public int Length { get; set; }
 
     [Params(InputKind.Random)]
