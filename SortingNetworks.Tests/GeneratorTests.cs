@@ -275,6 +275,72 @@ public partial class MySorter {{ }}
         Assert.Contains("Avx2.IsSupported", generatedSource);
     }
 
+    [Theory]
+    [InlineData(16, "byte")]
+    [InlineData(28, "byte")]
+    [InlineData(16, "sbyte")]
+    [InlineData(8, "short")]
+    [InlineData(16, "short")]
+    [InlineData(28, "short")]
+    [InlineData(8, "ushort")]
+    [InlineData(8, "int")]
+    [InlineData(16, "int")]
+    [InlineData(28, "int")]
+    [InlineData(32, "int")]
+    [InlineData(8, "uint")]
+    [InlineData(8, "float")]
+    [InlineData(16, "float")]
+    public void ArmSimdCode_Compiles(int size, string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify ARM SIMD code was generated
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains($"SortSimdArm{size}_{typeName}"));
+        Assert.NotNull(generatedSource);
+    }
+
+    [Theory]
+    [InlineData(16, "long")]
+    [InlineData(16, "double")]
+    public void ArmSimdCode_NotGenerated_For64BitTypes(int size, string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify no ARM SIMD code was generated for 64-bit types
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("SortSimdArm"));
+        Assert.Null(generatedSource);
+    }
+
     [Fact]
     public void ArrayOverload_GeneratesCode()
     {
