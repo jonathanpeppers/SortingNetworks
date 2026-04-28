@@ -32,6 +32,153 @@ int[] network28Flat =
 // Step sizes from the depth-13 network for 28 channels (arXiv:2511.04107).
 int[] network28StepSizes = [14, 14, 14, 14, 13, 14, 11, 10, 10, 10, 12, 12, 11];
 
+// Optimal networks for sizes 23-26 and 29-32 (Dobbelaere SorterHunter)
+int[] network23Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 12, 14, 13, 15, 16, 18, 17, 19, 21, 22,
+    0, 4, 1, 5, 2, 6, 3, 7, 8, 12, 9, 13, 10, 14, 11, 15, 17, 21, 18, 20, 19, 22,
+    0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15,
+    1, 2, 5, 18, 7, 19, 9, 16, 10, 21, 12, 20, 15, 22,
+    5, 9, 6, 7, 10, 18, 11, 21, 12, 17, 13, 20, 14, 15,
+    3, 17, 6, 16, 7, 14, 8, 12, 15, 19, 20, 21,
+    3, 4, 5, 8, 6, 10, 9, 12, 13, 16, 14, 15, 17, 18, 19, 21,
+    0, 5, 1, 8, 2, 12, 3, 9, 4, 10, 7, 13, 11, 17, 14, 16, 18, 20,
+    2, 6, 3, 5, 4, 8, 7, 11, 10, 12, 13, 18, 14, 17, 15, 20,
+    1, 3, 2, 5, 6, 9, 7, 10, 11, 13, 12, 14, 15, 18, 16, 17, 19, 20,
+    2, 3, 4, 6, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19,
+    3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18,
+    4, 5, 6, 7, 8, 9, 10, 11, 16, 17
+];
+
+int[] network24Flat =
+[
+    0, 20, 1, 12, 2, 16, 3, 23, 4, 6, 5, 10, 7, 21, 8, 14, 9, 15, 11, 22, 13, 18, 17, 19,
+    0, 3, 1, 11, 2, 7, 4, 17, 5, 13, 6, 19, 8, 9, 10, 18, 12, 22, 14, 15, 16, 21, 20, 23,
+    0, 1, 2, 4, 3, 12, 5, 8, 6, 9, 7, 10, 11, 20, 13, 16, 14, 17, 15, 18, 19, 21, 22, 23,
+    2, 5, 4, 8, 6, 11, 7, 14, 9, 16, 12, 17, 15, 19, 18, 21,
+    1, 8, 3, 14, 4, 7, 9, 20, 10, 12, 11, 13, 15, 22, 16, 19,
+    0, 7, 1, 5, 3, 4, 6, 11, 8, 15, 9, 14, 10, 13, 12, 17, 16, 23, 18, 22, 19, 20,
+    0, 2, 1, 6, 4, 7, 5, 9, 8, 10, 13, 15, 14, 18, 16, 19, 17, 22, 21, 23,
+    2, 3, 4, 5, 6, 8, 7, 9, 10, 11, 12, 13, 14, 16, 15, 17, 18, 19, 20, 21,
+    1, 2, 3, 6, 4, 10, 7, 8, 9, 11, 12, 14, 13, 19, 15, 16, 17, 20, 21, 22,
+    2, 3, 5, 10, 6, 7, 8, 9, 13, 18, 14, 15, 16, 17, 20, 21,
+    3, 4, 5, 7, 10, 12, 11, 13, 16, 18, 19, 20,
+    4, 6, 8, 10, 9, 12, 11, 14, 13, 15, 17, 19,
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+];
+
+int[] network25Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 12, 14, 13, 15, 16, 18, 17, 19, 21, 22, 23, 24,
+    0, 4, 1, 5, 2, 6, 3, 7, 8, 12, 9, 13, 10, 14, 11, 15, 18, 21, 20, 23, 22, 24,
+    0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 16, 20, 17, 22, 19, 24, 21, 23,
+    1, 18, 3, 21, 5, 23, 6, 19, 11, 14, 15, 24,
+    1, 16, 3, 17, 6, 9, 7, 11, 13, 19, 14, 23,
+    0, 1, 2, 16, 3, 8, 7, 20, 10, 13, 11, 22, 15, 23,
+    1, 2, 5, 10, 7, 18, 11, 21, 15, 20, 19, 22,
+    4, 7, 5, 6, 9, 18, 10, 17, 11, 12, 13, 21, 14, 15, 19, 20, 22, 23,
+    3, 4, 7, 8, 9, 10, 11, 16, 12, 17, 13, 18, 19, 21, 20, 22,
+    1, 3, 2, 4, 5, 11, 6, 16, 7, 9, 8, 10, 12, 13, 14, 19, 15, 18,
+    2, 3, 5, 7, 6, 9, 8, 11, 10, 16, 12, 14, 15, 17,
+    3, 5, 4, 6, 7, 8, 9, 11, 10, 12, 13, 14, 15, 16, 17, 18,
+    4, 7, 6, 8, 9, 10, 11, 12, 13, 15, 14, 16, 17, 19, 18, 21,
+    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
+];
+
+int[] network26Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 14, 16, 15, 17, 18, 20, 19, 21, 22, 24, 23, 25,
+    0, 4, 1, 6, 2, 5, 3, 7, 8, 14, 9, 16, 10, 15, 11, 17, 18, 22, 19, 24, 20, 23, 21, 25,
+    0, 18, 1, 19, 2, 20, 3, 21, 4, 22, 5, 23, 6, 24, 7, 25, 9, 12, 13, 16,
+    3, 11, 8, 9, 10, 13, 12, 15, 14, 22, 16, 17,
+    0, 8, 1, 9, 2, 14, 6, 12, 7, 15, 10, 18, 11, 23, 13, 19, 16, 24, 17, 25,
+    1, 2, 3, 18, 4, 8, 7, 22, 17, 21, 23, 24,
+    3, 14, 4, 10, 5, 18, 7, 20, 8, 13, 11, 22, 12, 17, 15, 21,
+    1, 4, 5, 6, 7, 9, 8, 10, 15, 17, 16, 18, 19, 20, 21, 24,
+    2, 5, 3, 10, 6, 14, 9, 13, 11, 19, 12, 16, 15, 22, 20, 23,
+    2, 8, 5, 7, 6, 9, 11, 12, 13, 14, 16, 19, 17, 23, 18, 20,
+    2, 4, 3, 5, 6, 11, 7, 10, 9, 16, 12, 13, 14, 19, 15, 18, 20, 22, 21, 23,
+    3, 4, 5, 8, 6, 7, 9, 11, 10, 12, 13, 15, 14, 16, 17, 20, 18, 19, 21, 22,
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
+];
+
+int[] network29Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 28, 17, 26, 18, 25, 19, 23, 21, 27, 22, 24,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 12, 14, 13, 15, 17, 22, 18, 19, 20, 27, 23, 25, 24, 26,
+    0, 4, 1, 5, 2, 6, 3, 7, 8, 12, 9, 13, 10, 14, 11, 15, 16, 20, 17, 18, 19, 22, 23, 24, 25, 26, 27, 28,
+    0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 16, 18, 20, 22, 21, 25, 24, 27, 26, 28,
+    1, 8, 2, 24, 4, 19, 5, 20, 6, 21, 7, 27, 9, 18, 10, 23, 11, 26, 13, 22, 14, 25, 15, 28, 16, 17,
+    0, 6, 2, 4, 3, 24, 5, 10, 12, 19, 13, 18, 14, 21, 15, 25, 20, 23, 26, 27,
+    0, 16, 1, 6, 3, 12, 4, 8, 5, 17, 7, 24, 14, 20, 15, 26, 18, 21, 19, 23, 25, 27,
+    1, 5, 2, 16, 3, 10, 6, 9, 7, 18, 8, 17, 11, 19, 13, 14, 15, 22, 21, 23, 25, 26,
+    1, 2, 3, 5, 4, 8, 6, 16, 7, 11, 9, 17, 10, 12, 14, 20, 15, 18, 19, 24, 22, 27,
+    4, 6, 9, 16, 10, 13, 11, 19, 12, 14, 20, 21, 22, 26, 23, 24,
+    2, 4, 3, 6, 7, 16, 8, 9, 11, 17, 15, 19, 18, 23, 24, 25,
+    3, 4, 5, 9, 7, 10, 11, 13, 12, 16, 14, 17, 15, 20, 19, 21, 22, 24,
+    5, 8, 6, 7, 9, 12, 10, 11, 13, 14, 15, 16, 17, 20, 18, 19, 21, 23, 24, 25,
+    5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 14, 16, 17, 18, 19, 20, 21, 22,
+    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+];
+
+int[] network30Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 13, 15, 14, 16, 18, 20, 19, 21, 22, 24, 23, 25, 26, 28, 27, 29,
+    0, 4, 1, 5, 2, 6, 3, 7, 8, 14, 9, 17, 10, 16, 12, 20, 13, 19, 15, 21, 22, 26, 23, 27, 24, 28, 25, 29,
+    0, 8, 1, 9, 2, 14, 3, 17, 4, 10, 5, 11, 6, 16, 12, 26, 13, 23, 15, 27, 18, 24, 19, 25, 20, 28, 21, 29,
+    1, 13, 2, 12, 3, 15, 4, 18, 5, 19, 6, 20, 7, 21, 8, 22, 9, 23, 10, 24, 11, 25, 14, 26, 16, 28, 17, 27,
+    0, 4, 2, 8, 3, 13, 5, 9, 6, 22, 7, 23, 10, 12, 11, 15, 14, 18, 16, 26, 17, 19, 20, 24, 21, 27, 25, 29,
+    0, 2, 1, 14, 3, 5, 4, 8, 9, 13, 11, 17, 12, 18, 15, 28, 16, 20, 21, 25, 24, 26, 27, 29,
+    2, 4, 5, 9, 6, 14, 7, 13, 8, 10, 15, 23, 16, 22, 19, 21, 20, 24, 25, 27,
+    6, 8, 7, 11, 10, 14, 12, 16, 13, 17, 15, 19, 18, 22, 21, 23,
+    4, 6, 7, 9, 8, 10, 11, 13, 12, 14, 15, 17, 16, 18, 19, 21, 20, 22, 23, 25,
+    1, 8, 3, 18, 5, 20, 7, 22, 9, 24, 10, 12, 11, 26, 13, 15, 14, 16, 17, 19, 21, 28,
+    1, 2, 3, 10, 5, 12, 7, 14, 9, 16, 11, 18, 13, 20, 15, 22, 17, 24, 19, 26, 27, 28,
+    2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15, 18, 17, 20, 19, 22, 21, 24, 23, 26, 25, 27,
+    3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
+];
+
+int[] network31Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 12, 14, 13, 15, 16, 18, 17, 19, 20, 22, 21, 23, 24, 26, 25, 27, 28, 30,
+    0, 4, 1, 5, 2, 6, 3, 7, 8, 12, 9, 13, 10, 14, 11, 15, 16, 20, 17, 21, 18, 22, 19, 23, 24, 28, 25, 29, 26, 30,
+    0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 16, 24, 17, 25, 18, 26, 19, 27, 20, 28, 21, 29, 22, 30,
+    0, 16, 1, 8, 2, 4, 3, 12, 5, 10, 6, 9, 7, 14, 11, 13, 17, 24, 18, 20, 19, 28, 21, 26, 22, 25, 23, 30, 27, 29,
+    1, 2, 3, 5, 4, 8, 6, 22, 7, 11, 9, 25, 10, 12, 13, 14, 17, 18, 19, 21, 20, 24, 23, 27, 26, 28, 29, 30,
+    1, 17, 2, 18, 3, 19, 4, 20, 5, 10, 7, 23, 8, 24, 11, 27, 12, 28, 13, 29, 14, 30, 21, 26,
+    3, 17, 4, 16, 5, 21, 6, 18, 7, 9, 8, 20, 10, 26, 11, 23, 13, 25, 14, 28, 15, 27, 22, 24,
+    1, 4, 3, 8, 5, 16, 7, 17, 9, 21, 10, 22, 11, 19, 12, 20, 14, 24, 15, 26, 23, 28, 27, 30,
+    2, 5, 7, 8, 9, 18, 11, 17, 12, 16, 13, 22, 14, 20, 15, 19, 23, 24, 26, 29,
+    2, 4, 6, 12, 9, 16, 10, 11, 13, 17, 14, 18, 15, 22, 19, 25, 20, 21, 27, 29,
+    5, 6, 8, 12, 9, 10, 11, 13, 14, 16, 15, 17, 18, 20, 19, 23, 21, 22, 25, 26,
+    3, 5, 6, 7, 8, 9, 10, 12, 11, 14, 13, 16, 15, 18, 17, 20, 19, 21, 22, 23, 24, 25, 26, 28,
+    3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
+];
+
+int[] network32Flat =
+[
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    0, 2, 1, 3, 4, 6, 5, 7, 8, 10, 9, 11, 12, 14, 13, 15, 16, 18, 17, 19, 20, 22, 21, 23, 24, 26, 25, 27, 28, 30, 29, 31,
+    0, 4, 1, 5, 2, 6, 3, 7, 8, 12, 9, 13, 10, 14, 11, 15, 16, 20, 17, 21, 18, 22, 19, 23, 24, 28, 25, 29, 26, 30, 27, 31,
+    0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 16, 24, 17, 25, 18, 26, 19, 27, 20, 28, 21, 29, 22, 30, 23, 31,
+    0, 16, 1, 8, 2, 4, 3, 12, 5, 10, 6, 9, 7, 14, 11, 13, 15, 31, 17, 24, 18, 20, 19, 28, 21, 26, 22, 25, 23, 30, 27, 29,
+    1, 2, 3, 5, 4, 8, 6, 22, 7, 11, 9, 25, 10, 12, 13, 14, 17, 18, 19, 21, 20, 24, 23, 27, 26, 28, 29, 30,
+    1, 17, 2, 18, 3, 19, 4, 20, 5, 10, 7, 23, 8, 24, 11, 27, 12, 28, 13, 29, 14, 30, 21, 26,
+    3, 17, 4, 16, 5, 21, 6, 18, 7, 9, 8, 20, 10, 26, 11, 23, 13, 25, 14, 28, 15, 27, 22, 24,
+    1, 4, 3, 8, 5, 16, 7, 17, 9, 21, 10, 22, 11, 19, 12, 20, 14, 24, 15, 26, 23, 28, 27, 30,
+    2, 5, 7, 8, 9, 18, 11, 17, 12, 16, 13, 22, 14, 20, 15, 19, 23, 24, 26, 29,
+    2, 4, 6, 12, 9, 16, 10, 11, 13, 17, 14, 18, 15, 22, 19, 25, 20, 21, 27, 29,
+    5, 6, 8, 12, 9, 10, 11, 13, 14, 16, 15, 17, 18, 20, 19, 23, 21, 22, 25, 26,
+    3, 5, 6, 7, 8, 9, 10, 12, 11, 14, 13, 16, 15, 18, 17, 20, 19, 21, 22, 23, 24, 25, 26, 28,
+    3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
+];
+
 // --- Main ---
 
 string baseDir = args.Length > 0 ? args[0] : "SortingNetworks";
@@ -57,12 +204,12 @@ using (var w = new StreamWriter(armSimdPath, false, new UTF8Encoding(false)))
 Console.WriteLine($"Generated {armSimdPath}");
 
 // Print stats
-for (int n = 27; n <= 28; n++)
+for (int n = 23; n <= 32; n++)
 {
     var pairs = GetNetwork(n);
-    var steps = GetNetworkSteps(n);
-    Console.WriteLine($"  Sort{n}: {pairs.Count} compare-swaps, {steps.Count} SIMD steps");
+    Console.WriteLine($"  Sort{n}: {pairs.Count} compare-swaps");
 }
+Console.WriteLine($"  SIMD steps available for sizes 27, 28");
 Console.WriteLine($"  Types: {string.Join(", ", primitiveTypes)}");
 
 // --- Batcher's odd-even merge sort network generator ---
@@ -103,12 +250,17 @@ List<(int A, int B)> GenerateBatcherNetwork(int n)
     return pairs;
 }
 
-List<(int A, int B)> GetNetwork28()
+List<(int A, int B)> FlatToPairs(int[] flat)
 {
     var pairs = new List<(int A, int B)>();
-    for (int i = 0; i < network28Flat.Length; i += 2)
-        pairs.Add((network28Flat[i], network28Flat[i + 1]));
+    for (int i = 0; i < flat.Length; i += 2)
+        pairs.Add((flat[i], flat[i + 1]));
     return pairs;
+}
+
+List<(int A, int B)> GetNetwork28()
+{
+    return FlatToPairs(network28Flat);
 }
 
 List<(int A, int B)> GetNetwork27()
@@ -124,8 +276,16 @@ List<(int A, int B)> GetNetwork27()
 
 List<(int A, int B)> GetNetwork(int n) => n switch
 {
-    28 => GetNetwork28(),
+    23 => FlatToPairs(network23Flat),
+    24 => FlatToPairs(network24Flat),
+    25 => FlatToPairs(network25Flat),
+    26 => FlatToPairs(network26Flat),
     27 => GetNetwork27(),
+    28 => GetNetwork28(),
+    29 => FlatToPairs(network29Flat),
+    30 => FlatToPairs(network30Flat),
+    31 => FlatToPairs(network31Flat),
+    32 => FlatToPairs(network32Flat),
     _ => GenerateBatcherNetwork(n),
 };
 
@@ -384,6 +544,17 @@ void WriteFileHeader(StreamWriter w)
 
 
         """);
+}
+
+void WriteScalarSwitchDispatch(StreamWriter w, int minSize, int maxSize, string indent)
+{
+    w.WriteLine($"{indent}switch (n)");
+    w.WriteLine($"{indent}{{");
+    for (int n = minSize; n <= maxSize; n++)
+    {
+        w.WriteLine($"{indent}    case {n}: Sort{n}(ref first); return;");
+    }
+    w.WriteLine($"{indent}}}");
 }
 
 void WriteUnrolledMethod(StreamWriter w, int n, List<(int A, int B)> pairs, string typeName)
@@ -1903,12 +2074,10 @@ void WritePublicApi(StreamWriter w, string t)
     w.WriteLine($"    public static void Sort(Span<{t}> span)");
     w.WriteLine("    {");
     w.WriteLine("        int n = span.Length;");
-    w.WriteLine("        if (n == 27 || n == 28)");
+    w.WriteLine("        if (n >= 23 && n <= 32)");
     w.WriteLine("        {");
     if (t == "nint")
     {
-        // Gate 64-bit dispatch on Avx512F — long only has SIMD via AVX-512.
-        // On ARM64 and AVX2-only x86, fall through to the scalar unrolled path.
         w.WriteLine("            if (nint.Size == 8 && Avx512F.IsSupported)");
         w.WriteLine("            {");
         w.WriteLine("                Sort(MemoryMarshal.Cast<nint, long>(span));");
@@ -1935,125 +2104,126 @@ void WritePublicApi(StreamWriter w, string t)
         w.WriteLine("            }");
         w.WriteLine();
     }
+    bool hasAnySIMD = hasSimd32_512 || hasSimd8 || hasSimd16 || hasSimd64;
+    if (hasAnySIMD)
+    {
+        w.WriteLine("            if (n == 27 || n == 28)");
+        w.WriteLine("            {");
+    }
     if (hasSimd32_512)
     {
-        w.WriteLine("            if (Avx512F.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimd27_512{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimd28_512{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
+        w.WriteLine("                if (Avx512F.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimd27_512{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimd28_512{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
         w.WriteLine();
         if (hasSimd32)
         {
-            w.WriteLine("            if (Avx2.IsSupported)");
-            w.WriteLine("            {");
-            w.WriteLine($"                if (n == 27)");
-            w.WriteLine($"                    SortSimd27{suffix}(span);");
-            w.WriteLine("                else");
-            w.WriteLine($"                    SortSimd28{suffix}(span);");
-            w.WriteLine("                return;");
-            w.WriteLine("            }");
+            w.WriteLine("                if (Avx2.IsSupported)");
+            w.WriteLine("                {");
+            w.WriteLine($"                    if (n == 27)");
+            w.WriteLine($"                        SortSimd27{suffix}(span);");
+            w.WriteLine("                    else");
+            w.WriteLine($"                        SortSimd28{suffix}(span);");
+            w.WriteLine("                    return;");
+            w.WriteLine("                }");
             w.WriteLine();
         }
         else if (hasAvx2Float)
         {
-            w.WriteLine("            if (Avx2.IsSupported)");
-            w.WriteLine("            {");
-            w.WriteLine($"                if (n == 27)");
-            w.WriteLine($"                    SortSimd27{suffix}(span);");
-            w.WriteLine("                else");
-            w.WriteLine($"                    SortSimd28{suffix}(span);");
-            w.WriteLine("                return;");
-            w.WriteLine("            }");
+            w.WriteLine("                if (Avx2.IsSupported)");
+            w.WriteLine("                {");
+            w.WriteLine($"                    if (n == 27)");
+            w.WriteLine($"                        SortSimd27{suffix}(span);");
+            w.WriteLine("                    else");
+            w.WriteLine($"                        SortSimd28{suffix}(span);");
+            w.WriteLine("                    return;");
+            w.WriteLine("                }");
             w.WriteLine();
         }
-        w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimdArm27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimdArm28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
-        w.WriteLine();
+        w.WriteLine("                if (AdvSimd.Arm64.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimdArm27{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimdArm28{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
     }
     else if (hasSimd8)
     {
-        // Vector256.Shuffle<byte> requires AVX2 (VPSHUFB) on x86
-        w.WriteLine("            if (Avx2.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimd27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimd28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
+        w.WriteLine("                if (Avx2.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimd27{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimd28{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
         w.WriteLine();
-        // Vector128.Shuffle<byte> requires SSSE3 (PSHUFB) on x86 or AdvSimd (TBL) on ARM
-        w.WriteLine("            if (Ssse3.IsSupported || AdvSimd.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimd128_27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimd128_28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
-        w.WriteLine();
+        w.WriteLine("                if (Ssse3.IsSupported || AdvSimd.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimd128_27{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimd128_28{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
     }
     else if (hasSimd16)
     {
-        w.WriteLine("            if (Avx512BW.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimd27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimd28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
+        w.WriteLine("                if (Avx512BW.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimd27{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimd28{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
         w.WriteLine();
-        w.WriteLine("            if (AdvSimd.Arm64.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimdArm27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimdArm28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
-        w.WriteLine();
+        w.WriteLine("                if (AdvSimd.Arm64.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimdArm27{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimdArm28{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
     }
     else if (hasSimd64)
     {
-        w.WriteLine("            if (Avx512F.IsSupported)");
-        w.WriteLine("            {");
-        w.WriteLine($"                if (n == 27)");
-        w.WriteLine($"                    SortSimd27{suffix}(span);");
-        w.WriteLine("                else");
-        w.WriteLine($"                    SortSimd28{suffix}(span);");
-        w.WriteLine("                return;");
-        w.WriteLine("            }");
+        w.WriteLine("                if (Avx512F.IsSupported)");
+        w.WriteLine("                {");
+        w.WriteLine($"                    if (n == 27)");
+        w.WriteLine($"                        SortSimd27{suffix}(span);");
+        w.WriteLine("                    else");
+        w.WriteLine($"                        SortSimd28{suffix}(span);");
+        w.WriteLine("                    return;");
+        w.WriteLine("                }");
         w.WriteLine();
         if (hasAvx2Float)
         {
-            w.WriteLine("            if (Avx2.IsSupported)");
-            w.WriteLine("            {");
-            w.WriteLine($"                if (n == 27)");
-            w.WriteLine($"                    SortSimdAvx2_27{suffix}(span);");
-            w.WriteLine("                else");
-            w.WriteLine($"                    SortSimdAvx2_28{suffix}(span);");
-            w.WriteLine("                return;");
-            w.WriteLine("            }");
-            w.WriteLine();
+            w.WriteLine("                if (Avx2.IsSupported)");
+            w.WriteLine("                {");
+            w.WriteLine($"                    if (n == 27)");
+            w.WriteLine($"                        SortSimdAvx2_27{suffix}(span);");
+            w.WriteLine("                    else");
+            w.WriteLine($"                        SortSimdAvx2_28{suffix}(span);");
+            w.WriteLine("                    return;");
+            w.WriteLine("                }");
         }
     }
+    if (hasAnySIMD)
+    {
+        w.WriteLine("            }");
+        w.WriteLine();
+    }
     w.WriteLine($"            ref {t} first = ref MemoryMarshal.GetReference(span);");
-    w.WriteLine("            if (n == 27)");
-    w.WriteLine("                Sort27(ref first);");
-    w.WriteLine("            else");
-    w.WriteLine("                Sort28(ref first);");
-    w.WriteLine("            return;");
+    WriteScalarSwitchDispatch(w, 23, 32, "            ");
     w.WriteLine("        }");
     w.WriteLine();
     w.WriteLine("        span.Sort();");
@@ -2077,7 +2247,7 @@ void WritePublicApi(StreamWriter w, string t)
             {
                 comparer ??= Comparer<{{t}}>.Default;
                 int n = span.Length;
-                if (n == 27 || n == 28)
+                if (n >= 23 && n <= 32)
                 {
                     ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
                     return;
@@ -2118,7 +2288,7 @@ void WritePublicApi(StreamWriter w, string t)
 
 void WriteStringApi(StreamWriter w)
 {
-    w.Write("""
+    w.Write($$"""
             /// <summary>
             /// Sorts a span of string using a sorting network when possible.
             /// Uses ordinal comparison for maximum performance.
@@ -2126,14 +2296,13 @@ void WriteStringApi(StreamWriter w)
             public static void Sort(Span<string> span)
             {
                 int n = span.Length;
-                if (n == 27 || n == 28)
+                if (n >= 23 && n <= 32)
                 {
                     ref string first = ref MemoryMarshal.GetReference(span);
-                    if (n == 27)
-                        Sort27(ref first);
-                    else
-                        Sort28(ref first);
-                    return;
+
+        """);
+    WriteScalarSwitchDispatch(w, 23, 32, "            ");
+    w.Write($$"""
                 }
 
                 span.Sort(StringComparer.Ordinal);
@@ -2157,7 +2326,7 @@ void WriteStringApi(StreamWriter w)
             {
                 comparer ??= Comparer<string>.Default;
                 int n = span.Length;
-                if (n == 27 || n == 28)
+                if (n >= 23 && n <= 32)
                 {
                     ApplyNetworkWithComparer(span, NetworkData.GetNetwork(n), comparer);
                     return;
@@ -2207,7 +2376,7 @@ void WriteGenericSortT(StreamWriter w)
                 ArgumentNullException.ThrowIfNull(array);
                 ArgumentNullException.ThrowIfNull(comparer);
                 int n = array.Length;
-                if (n == 27 || n == 28)
+                if (n >= 23 && n <= 32)
                 {
                     int[] network = NetworkData.GetNetwork(n);
                     for (int i = 0; i < network.Length; i += 2)
@@ -2247,8 +2416,9 @@ void WriteApiFile(StreamWriter w)
 
         /// <summary>
         /// Provides sorting-network-based sorting for small collections.
-        /// Uses fixed compare-and-swap networks for sizes up to 28, including
-        /// depth-13 networks for 27 and 28 channels from arXiv:2511.04107.
+        /// Uses fixed compare-and-swap networks for sizes up to 32, including
+        /// depth-13 networks for 27 and 28 channels from arXiv:2511.04107
+        /// and Dobbelaere SorterHunter networks for sizes 23–26 and 29–32.
         /// Falls back to the default .NET sort for larger inputs.
         /// </summary>
         public static partial class NetworkSort
@@ -2277,10 +2447,11 @@ void WriteUnrolledFile(StreamWriter w)
     w.WriteLine("public static partial class NetworkSort");
     w.WriteLine("{");
 
+    int[] sizes = [23, 24, 25, 26, 27, 28, 29, 30, 31, 32];
     bool firstMethod = true;
     foreach (string typeName in primitiveTypes.Concat(["string"]))
     {
-        foreach (int n in new[] { 27, 28 })
+        foreach (int n in sizes)
         {
             var pairs = GetNetwork(n);
             if (!firstMethod) w.WriteLine();
