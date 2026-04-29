@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace SortingNetworks.Generators
 {
@@ -14,9 +15,9 @@ namespace SortingNetworks.Generators
         /// <summary>
         /// Returns true if this type can be SIMD-accelerated on x86.
         /// </summary>
-        internal static bool CanEmit(string typeName, int size)
+        internal static bool CanEmit(SpecialType specialType, int size)
         {
-            int elemBytes = ElementSize(typeName);
+            int elemBytes = ElementSize(specialType);
             if (elemBytes <= 0) return false;
             // Max elements we can handle: 4 vectors worth
             int maxElements = MaxElements(elemBytes);
@@ -29,9 +30,9 @@ namespace SortingNetworks.Generators
         /// <summary>
         /// Returns the SIMD guard condition string for the given element type.
         /// </summary>
-        internal static string GetGuardCondition(string typeName)
+        internal static string GetGuardCondition(SpecialType specialType)
         {
-            int elemBytes = ElementSize(typeName);
+            int elemBytes = ElementSize(specialType);
             switch (elemBytes)
             {
                 case 1: return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
@@ -45,15 +46,15 @@ namespace SortingNetworks.Generators
         /// <summary>
         /// Returns true if this type/size can use an AVX2 fallback path (currently 16-bit types, sizes 8-16).
         /// </summary>
-        internal static bool CanEmitAvx2Fallback(string typeName, int size)
+        internal static bool CanEmitAvx2Fallback(SpecialType specialType, int size)
         {
             // 16-bit types: AVX2 fallback for sizes 8-16 (single Vector256<ushort>)
-            if (ElementSize(typeName) == 2 && size >= 8 && size <= 16)
+            if (ElementSize(specialType) == 2 && size >= 8 && size <= 16)
                 return true;
             // double: AVX2 fallback using Permute4x64 on Vector256<double>.
             // long/ulong have no AVX2 min/max intrinsics for 64-bit integers,
             // so they require AVX-512F and cannot use this fallback.
-            if (typeName == "double")
+            if (specialType == SpecialType.System_Double)
             {
                 int regSize = 4; // Vector256<double> holds 4 elements
                 int maxRegs = 7;
@@ -76,28 +77,28 @@ namespace SortingNetworks.Generators
         /// Emits an AVX2 fallback SIMD sort method.
         /// Returns the method source and dispatch code.
         /// </summary>
-        internal static (string MethodSource, string DispatchCode) EmitAvx2Fallback(int size, string typeName, List<List<(int A, int B)>> steps)
+        internal static (string MethodSource, string DispatchCode) EmitAvx2Fallback(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (!CanEmitAvx2Fallback(typeName, size)) return ("", "");
-            if (typeName == "double")
+            if (!CanEmitAvx2Fallback(specialType, size)) return ("", "");
+            if (specialType == SpecialType.System_Double)
                 return EmitDoubleAvx2(size, steps);
-            return EmitShortAvx2(size, typeName, steps);
+            return EmitShortAvx2(size, typeName, specialType, steps);
         }
 
         /// <summary>
         /// Emits a SIMD sort method + dispatch from the public Sort method.
         /// Returns the SIMD method source and the dispatch check to insert into Sort.
         /// </summary>
-        internal static (string MethodSource, string DispatchCode) Emit(int size, string typeName, List<List<(int A, int B)>> steps)
+        internal static (string MethodSource, string DispatchCode) Emit(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            int elemBytes = ElementSize(typeName);
+            int elemBytes = ElementSize(specialType);
 
             switch (elemBytes)
             {
-                case 1: return EmitByte(size, typeName, steps);
-                case 2: return EmitShort(size, typeName, steps);
-                case 4: return EmitInt32(size, typeName, steps);
-                case 8: return EmitInt64(size, typeName, steps);
+                case 1: return EmitByte(size, typeName, specialType, steps);
+                case 2: return EmitShort(size, typeName, specialType, steps);
+                case 4: return EmitInt32(size, typeName, specialType, steps);
+                case 8: return EmitInt64(size, typeName, specialType, steps);
                 default: return ("", "");
             }
         }
@@ -135,7 +136,7 @@ namespace SortingNetworks.Generators
 
         // --- Byte (8-bit) types: single Vector256 for sizes ≤ 32 ---
 
-        private static (string, string) EmitByte(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitByte(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             if (size > 32) return ("", "");
 
@@ -196,8 +197,8 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            // Step {si}: {pairStr}");
                 sb.AppendLine("            {");
                 sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.Vector256.Shuffle(vec, {FmtVec256(perm)});");
-                sb.AppendLine($"                var mins = {MinExprByte(typeName, "vec", "shuffled")};");
-                sb.AppendLine($"                var maxs = {MaxExprByte(typeName, "vec", "shuffled")};");
+                sb.AppendLine($"                var mins = {MinExprByte(specialType, "vec", "shuffled")};");
+                sb.AppendLine($"                var maxs = {MaxExprByte(specialType, "vec", "shuffled")};");
                 sb.AppendLine($"                vec = System.Runtime.Intrinsics.Vector256.ConditionalSelect({FmtVec256(blend)}, maxs, mins);");
                 sb.AppendLine("            }");
             }
@@ -243,7 +244,7 @@ namespace SortingNetworks.Generators
 
         // --- 16-bit types: 4x Vector128 with AVX-512 PermuteVar32x16 ---
 
-        private static (string, string) EmitShort(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitShort(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             // AVX-512 BW: single Vector512 for ≤ 32 elements
             if (size > 32) return ("", "");
@@ -299,8 +300,8 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            // Step {si}: {pairStr}");
                 sb.AppendLine("            {");
                 sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.X86.Avx512BW.PermuteVar32x16(vec, {FmtVec512UShort(perm)});");
-                sb.AppendLine($"                var mins = {MinExprShort(typeName, "vec", "shuffled")};");
-                sb.AppendLine($"                var maxs = {MaxExprShort(typeName, "vec", "shuffled")};");
+                sb.AppendLine($"                var mins = {MinExprShort(specialType, "vec", "shuffled")};");
+                sb.AppendLine($"                var maxs = {MaxExprShort(specialType, "vec", "shuffled")};");
                 sb.AppendLine($"                vec = System.Runtime.Intrinsics.Vector512.ConditionalSelect({FmtVec512UShort(blend)}, maxs, mins);");
                 sb.AppendLine("            }");
             }
@@ -343,7 +344,7 @@ namespace SortingNetworks.Generators
 
         // --- 16-bit types: single Vector256 with AVX2 fallback (sizes 8-16) ---
 
-        private static (string, string) EmitShortAvx2(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitShortAvx2(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             // AVX2: single Vector256<ushort> for ≤ 16 elements
             if (size > 16) return ("", "");
@@ -463,8 +464,8 @@ namespace SortingNetworks.Generators
                     sb.AppendLine($"                    System.Runtime.Intrinsics.X86.Avx2.Shuffle(swapped, {FmtVec256(crossMask)})).AsUInt16();");
                 }
 
-                sb.AppendLine($"                var mins = {MinExprShortAvx2(typeName, "vec", "shuffled")};");
-                sb.AppendLine($"                var maxs = {MaxExprShortAvx2(typeName, "vec", "shuffled")};");
+                sb.AppendLine($"                var mins = {MinExprShortAvx2(specialType, "vec", "shuffled")};");
+                sb.AppendLine($"                var maxs = {MaxExprShortAvx2(specialType, "vec", "shuffled")};");
                 sb.AppendLine($"                vec = System.Runtime.Intrinsics.X86.Avx2.BlendVariable(mins.AsByte(), maxs.AsByte(), {FmtVec256(blendBytes)}).AsUInt16();");
                 sb.AppendLine("            }");
             }
@@ -508,7 +509,7 @@ namespace SortingNetworks.Generators
 
         // --- 32-bit types: multi-Vector256 with AVX2 ---
 
-        private static (string, string) EmitInt32(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitInt32(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             if (size > 32) return ("", "");
 
@@ -683,16 +684,16 @@ namespace SortingNetworks.Generators
 
                     if (blendImm == 0x00)
                     {
-                        sb.AppendLine($"                v{d} = {MinExprInt(typeName, $"v{d}", $"s{d}")};");
+                        sb.AppendLine($"                v{d} = {MinExprInt(specialType, $"v{d}", $"s{d}")};");
                     }
                     else if (blendImm == 0xFF)
                     {
-                        sb.AppendLine($"                v{d} = {MaxExprInt(typeName, $"v{d}", $"s{d}")};");
+                        sb.AppendLine($"                v{d} = {MaxExprInt(specialType, $"v{d}", $"s{d}")};");
                     }
                     else
                     {
-                        sb.AppendLine($"                var min{d} = {MinExprInt(typeName, $"v{d}", $"s{d}")};");
-                        sb.AppendLine($"                var max{d} = {MaxExprInt(typeName, $"v{d}", $"s{d}")};");
+                        sb.AppendLine($"                var min{d} = {MinExprInt(specialType, $"v{d}", $"s{d}")};");
+                        sb.AppendLine($"                var max{d} = {MaxExprInt(specialType, $"v{d}", $"s{d}")};");
                         sb.AppendLine($"                v{d} = System.Runtime.Intrinsics.X86.Avx2.Blend(min{d}, max{d}, 0x{blendImm:X2});");
                     }
                 }
@@ -755,7 +756,7 @@ namespace SortingNetworks.Generators
 
         // --- 64-bit types: multi-Vector256 or AVX-512 ---
 
-        private static (string, string) EmitInt64(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitInt64(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             // AVX-512 required for 64-bit SIMD sort
             if (size > 32) return ("", "");
@@ -895,13 +896,13 @@ namespace SortingNetworks.Generators
                     bool allMax = blendSlice.All(v => v == -1L);
 
                     if (allMin)
-                        sb.AppendLine($"                v{vi} = {MinExprLong(typeName, $"v{vi}", $"shuffled{vi}")};");
+                        sb.AppendLine($"                v{vi} = {MinExprLong(specialType, $"v{vi}", $"shuffled{vi}")};");
                     else if (allMax)
-                        sb.AppendLine($"                v{vi} = {MaxExprLong(typeName, $"v{vi}", $"shuffled{vi}")};");
+                        sb.AppendLine($"                v{vi} = {MaxExprLong(specialType, $"v{vi}", $"shuffled{vi}")};");
                     else
                     {
-                        sb.AppendLine($"                var mins{vi} = {MinExprLong(typeName, $"v{vi}", $"shuffled{vi}")};");
-                        sb.AppendLine($"                var maxs{vi} = {MaxExprLong(typeName, $"v{vi}", $"shuffled{vi}")};");
+                        sb.AppendLine($"                var mins{vi} = {MinExprLong(specialType, $"v{vi}", $"shuffled{vi}")};");
+                        sb.AppendLine($"                var maxs{vi} = {MaxExprLong(specialType, $"v{vi}", $"shuffled{vi}")};");
                         sb.AppendLine($"                v{vi} = System.Runtime.Intrinsics.Vector512.ConditionalSelect({FmtVec512Long(blendSlice)}, maxs{vi}, mins{vi});");
                     }
                 }
@@ -1153,14 +1154,14 @@ namespace SortingNetworks.Generators
 
         // --- Helper methods ---
 
-        private static int ElementSize(string typeName)
+        private static int ElementSize(SpecialType specialType)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "byte": case "sbyte": return 1;
-                case "short": case "ushort": case "char": return 2;
-                case "int": case "uint": case "float": return 4;
-                case "long": case "ulong": case "double": return 8;
+                case SpecialType.System_Byte: case SpecialType.System_SByte: return 1;
+                case SpecialType.System_Int16: case SpecialType.System_UInt16: case SpecialType.System_Char: return 2;
+                case SpecialType.System_Int32: case SpecialType.System_UInt32: case SpecialType.System_Single: return 4;
+                case SpecialType.System_Int64: case SpecialType.System_UInt64: case SpecialType.System_Double: return 8;
                 default: return -1;
             }
         }
@@ -1212,72 +1213,72 @@ namespace SortingNetworks.Generators
         private static string FmtVec512Long(long[] values) =>
             $"System.Runtime.Intrinsics.Vector512.Create({string.Join(", ", values.Select(v => $"{v}L"))})";
 
-        private static string MinExprByte(string typeName, string v, string s) =>
-            typeName == "sbyte"
+        private static string MinExprByte(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_SByte
                 ? $"System.Runtime.Intrinsics.Vector256.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()"
                 : $"System.Runtime.Intrinsics.Vector256.Min({v}, {s})";
 
-        private static string MaxExprByte(string typeName, string v, string s) =>
-            typeName == "sbyte"
+        private static string MaxExprByte(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_SByte
                 ? $"System.Runtime.Intrinsics.Vector256.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()"
                 : $"System.Runtime.Intrinsics.Vector256.Max({v}, {s})";
 
-        private static string MinExprShort(string typeName, string v, string s) =>
-            typeName == "short"
+        private static string MinExprShort(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_Int16
                 ? $"System.Runtime.Intrinsics.X86.Avx512BW.Min({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
                 : $"System.Runtime.Intrinsics.X86.Avx512BW.Min({v}, {s})";
 
-        private static string MaxExprShort(string typeName, string v, string s) =>
-            typeName == "short"
+        private static string MaxExprShort(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_Int16
                 ? $"System.Runtime.Intrinsics.X86.Avx512BW.Max({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
                 : $"System.Runtime.Intrinsics.X86.Avx512BW.Max({v}, {s})";
 
-        private static string MinExprShortAvx2(string typeName, string v, string s) =>
-            typeName == "short"
+        private static string MinExprShortAvx2(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_Int16
                 ? $"System.Runtime.Intrinsics.Vector256.Min({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
                 : $"System.Runtime.Intrinsics.Vector256.Min({v}, {s})";
 
-        private static string MaxExprShortAvx2(string typeName, string v, string s) =>
-            typeName == "short"
+        private static string MaxExprShortAvx2(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_Int16
                 ? $"System.Runtime.Intrinsics.Vector256.Max({v}.AsInt16(), {s}.AsInt16()).AsUInt16()"
                 : $"System.Runtime.Intrinsics.Vector256.Max({v}, {s})";
 
-        private static string MinExprInt(string typeName, string v, string s)
+        private static string MinExprInt(SpecialType specialType, string v, string s)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "uint": return $"System.Runtime.Intrinsics.X86.Avx2.Min({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()";
-                case "float": return $"System.Runtime.Intrinsics.X86.Avx.Min({v}.AsSingle(), {s}.AsSingle()).AsInt32()";
+                case SpecialType.System_UInt32: return $"System.Runtime.Intrinsics.X86.Avx2.Min({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()";
+                case SpecialType.System_Single: return $"System.Runtime.Intrinsics.X86.Avx.Min({v}.AsSingle(), {s}.AsSingle()).AsInt32()";
                 default: return $"System.Runtime.Intrinsics.X86.Avx2.Min({v}, {s})";
             }
         }
 
-        private static string MaxExprInt(string typeName, string v, string s)
+        private static string MaxExprInt(SpecialType specialType, string v, string s)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "uint": return $"System.Runtime.Intrinsics.X86.Avx2.Max({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()";
-                case "float": return $"System.Runtime.Intrinsics.X86.Avx.Max({v}.AsSingle(), {s}.AsSingle()).AsInt32()";
+                case SpecialType.System_UInt32: return $"System.Runtime.Intrinsics.X86.Avx2.Max({v}.AsUInt32(), {s}.AsUInt32()).AsInt32()";
+                case SpecialType.System_Single: return $"System.Runtime.Intrinsics.X86.Avx.Max({v}.AsSingle(), {s}.AsSingle()).AsInt32()";
                 default: return $"System.Runtime.Intrinsics.X86.Avx2.Max({v}, {s})";
             }
         }
 
-        private static string MinExprLong(string typeName, string v, string s)
+        private static string MinExprLong(SpecialType specialType, string v, string s)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "ulong": return $"System.Runtime.Intrinsics.X86.Avx512F.Min({v}.AsUInt64(), {s}.AsUInt64()).AsInt64()";
-                case "double": return $"System.Runtime.Intrinsics.X86.Avx512F.Min({v}.AsDouble(), {s}.AsDouble()).AsInt64()";
+                case SpecialType.System_UInt64: return $"System.Runtime.Intrinsics.X86.Avx512F.Min({v}.AsUInt64(), {s}.AsUInt64()).AsInt64()";
+                case SpecialType.System_Double: return $"System.Runtime.Intrinsics.X86.Avx512F.Min({v}.AsDouble(), {s}.AsDouble()).AsInt64()";
                 default: return $"System.Runtime.Intrinsics.X86.Avx512F.Min({v}, {s})";
             }
         }
 
-        private static string MaxExprLong(string typeName, string v, string s)
+        private static string MaxExprLong(SpecialType specialType, string v, string s)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "ulong": return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}.AsUInt64(), {s}.AsUInt64()).AsInt64()";
-                case "double": return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}.AsDouble(), {s}.AsDouble()).AsInt64()";
+                case SpecialType.System_UInt64: return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}.AsUInt64(), {s}.AsUInt64()).AsInt64()";
+                case SpecialType.System_Double: return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}.AsDouble(), {s}.AsDouble()).AsInt64()";
                 default: return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}, {s})";
             }
         }
