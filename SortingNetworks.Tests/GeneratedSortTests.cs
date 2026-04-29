@@ -245,4 +245,38 @@ public class GeneratedSortTests
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fact]
+    public void Sort16_NInt_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => (nint)rng.Next(-10000, 10000)).ToArray();
+            var expected = (nint[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (nint[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort16_NUInt_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => (nuint)rng.Next(0, 20000)).ToArray();
+            var expected = (nuint[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (nuint[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }

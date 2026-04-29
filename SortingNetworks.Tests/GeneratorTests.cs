@@ -225,6 +225,8 @@ public partial class MySorter { }
     [InlineData(8, "double")]
     [InlineData(16, "double")]
     [InlineData(28, "double")]
+    [InlineData(16, "nint")]
+    [InlineData(16, "nuint")]
     public void SimdCode_Compiles(int size, string typeName)
     {
         var source = $@"
