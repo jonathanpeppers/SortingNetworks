@@ -433,4 +433,58 @@ public partial class MySorter {{ }}
         Assert.Contains("Avx512BW.IsSupported", generatedSource);
         Assert.Contains("Avx2.IsSupported", generatedSource);
     }
+
+    [Fact]
+    public void ComparerOverload_GeneratesCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Should contain the comparer span overload
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("IComparer<int>"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("Sort(System.Span<int> span, System.Collections.Generic.IComparer<int>?", generatedSource);
+        Assert.Contains("Sort(int[] array, System.Collections.Generic.IComparer<int>?", generatedSource);
+        Assert.Contains("ApplyNetworkWithComparer", generatedSource);
+        Assert.Contains("Network4", generatedSource);
+    }
+
+    [Fact]
+    public void ComparerOverload_MultipleTypes_GeneratesCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+[SortingNetwork(4, typeof(double))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("IComparer<int>") && s.Contains("IComparer<double>"));
+        Assert.NotNull(generatedSource);
+    }
 }

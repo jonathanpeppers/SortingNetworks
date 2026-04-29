@@ -505,6 +505,46 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            Sort((System.Span<{typeName}>)array);");
                 sb.AppendLine("        }");
                 sb.AppendLine();
+
+                // Emit comparer Span overload
+                sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network with a custom comparer.</summary>");
+                sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer)");
+                sb.AppendLine("        {");
+                sb.AppendLine($"            comparer ??= System.Collections.Generic.Comparer<{typeName}>.Default;");
+                sb.AppendLine("            int n = span.Length;");
+
+                if (sizes.Count == 1)
+                {
+                    sb.AppendLine($"            if (n == {sizes[0].Size})");
+                    sb.AppendLine("            {");
+                    sb.AppendLine($"                ApplyNetworkWithComparer(span, Network{sizes[0].Size}, comparer);");
+                    sb.AppendLine("                return;");
+                    sb.AppendLine("            }");
+                }
+                else
+                {
+                    var comparerSizeChecks = string.Join(" || ", sizes.Select(s => $"n == {s.Size}"));
+                    sb.AppendLine($"            if ({comparerSizeChecks})");
+                    sb.AppendLine("            {");
+                    foreach (var request in sizes)
+                    {
+                        sb.AppendLine($"                if (n == {request.Size}) {{ ApplyNetworkWithComparer(span, Network{request.Size}, comparer); return; }}");
+                    }
+                    sb.AppendLine("            }");
+                }
+
+                sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                sb.AppendLine("        }");
+                sb.AppendLine();
+
+                // Emit comparer array overload
+                sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network with a custom comparer.</summary>");
+                sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer)");
+                sb.AppendLine("        {");
+                sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
+                sb.AppendLine($"            Sort((System.Span<{typeName}>)array, comparer);");
+                sb.AppendLine("        }");
+                sb.AppendLine();
             }
 
             // Emit private SIMD methods and scalar Sort{size} methods
@@ -610,6 +650,30 @@ namespace SortingNetworks.Generators
                 // Emit scalar method (takes ref T first, matches library pattern)
                 sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
                 sb.AppendLine();
+            }
+
+            // Emit static network data fields (one per size, shared across types)
+            var emittedNetworkSizes = new HashSet<int>();
+            foreach (var request in validRequests)
+            {
+                if (emittedNetworkSizes.Add(request.Size))
+                {
+                    var key = $"{request.TypeName}_{request.Size}";
+                    var network = networksByRequest[key];
+                    sb.Append(ScalarEmitter.EmitNetworkDataField(request.Size, network));
+                    sb.AppendLine();
+                }
+            }
+
+            // Emit ApplyNetworkWithComparer (one per type)
+            var emittedComparerTypes = new HashSet<string>();
+            foreach (var request in validRequests)
+            {
+                if (emittedComparerTypes.Add(request.TypeName))
+                {
+                    sb.Append(ScalarEmitter.EmitApplyNetworkWithComparer(request.TypeName));
+                    sb.AppendLine();
+                }
             }
 
             sb.AppendLine("    }");
