@@ -64,6 +64,8 @@ public class GeneratedSortTests
     [Theory]
     [InlineData(27)]
     [InlineData(28)]
+    [InlineData(48)]
+    [InlineData(64)]
     public void Sort_Double_MatchesArraySort(int size)
     {
         for (int seed = 0; seed < 100; seed++)
@@ -98,6 +100,26 @@ public class GeneratedSortTests
         }
     }
 
+    [Theory]
+    [InlineData(48)]
+    [InlineData(64)]
+    public void Sort_Byte_MatchesArraySort(int size)
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = new byte[size];
+            rng.NextBytes(input);
+            var expected = (byte[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (byte[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
     [Fact]
     public void Sort16_Long_MatchesArraySort()
     {
@@ -109,6 +131,44 @@ public class GeneratedSortTests
             Array.Sort(expected);
 
             var actual = (long[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Theory]
+    [InlineData(48)]
+    [InlineData(64)]
+    public void Sort_UInt_MatchesArraySort(int size)
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, size).Select(_ => (uint)rng.Next(0, int.MaxValue)).ToArray();
+            var expected = (uint[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (uint[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Theory]
+    [InlineData(48)]
+    [InlineData(64)]
+    public void Sort_Float_MatchesArraySort(int size)
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, size).Select(_ => (float)(rng.NextDouble() * 2000 - 1000)).ToArray();
+            var expected = (float[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (float[])input.Clone();
             GeneratedSorters.Sort(actual.AsSpan());
 
             Assert.Equal(expected, actual);
