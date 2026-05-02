@@ -343,7 +343,7 @@ namespace SortingNetworks.Generators
             }
             else
             {
-                // Cross-vector with >4 registers: two-stage TBL
+                // Cross-vector with >4 registers: multi-stage TBL
                 EmitMultiStageTblShuffle(sb, perm, d, regSize, elemBytes, totalSlots, numRegs);
             }
         }
@@ -658,12 +658,6 @@ namespace SortingNetworks.Generators
                 for (int k = 0; k < elemBytes; k++)
                 {
                     groupIndices[group][j * elemBytes + k] = (byte)(byteOffset + k);
-                    // Clear other groups for this byte lane
-                    for (int og = 0; og < numGroups; og++)
-                    {
-                        if (og != group)
-                            groupIndices[og][j * elemBytes + k] = 0xFF;
-                    }
                 }
             }
 
