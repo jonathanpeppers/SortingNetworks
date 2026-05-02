@@ -263,17 +263,12 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            // Step {si}: {pairStr}");
                 sb.AppendLine("            {");
 
-                // Build table tuple string
-                string tableTuple = BuildTableTuple(numRegs);
-
-                // Shuffle phase: ALL use VectorTableLookup for short types
+                // Shuffle phase: use Vector128.Shuffle (TBL1) for intra-register,
+                // VectorTableLookup (TBL4) only for cross-register shuffles
                 for (int d = 0; d < numRegs; d++)
                 {
                     if (!IsVectorModified(perm, d, regSize, totalSlots)) continue;
-
-                    byte[] indices = BuildTblByteIndices(perm, d, regSize, elemBytes, totalSlots);
-
-                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tableTuple}, {FmtVec128(indices)});");
+                    EmitShortShuffle(sb, perm, d, regSize, elemBytes, totalSlots, numRegs, size);
                 }
 
                 // Min/Max/Blend phase
@@ -301,6 +296,68 @@ namespace SortingNetworks.Generators
                 $"            }}\n";
 
             return (sb.ToString(), dispatch);
+        }
+
+        /// <summary>
+        /// Emit the shuffle for a single destination register in the short (16-bit) path.
+        /// Uses Vector128.Shuffle (TBL1) for intra-vector, VectorTableLookup for cross-vector.
+        /// This avoids expensive TBL4 instructions on processors like Ampere Altra where
+        /// TBL4 has significantly higher latency than TBL1.
+        /// </summary>
+        private static void EmitShortShuffle(StringBuilder sb, int[] perm, int d, int regSize, int elemBytes, int totalSlots, int numRegs, int size)
+        {
+            // Check if all active (non-padding) sources come from a single register
+            int singleSrc = -1;
+            bool allFromSame = true;
+            for (int j = 0; j < regSize; j++)
+            {
+                int pos = d * regSize + j;
+                if (pos >= size) break; // skip padding lanes
+                int sr = perm[pos] / regSize;
+                if (singleSrc == -1) singleSrc = sr;
+                else if (sr != singleSrc) { allFromSame = false; break; }
+            }
+
+            if (allFromSame)
+            {
+                // Intra-vector: Vector128.Shuffle (TBL1)
+                byte[] mask = new byte[16];
+                for (int j = 0; j < regSize; j++)
+                {
+                    int pos = d * regSize + j;
+                    if (pos < size)
+                    {
+                        int srcLane = perm[pos] % regSize;
+                        for (int k = 0; k < elemBytes; k++)
+                            mask[j * elemBytes + k] = (byte)(srcLane * elemBytes + k);
+                    }
+                    else
+                    {
+                        // Padding lane: use 0x80 to zero it out
+                        for (int k = 0; k < elemBytes; k++)
+                            mask[j * elemBytes + k] = 0x80;
+                    }
+                }
+
+                bool isIdentity = true;
+                for (int j = 0; j < regSize; j++)
+                {
+                    int pos = d * regSize + j;
+                    if (pos < size && perm[pos] != pos) { isIdentity = false; break; }
+                }
+
+                if (isIdentity)
+                    sb.AppendLine($"                var s{d} = v{singleSrc};");
+                else
+                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Vector128.Shuffle(v{singleSrc}, {FmtVec128(mask)});");
+            }
+            else
+            {
+                // Cross-vector: VectorTableLookup
+                byte[] indices = BuildTblByteIndices(perm, d, regSize, elemBytes, totalSlots);
+                string tableTuple = BuildTableTuple(numRegs);
+                sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tableTuple}, {FmtVec128(indices)});");
+            }
         }
 
         // --- Int32 (32-bit) types: 1-8 Vector128<byte> ---
