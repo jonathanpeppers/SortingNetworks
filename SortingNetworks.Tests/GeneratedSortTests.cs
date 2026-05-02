@@ -279,4 +279,107 @@ public class GeneratedSortTests
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fact]
+    public void Sort_WithComparer_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (int[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan(), Comparer<int>.Default);
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort_WithComparer_ReverseOrder()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected, Comparer<int>.Create((a, b) => b.CompareTo(a)));
+
+            var actual = (int[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan(), Comparer<int>.Create((a, b) => b.CompareTo(a)));
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort_WithComparer_NullComparer_UsesDefault()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (int[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan(), null);
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort_ArrayWithComparer_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            GeneratedSorters.Sort(input, Comparer<int>.Default);
+
+            Assert.Equal(expected, input);
+        }
+    }
+
+    [Fact]
+    public void Sort_ArrayWithComparer_NullArray_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => GeneratedSorters.Sort((int[])null!, Comparer<int>.Default));
+    }
+
+    [Fact]
+    public void Sort_WithComparer_WrongSize_Throws()
+    {
+        var arr = new int[5];
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr.AsSpan(), Comparer<int>.Default));
+    }
+
+    [Fact]
+    public void Sort_ArrayWithComparer_WrongSize_Throws()
+    {
+        var arr = new int[5];
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr, Comparer<int>.Default));
+    }
+
+    [Fact]
+    public void Sort_ArrayWithComparer_NullComparer_UsesDefault()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            GeneratedSorters.Sort(input, null);
+
+            Assert.Equal(expected, input);
+        }
+    }
 }

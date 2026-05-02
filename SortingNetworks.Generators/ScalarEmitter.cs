@@ -45,5 +45,47 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"        }}");
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Emits a static readonly int[] field containing the network comparator pairs for a given size.
+        /// </summary>
+        internal static string EmitNetworkDataField(int size, int[] network)
+        {
+            var sb = new StringBuilder();
+            sb.Append($"        private static readonly int[] Network{size} = new int[] {{ ");
+            for (int i = 0; i < network.Length; i++)
+            {
+                if (i > 0) sb.Append(", ");
+                sb.Append(network[i]);
+            }
+            sb.AppendLine(" };");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Emits a private ApplyNetworkWithComparer method for the given element type.
+        /// Uses the same loop-based pattern as the library's NetworkSort.cs.
+        /// </summary>
+        internal static string EmitApplyNetworkWithComparer(string typeName)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
+            sb.AppendLine($"        private static void ApplyNetworkWithComparer(System.Span<{typeName}> span, int[] network, System.Collections.Generic.IComparer<{typeName}> comparer)");
+            sb.AppendLine($"        {{");
+            sb.AppendLine($"            ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
+            sb.AppendLine($"            for (int i = 0; i < network.Length; i += 2)");
+            sb.AppendLine($"            {{");
+            sb.AppendLine($"                ref {typeName} a = ref System.Runtime.CompilerServices.Unsafe.Add(ref first, network[i]);");
+            sb.AppendLine($"                ref {typeName} b = ref System.Runtime.CompilerServices.Unsafe.Add(ref first, network[i + 1]);");
+            sb.AppendLine($"                if (comparer.Compare(a, b) > 0)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {typeName} temp = a;");
+            sb.AppendLine($"                    a = b;");
+            sb.AppendLine($"                    b = temp;");
+            sb.AppendLine($"                }}");
+            sb.AppendLine($"            }}");
+            sb.AppendLine($"        }}");
+            return sb.ToString();
+        }
     }
 }
