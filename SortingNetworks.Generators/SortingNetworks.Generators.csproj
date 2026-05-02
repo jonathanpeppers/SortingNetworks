@@ -8,6 +8,7 @@
     <NoWarn>$(NoWarn);RS2008</NoWarn>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <IsRoslynComponent>true</IsRoslynComponent>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

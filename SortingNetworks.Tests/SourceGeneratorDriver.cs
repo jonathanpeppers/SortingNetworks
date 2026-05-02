@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
+using SortingNetworks;
 using SortingNetworks.Generators;
 
 namespace SortingNetworks.Tests;
@@ -32,7 +33,10 @@ public static class SourceGeneratorDriver
                 catch { return null; }
             })
             .Where(r => r != null)
-            .ToArray()!;
+            .ToList()!;
+
+        // Add reference to SortingNetworks assembly for the SortingNetworkAttribute type
+        references.Add(MetadataReference.CreateFromFile(typeof(SortingNetworkAttribute).Assembly.Location));
 
         return CSharpCompilation.Create(
             assemblyName,

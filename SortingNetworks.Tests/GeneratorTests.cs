@@ -17,8 +17,8 @@ public partial class MySorter { }
         var compilation = SourceGeneratorDriver.CreateCompilation(source);
         var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
 
-        // Should have generated the attribute + the sort implementation
-        Assert.True(result.GeneratedTrees.Length >= 2, $"Expected at least 2 generated trees, got {result.GeneratedTrees.Length}");
+        // Should have generated the sort implementation
+        Assert.True(result.GeneratedTrees.Length >= 1, $"Expected at least 1 generated tree, got {result.GeneratedTrees.Length}");
 
         // No generator diagnostics (errors)
         var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
@@ -195,7 +195,7 @@ namespace MyApp.Sorting
     }
 
     [Fact]
-    public void NoAttributes_GeneratesOnlyAttributeSource()
+    public void NoAttributes_GeneratesNoSource()
     {
         var source = @"
 public partial class MySorter { }
@@ -203,10 +203,8 @@ public partial class MySorter { }
         var compilation = SourceGeneratorDriver.CreateCompilation(source);
         var result = SourceGeneratorDriver.RunGenerator(compilation);
 
-        // Should generate only the attribute definition, not a sort implementation
-        Assert.Single(result.GeneratedTrees);
-        var text = result.GeneratedTrees[0].GetText().ToString();
-        Assert.Contains("SortingNetworkAttribute", text);
+        // No attributes means no generated source
+        Assert.Empty(result.GeneratedTrees);
     }
 
     [Theory]
