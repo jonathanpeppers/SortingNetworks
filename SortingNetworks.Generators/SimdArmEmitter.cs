@@ -60,14 +60,15 @@ namespace SortingNetworks.Generators
             }
         }
 
-        // --- Byte (8-bit) types: 1-2 Vector128<byte> ---
+        // --- Byte (8-bit) types: 1-4 Vector128<byte> ---
 
         private static (string, string) EmitByte(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (size > 32) return ("", "");
+            if (size > 64) return ("", "");
 
             int regSize = 16;
-            int numRegs = size <= 16 ? 1 : 2;
+            int elemBytes = 1;
+            int numRegs = (size + regSize - 1) / regSize;
             int totalSlots = numRegs * regSize;
 
             var sb = new StringBuilder();
@@ -80,22 +81,13 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
 
             // Load
-            sb.AppendLine("            var v0 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref first);");
-            if (numRegs == 2)
+            if (numRegs == 1)
             {
-                if (size == 32)
-                {
-                    sb.AppendLine("            var v1 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, 16));");
-                }
-                else
-                {
-                    int readOffset = size - 16;
-                    int shiftBytes = 32 - size;
-                    sb.AppendLine($"            var v1 = System.Runtime.Intrinsics.Arm.AdvSimd.ExtractVector128(");
-                    sb.AppendLine($"                System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {readOffset})),");
-                    sb.AppendLine($"                System.Runtime.Intrinsics.Vector128<byte>.Zero,");
-                    sb.AppendLine($"                {shiftBytes});");
-                }
+                sb.AppendLine("            var v0 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref first);");
+            }
+            else
+            {
+                EmitLoad(sb, numRegs, regSize, elemBytes, size);
             }
 
             // Emit steps
@@ -132,7 +124,7 @@ namespace SortingNetworks.Generators
                 }
                 else
                 {
-                    // Two registers: per-register shuffle + min/max/blend
+                    // Multi-register: per-register shuffle + min/max/blend
                     EmitByteShufflePhase(sb, perm, totalSlots, regSize, numRegs);
                     EmitMinMaxBlendPhase(sb, perm, blend, totalSlots, regSize, numRegs, 1, specialType);
                 }
@@ -146,19 +138,9 @@ namespace SortingNetworks.Generators
             {
                 sb.AppendLine("            v0.StoreUnsafe(ref first);");
             }
-            else if (size == 32)
-            {
-                sb.AppendLine("            v1.StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, 16));");
-                sb.AppendLine("            v0.StoreUnsafe(ref first);");
-            }
             else
             {
-                int readOffset = size - 16;
-                int shiftBytes = 32 - size;
-                int storeShift = 16 - shiftBytes;
-                sb.AppendLine($"            System.Runtime.Intrinsics.Arm.AdvSimd.ExtractVector128(System.Runtime.Intrinsics.Vector128<byte>.Zero, v1, {storeShift})");
-                sb.AppendLine($"                .StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {readOffset}));");
-                sb.AppendLine("            v0.StoreUnsafe(ref first);");
+                EmitStore(sb, numRegs, regSize, elemBytes, size);
             }
 
             sb.AppendLine("        }");
@@ -209,7 +191,7 @@ namespace SortingNetworks.Generators
                 }
                 else
                 {
-                    // Cross-register: VectorTableLookup with (v0, v1, zero, zero)
+                    // Cross-register: VectorTableLookup with up to 4 registers
                     byte[] indices = new byte[16];
                     for (int j = 0; j < 16; j++)
                     {
@@ -218,16 +200,17 @@ namespace SortingNetworks.Generators
                         int sl = srcPos % regSize;
                         indices[j] = (byte)(sr * 16 + sl);
                     }
-                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup((v0, v1, System.Runtime.Intrinsics.Vector128<byte>.Zero, System.Runtime.Intrinsics.Vector128<byte>.Zero), {FmtVec128(indices)});");
+                    string tableTuple = BuildTableTuple(numRegs);
+                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tableTuple}, {FmtVec128(indices)});");
                 }
             }
         }
 
-        // --- Short (16-bit) types: 1-4 Vector128<byte> ---
+        // --- Short (16-bit) types: 1-8 Vector128<byte> ---
 
         private static (string, string) EmitShort(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (size > 32) return ("", "");
+            if (size > 64) return ("", "");
 
             int regSize = 8;
             int elemBytes = 2;
@@ -351,20 +334,25 @@ namespace SortingNetworks.Generators
                 else
                     sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Vector128.Shuffle(v{singleSrc}, {FmtVec128(mask)});");
             }
-            else
+            else if (numRegs <= 4)
             {
-                // Cross-vector: VectorTableLookup
+                // Cross-vector with ≤4 registers: single VectorTableLookup
                 byte[] indices = BuildTblByteIndices(perm, d, regSize, elemBytes, totalSlots);
                 string tableTuple = BuildTableTuple(numRegs);
                 sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tableTuple}, {FmtVec128(indices)});");
             }
+            else
+            {
+                // Cross-vector with >4 registers: two-stage TBL
+                EmitMultiStageTblShuffle(sb, perm, d, regSize, elemBytes, totalSlots, numRegs);
+            }
         }
 
-        // --- Int32 (32-bit) types: 1-8 Vector128<byte> ---
+        // --- Int32 (32-bit) types: 1-16 Vector128<byte> ---
 
         private static (string, string) EmitInt32(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (size > 32) return ("", "");
+            if (size > 64) return ("", "");
 
             int regSize = 4;
             int elemBytes = 4;
@@ -494,65 +482,8 @@ namespace SortingNetworks.Generators
             }
             else
             {
-                // Cross-vector with >4 registers: two-stage TBL
-                byte[] indicesA = new byte[16];
-                byte[] indicesB = new byte[16];
-                for (int i = 0; i < 16; i++) { indicesA[i] = 0xFF; indicesB[i] = 0xFF; }
-
-                for (int j = 0; j < regSize; j++)
-                {
-                    int pos = d * regSize + j;
-                    if (pos >= totalSlots) continue;
-
-                    int src = perm[pos];
-                    int srcReg = src / regSize;
-                    int srcLane = src % regSize;
-
-                    if (srcReg < 4)
-                    {
-                        int byteOffset = srcReg * 16 + srcLane * elemBytes;
-                        for (int k = 0; k < elemBytes; k++)
-                        {
-                            indicesA[j * elemBytes + k] = (byte)(byteOffset + k);
-                            indicesB[j * elemBytes + k] = 0xFF;
-                        }
-                    }
-                    else
-                    {
-                        int byteOffset = (srcReg - 4) * 16 + srcLane * elemBytes;
-                        for (int k = 0; k < elemBytes; k++)
-                        {
-                            indicesA[j * elemBytes + k] = 0xFF;
-                            indicesB[j * elemBytes + k] = (byte)(byteOffset + k);
-                        }
-                    }
-                }
-
-                // tableA = (v0, v1, v2, v3)
-                string tupleA = "(v0, v1, v2, v3)";
-
-                // tableB = (v4, v5, v6, v7_or_zero) — pad missing registers with zero
-                var partsB = new string[4];
-                for (int i = 0; i < 4; i++)
-                    partsB[i] = (i + 4) < numRegs ? $"v{i + 4}" : "System.Runtime.Intrinsics.Vector128<byte>.Zero";
-                string tupleB = $"({string.Join(", ", partsB)})";
-
-                bool anyFromA = indicesA.Any(b => b != 0xFF);
-                bool anyFromB = indicesB.Any(b => b != 0xFF);
-
-                if (anyFromA && anyFromB)
-                {
-                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tupleA}, {FmtVec128(indicesA)});");
-                    sb.AppendLine($"                s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookupExtension(s{d}, {tupleB}, {FmtVec128(indicesB)});");
-                }
-                else if (anyFromA)
-                {
-                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tupleA}, {FmtVec128(indicesA)});");
-                }
-                else
-                {
-                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tupleB}, {FmtVec128(indicesB)});");
-                }
+                // Cross-vector with >4 registers: multi-stage TBL
+                EmitMultiStageTblShuffle(sb, perm, d, regSize, elemBytes, totalSlots, numRegs);
             }
         }
 
@@ -681,6 +612,87 @@ namespace SortingNetworks.Generators
         }
 
         /// <summary>
+        /// Builds a table tuple string for a group of 4 registers starting at <paramref name="groupStart"/>.
+        /// Missing registers are padded with Vector128&lt;byte&gt;.Zero.
+        /// </summary>
+        private static string BuildTableTupleForGroup(int groupStart, int numRegs)
+        {
+            var parts = new string[4];
+            for (int i = 0; i < 4; i++)
+            {
+                int regIdx = groupStart + i;
+                parts[i] = regIdx < numRegs ? $"v{regIdx}" : "System.Runtime.Intrinsics.Vector128<byte>.Zero";
+            }
+            return $"({string.Join(", ", parts)})";
+        }
+
+        /// <summary>
+        /// Emits a multi-stage TBL shuffle for cross-register permutations with >4 registers.
+        /// Divides registers into groups of 4. The first group with data uses VectorTableLookup,
+        /// subsequent groups use VectorTableLookupExtension.
+        /// </summary>
+        private static void EmitMultiStageTblShuffle(StringBuilder sb, int[] perm, int d, int regSize, int elemBytes, int totalSlots, int numRegs)
+        {
+            int numGroups = (numRegs + 3) / 4;
+
+            // Build per-group index arrays
+            byte[][] groupIndices = new byte[numGroups][];
+            for (int g = 0; g < numGroups; g++)
+            {
+                groupIndices[g] = new byte[16];
+                for (int i = 0; i < 16; i++) groupIndices[g][i] = 0xFF;
+            }
+
+            for (int j = 0; j < regSize; j++)
+            {
+                int pos = d * regSize + j;
+                if (pos >= totalSlots) continue;
+
+                int src = perm[pos];
+                int srcReg = src / regSize;
+                int srcLane = src % regSize;
+                int group = srcReg / 4;
+                int regInGroup = srcReg % 4;
+
+                int byteOffset = regInGroup * 16 + srcLane * elemBytes;
+                for (int k = 0; k < elemBytes; k++)
+                {
+                    groupIndices[group][j * elemBytes + k] = (byte)(byteOffset + k);
+                    // Clear other groups for this byte lane
+                    for (int og = 0; og < numGroups; og++)
+                    {
+                        if (og != group)
+                            groupIndices[og][j * elemBytes + k] = 0xFF;
+                    }
+                }
+            }
+
+            // Find which groups have data
+            bool[] hasData = new bool[numGroups];
+            for (int g = 0; g < numGroups; g++)
+                hasData[g] = groupIndices[g].Any(b => b != 0xFF);
+
+            // Emit: first group with data uses VectorTableLookup, rest use VectorTableLookupExtension
+            bool firstEmitted = false;
+            for (int g = 0; g < numGroups; g++)
+            {
+                if (!hasData[g]) continue;
+
+                string tuple = BuildTableTupleForGroup(g * 4, numRegs);
+
+                if (!firstEmitted)
+                {
+                    sb.AppendLine($"                var s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookup({tuple}, {FmtVec128(groupIndices[g])});");
+                    firstEmitted = true;
+                }
+                else
+                {
+                    sb.AppendLine($"                s{d} = System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.VectorTableLookupExtension(s{d}, {tuple}, {FmtVec128(groupIndices[g])});");
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns true if any element in register d has a non-identity permutation.
         /// </summary>
         private static bool IsVectorModified(int[] perm, int d, int regSize, int totalSlots)
@@ -796,9 +808,9 @@ namespace SortingNetworks.Generators
         {
             switch (elemBytes)
             {
-                case 1: return 32;   // 2 × Vector128<byte>
-                case 2: return 32;   // 4 × Vector128<byte>
-                case 4: return 32;   // 8 × Vector128<byte>
+                case 1: return 64;   // 4 × Vector128<byte>
+                case 2: return 64;   // 8 × Vector128<byte>
+                case 4: return 64;   // 16 × Vector128<byte>
                 default: return 0;   // 64-bit not supported on ARM
             }
         }

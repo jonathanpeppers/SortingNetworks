@@ -180,6 +180,56 @@ public class GeneratedSortTests
     [Fact]
     public void Sort_28Elements_Double() => StressSort(28, rng => rng.NextDouble() * 20000 - 10000, a => GeneratedSorters.Sort(a.AsSpan()));
 
+    // --- Stress tests at sizes 48 and 64 for ARM-SIMD-capable types ---
+
+    [Fact]
+    public void Sort_48Elements_Byte() => StressSort(48, rng => (byte)rng.Next(0, 256), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_Byte() => StressSort(64, rng => (byte)rng.Next(0, 256), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_SByte() => StressSort(48, rng => (sbyte)rng.Next(-128, 128), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_SByte() => StressSort(64, rng => (sbyte)rng.Next(-128, 128), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_Short() => StressSort(48, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_Short() => StressSort(64, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_UShort() => StressSort(48, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_UShort() => StressSort(64, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_Int() => StressSort(48, rng => rng.Next(-10000, 10000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_Int() => StressSort(64, rng => rng.Next(-10000, 10000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_UInt() => StressSort(48, rng => (uint)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_UInt() => StressSort(64, rng => (uint)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_Char() => StressSort(48, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_Char() => StressSort(64, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_48Elements_Float() => StressSort(48, rng => (float)(rng.NextDouble() * 20000 - 10000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_64Elements_Float() => StressSort(64, rng => (float)(rng.NextDouble() * 20000 - 10000), a => GeneratedSorters.Sort(a.AsSpan()));
+
     // --- Random data for all types via Span ---
 
     [Theory]
