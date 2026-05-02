@@ -526,4 +526,98 @@ public partial class MySorter { }
             .FirstOrDefault(s => s.Contains("IComparer<int>") && s.Contains("IComparer<double>"));
         Assert.NotNull(generatedSource);
     }
+
+    [Fact]
+    public void OnFallback_GeneratesCallInsteadOfThrow()
+    {
+        var source = @"
+using SortingNetworks;
+using System;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter
+{
+    static void OnFallback(Span<int> span)
+    {
+        span.Sort();
+    }
+}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("OnFallback(span)"));
+        Assert.NotNull(generatedSource);
+        // Should NOT contain the throw for int
+        Assert.DoesNotContain("throw new System.ArgumentException", generatedSource);
+    }
+
+    [Fact]
+    public void WithoutOnFallback_GeneratesThrow()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort4"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("throw new System.ArgumentException", generatedSource);
+        Assert.DoesNotContain("OnFallback", generatedSource);
+    }
+
+    [Fact]
+    public void OnFallback_MultipleTypes_OnlyFallbackForDefinedType()
+    {
+        var source = @"
+using SortingNetworks;
+using System;
+
+[SortingNetwork(4, typeof(int))]
+[SortingNetwork(4, typeof(double))]
+public partial class MySorter
+{
+    static void OnFallback(Span<int> span)
+    {
+        span.Sort();
+    }
+}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort4"));
+        Assert.NotNull(generatedSource);
+        // int should have OnFallback, double should still throw
+        Assert.Contains("OnFallback(span)", generatedSource);
+        Assert.Contains("throw new System.ArgumentException", generatedSource);
+    }
 }

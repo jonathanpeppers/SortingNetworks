@@ -1233,4 +1233,82 @@ public class GeneratedSortTests
         GeneratedSorters.Sort(input.AsSpan(), null);
         Assert.Equal(expected, input);
     }
+
+    // --- OnFallback tests ---
+
+    [Fact]
+    public void Sort_OnFallback_SortsUnsupportedSize()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 10).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        FallbackSorter.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_OnFallback_SupportedSize_UsesNetwork()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 4).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (int[])input.Clone();
+            FallbackSorter.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort_OnFallback_Double_SortsUnsupportedSize()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 10).Select(_ => rng.NextDouble() * 200 - 100).ToArray();
+        var expected = (double[])input.Clone();
+        Array.Sort(expected);
+
+        FallbackSorter.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_OnFallback_ArrayOverload_SortsUnsupportedSize()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 10).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        FallbackSorter.Sort(input);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_OnFallback_WithComparer_SortsUnsupportedSize()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 10).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected);
+
+        FallbackSorter.Sort(input.AsSpan(), Comparer<int>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_WithoutOnFallback_StillThrows()
+    {
+        var arr = new int[5];
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr));
+    }
 }

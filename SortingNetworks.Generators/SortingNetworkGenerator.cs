@@ -92,6 +92,27 @@ namespace SortingNetworks.Generators
             if (attributes.Count == 0)
                 return null;
 
+            // Detect OnFallback methods: static void OnFallback(Span<T>)
+            var fallbackTypes = new HashSet<string>();
+            foreach (var member in classSymbol.GetMembers("OnFallback"))
+            {
+                if (member is IMethodSymbol method &&
+                    method.IsStatic &&
+                    method.ReturnsVoid &&
+                    method.Parameters.Length == 1)
+                {
+                    var paramType = method.Parameters[0].Type;
+                    if (paramType is INamedTypeSymbol namedType &&
+                        namedType.OriginalDefinition.ToDisplayString() == "System.Span<T>")
+                    {
+                        var typeArg = namedType.TypeArguments[0];
+                        var typeName = GetKeywordName(typeArg.SpecialType)
+                            ?? typeArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        fallbackTypes.Add(typeName);
+                    }
+                }
+            }
+
             var namespaceName = classSymbol.ContainingNamespace.IsGlobalNamespace
                 ? null
                 : classSymbol.ContainingNamespace.ToDisplayString();
@@ -99,7 +120,8 @@ namespace SortingNetworks.Generators
             return new GenerationInfo(
                 classSymbol.Name,
                 namespaceName,
-                attributes.ToArray());
+                attributes.ToArray(),
+                fallbackTypes);
         }
 
         private static void Execute(SourceProductionContext context, ImmutableArray<GenerationInfo?> infos)
@@ -530,7 +552,14 @@ namespace SortingNetworks.Generators
                 }
                 sb.AppendLine("                return;");
                 sb.AppendLine("            }");
-                sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                if (info.FallbackTypes.Contains(typeName))
+                {
+                    sb.AppendLine($"            OnFallback(span);");
+                }
+                else
+                {
+                    sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                }
                 sb.AppendLine("        }");
                 sb.AppendLine();
 
@@ -570,7 +599,14 @@ namespace SortingNetworks.Generators
                     sb.AppendLine("            }");
                 }
 
-                sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                if (info.FallbackTypes.Contains(typeName))
+                {
+                    sb.AppendLine($"            OnFallback(span);");
+                }
+                else
+                {
+                    sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                }
                 sb.AppendLine("        }");
                 sb.AppendLine();
 
@@ -730,12 +766,14 @@ namespace SortingNetworks.Generators
             public string ClassName { get; }
             public string? Namespace { get; }
             public NetworkRequest[] Requests { get; }
+            public HashSet<string> FallbackTypes { get; }
 
-            public GenerationInfo(string className, string? ns, NetworkRequest[] requests)
+            public GenerationInfo(string className, string? ns, NetworkRequest[] requests, HashSet<string> fallbackTypes)
             {
                 ClassName = className;
                 Namespace = ns;
                 Requests = requests;
+                FallbackTypes = fallbackTypes;
             }
         }
 
