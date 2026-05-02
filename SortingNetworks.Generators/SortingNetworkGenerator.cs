@@ -314,8 +314,13 @@ namespace SortingNetworks.Generators
 
                 bool isCustomType = sizes[0].IsCustomType;
 
-                if (!isCustomType)
+                // Custom types: emit comparer-only overloads and skip SIMD/scalar
+                if (isCustomType)
                 {
+                    EmitComparerOverloads(sb, typeName, sizes, defaultNull: true);
+                    continue;
+                }
+
                 // Check which sizes have SIMD support
                 var simdSizes = new List<NetworkRequest>();
                 var avx2FallbackSizes = new List<NetworkRequest>();
@@ -587,12 +592,10 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            Sort((System.Span<{typeName}>)array);");
                 sb.AppendLine("        }");
                 sb.AppendLine();
-                } // end if (!isCustomType)
 
                 // Emit comparer Span overload
-                string comparerDefault = isCustomType ? " = null" : "";
                 sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network with a custom comparer.</summary>");
-                sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
+                sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer)");
                 sb.AppendLine("        {");
                 sb.AppendLine($"            comparer ??= System.Collections.Generic.Comparer<{typeName}>.Default;");
                 sb.AppendLine("            int n = span.Length;");
@@ -630,7 +633,7 @@ namespace SortingNetworks.Generators
 
                 // Emit comparer array overload
                 sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network with a custom comparer.</summary>");
-                sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
+                sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer)");
                 sb.AppendLine("        {");
                 sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
                 sb.AppendLine($"            Sort((System.Span<{typeName}>)array, comparer);");
@@ -781,6 +784,53 @@ namespace SortingNetworks.Generators
             return sb.ToString();
         }
 
+
+        /// <summary>
+        /// Emits Sort(Span&lt;T&gt;, IComparer&lt;T&gt;?) and Sort(T[], IComparer&lt;T&gt;?) overloads.
+        /// When <paramref name="defaultNull"/> is true the comparer parameter gets a <c>= null</c> default.
+        /// </summary>
+        private static void EmitComparerOverloads(StringBuilder sb, string typeName, List<NetworkRequest> sizes, bool defaultNull)
+        {
+            string comparerDefault = defaultNull ? " = null" : "";
+
+            sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network with a custom comparer.</summary>");
+            sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            comparer ??= System.Collections.Generic.Comparer<{typeName}>.Default;");
+            sb.AppendLine("            int n = span.Length;");
+
+            if (sizes.Count == 1)
+            {
+                sb.AppendLine($"            if (n == {sizes[0].Size})");
+                sb.AppendLine("            {");
+                sb.AppendLine($"                ApplyNetworkWithComparer(span, Network{sizes[0].Size}, comparer);");
+                sb.AppendLine("                return;");
+                sb.AppendLine("            }");
+            }
+            else
+            {
+                var comparerSizeChecks = string.Join(" || ", sizes.Select(s => $"n == {s.Size}"));
+                sb.AppendLine($"            if ({comparerSizeChecks})");
+                sb.AppendLine("            {");
+                foreach (var request in sizes)
+                {
+                    sb.AppendLine($"                if (n == {request.Size}) {{ ApplyNetworkWithComparer(span, Network{request.Size}, comparer); return; }}");
+                }
+                sb.AppendLine("            }");
+            }
+
+            sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network with a custom comparer.</summary>");
+            sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
+            sb.AppendLine("        {");
+            sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
+            sb.AppendLine($"            Sort((System.Span<{typeName}>)array, comparer);");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+        }
 
         private sealed class GenerationInfo
         {
