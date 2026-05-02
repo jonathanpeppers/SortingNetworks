@@ -328,8 +328,8 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            if ({sizeChecks})");
                 sb.AppendLine("            {");
 
-                // SIMD dispatch blocks (grouped by guard condition)
-                foreach (var guardGroup in simdGuardGroups)
+                // SIMD dispatch blocks (grouped by guard condition, ordered deterministically)
+                foreach (var guardGroup in simdGuardGroups.OrderBy(kvp => kvp.Key))
                 {
                     var simdGuard = guardGroup.Key;
                     var guardSizes = guardGroup.Value;

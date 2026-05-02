@@ -877,7 +877,11 @@ namespace SortingNetworks.Generators
 
         private static (string, string) EmitInt64(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            // AVX-512 required for 64-bit SIMD sort
+            // AVX-512 required for 64-bit SIMD sort.
+            // Cross-vector shuffle uses PermuteVar8x64x2 which only addresses
+            // 2 source registers per call, limiting us to 4 registers (size 32).
+            if (size > 32) return ("", "");
+
             int regSize = 8; // Vector512<long> holds 8 elements
             int numRegs = (size + regSize - 1) / regSize;
             int totalSlots = numRegs * regSize;
@@ -1291,7 +1295,7 @@ namespace SortingNetworks.Generators
                 case 1: return 64;   // Vector256<byte> (≤32) or Vector512<byte> with VBMI (33-64)
                 case 2: return 32;   // Vector512<ushort>
                 case 4: return 64;   // 8x Vector256<int>
-                case 8: return 64;   // 8x Vector512<long>
+                case 8: return 32;   // 4x Vector512<long> (double uses AVX2 fallback for >32)
                 default: return 0;
             }
         }

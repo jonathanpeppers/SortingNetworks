@@ -140,16 +140,35 @@ public class GeneratedSortTests
     [Theory]
     [InlineData(48)]
     [InlineData(64)]
-    public void Sort_Long_MatchesArraySort(int size)
+    public void Sort_UInt_MatchesArraySort(int size)
     {
         for (int seed = 0; seed < 100; seed++)
         {
             var rng = new Random(seed);
-            var input = Enumerable.Range(0, size).Select(_ => rng.NextInt64(-10000, 10000)).ToArray();
-            var expected = (long[])input.Clone();
+            var input = Enumerable.Range(0, size).Select(_ => (uint)rng.Next(0, int.MaxValue)).ToArray();
+            var expected = (uint[])input.Clone();
             Array.Sort(expected);
 
-            var actual = (long[])input.Clone();
+            var actual = (uint[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Theory]
+    [InlineData(48)]
+    [InlineData(64)]
+    public void Sort_Float_MatchesArraySort(int size)
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, size).Select(_ => (float)(rng.NextDouble() * 2000 - 1000)).ToArray();
+            var expected = (float[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (float[])input.Clone();
             GeneratedSorters.Sort(actual.AsSpan());
 
             Assert.Equal(expected, actual);
