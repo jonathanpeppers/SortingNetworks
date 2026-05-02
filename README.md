@@ -305,12 +305,13 @@ For `double`, AVX-512F SIMD is emitted on x86 when available (four `Vector512`
 registers). On CPUs without AVX-512F, an AVX2 fallback uses seven
 `Vector256<double>` registers (4 elements each) with `Permute4x64` shuffles.
 
-For `nint` and `nuint`, the generated code dispatches to the corresponding fixed-size
-integer sort via `MemoryMarshal.Cast` when SIMD is available for the target type.
-On 64-bit platforms with AVX-512, `nint`/`nuint` dispatch to `long`/`ulong` to
-use AVX-512F SIMD. On 32-bit platforms, they dispatch to `int`/`uint`. When no
-SIMD path exists for the target type (e.g., ARM64 or AVX2-only x86 for 64-bit),
-the scalar unrolled network is used directly to avoid dispatch overhead.
+For `nint` and `nuint`, the generated code delegates to the corresponding fixed-size
+integer sort (`int`/`uint` on 32-bit, `long`/`ulong` on 64-bit) for both SIMD and
+scalar paths. The SIMD path uses `MemoryMarshal.Cast` to reinterpret the span,
+while the scalar path uses `Unsafe.As` to reinterpret the element reference —
+matching the pattern used by dotnet/runtime's `SpanHelpers` for native-sized types.
+This ensures optimal JIT codegen on all platforms by avoiding separate `nint`/`nuint`
+sort methods.
 
 ## Benchmarks
 
