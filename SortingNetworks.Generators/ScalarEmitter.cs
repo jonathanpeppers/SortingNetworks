@@ -52,13 +52,13 @@ namespace SortingNetworks.Generators
         internal static string EmitNetworkDataField(int size, int[] network)
         {
             var sb = new StringBuilder();
-            sb.Append($"        private static readonly int[] Network{size} = [");
+            sb.Append($"        private static readonly int[] Network{size} = new int[] {{ ");
             for (int i = 0; i < network.Length; i++)
             {
                 if (i > 0) sb.Append(", ");
                 sb.Append(network[i]);
             }
-            sb.AppendLine("];");
+            sb.AppendLine(" };");
             return sb.ToString();
         }
 

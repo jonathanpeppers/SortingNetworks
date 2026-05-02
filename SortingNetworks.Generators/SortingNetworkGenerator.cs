@@ -658,9 +658,8 @@ namespace SortingNetworks.Generators
             {
                 if (emittedNetworkSizes.Add(request.Size))
                 {
-                    // Network data is the same for all types at a given size
-                    var network = NetworkDatabase.GetNetwork(request.Size)
-                        ?? BatcherNetworkBuilder.Generate(request.Size);
+                    var key = $"{request.TypeName}_{request.Size}";
+                    var network = networksByRequest[key];
                     sb.Append(ScalarEmitter.EmitNetworkDataField(request.Size, network));
                     sb.AppendLine();
                 }

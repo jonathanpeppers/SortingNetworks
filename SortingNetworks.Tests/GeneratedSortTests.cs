@@ -352,4 +352,34 @@ public class GeneratedSortTests
     {
         Assert.Throws<ArgumentNullException>(() => GeneratedSorters.Sort((int[])null!, Comparer<int>.Default));
     }
+
+    [Fact]
+    public void Sort_WithComparer_WrongSize_Throws()
+    {
+        var arr = new int[5];
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr.AsSpan(), Comparer<int>.Default));
+    }
+
+    [Fact]
+    public void Sort_ArrayWithComparer_WrongSize_Throws()
+    {
+        var arr = new int[5];
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr, Comparer<int>.Default));
+    }
+
+    [Fact]
+    public void Sort_ArrayWithComparer_NullComparer_UsesDefault()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 16).Select(_ => rng.Next(-1000, 1000)).ToArray();
+            var expected = (int[])input.Clone();
+            Array.Sort(expected);
+
+            GeneratedSorters.Sort(input, null);
+
+            Assert.Equal(expected, input);
+        }
+    }
 }
