@@ -760,12 +760,14 @@ public partial class MySorter { }
             .FirstOrDefault(s => s.Contains("IComparer<global::MyRecord>"));
         Assert.NotNull(generatedSource);
 
-        // Should have comparer overload with default null parameter
-        Assert.Contains("comparer = null", generatedSource);
-        Assert.Contains("ApplyNetworkWithComparer", generatedSource);
+        // IComparable<T> value types get a parameterless Sort(Span<T>) with unrolled CompareTo
+        Assert.Contains("public static void Sort(System.Span<global::MyRecord> span)", generatedSource);
+        Assert.Contains(".CompareTo(", generatedSource);
+        Assert.Contains("Sort4(ref first)", generatedSource);
 
-        // Should NOT have parameterless Sort(Span<T>) overload
-        Assert.DoesNotContain("public static void Sort(System.Span<global::MyRecord> span)", generatedSource);
+        // Should also have comparer overload (without default null, since parameterless exists)
+        Assert.Contains("ApplyNetworkWithComparer", generatedSource);
+        Assert.DoesNotContain("comparer = null", generatedSource);
     }
 
     [Fact]
