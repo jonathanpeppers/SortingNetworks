@@ -91,7 +91,13 @@ public class GeneratedSortTests
     public void Sort_28Elements_Short() => StressSort(28, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
+    public void Sort_33Elements_Short() => StressSort(33, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
     public void Sort_48Elements_Short() => StressSort(48, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_63Elements_Short() => StressSort(63, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
     public void Sort_64Elements_Short() => StressSort(64, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
@@ -103,7 +109,13 @@ public class GeneratedSortTests
     public void Sort_28Elements_UShort() => StressSort(28, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
+    public void Sort_33Elements_UShort() => StressSort(33, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
     public void Sort_48Elements_UShort() => StressSort(48, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_63Elements_UShort() => StressSort(63, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
     public void Sort_64Elements_UShort() => StressSort(64, rng => (ushort)rng.Next(0, 2000), a => GeneratedSorters.Sort(a.AsSpan()));
@@ -145,7 +157,13 @@ public class GeneratedSortTests
     public void Sort_28Elements_Char() => StressSort(28, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
+    public void Sort_33Elements_Char() => StressSort(33, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
     public void Sort_48Elements_Char() => StressSort(48, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_63Elements_Char() => StressSort(63, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
     public void Sort_64Elements_Char() => StressSort(64, rng => (char)rng.Next(32, 127), a => GeneratedSorters.Sort(a.AsSpan()));
