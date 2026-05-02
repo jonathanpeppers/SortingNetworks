@@ -132,6 +132,23 @@ namespace SortingNetworks.Generators
                     needsSimdUsing = true;
                     break;
                 }
+
+                // nint/nuint delegate to fixed-size types for SIMD
+                var delegateTypes = GetNativeIntDelegateTypes(request.TypeName);
+                if (delegateTypes != null)
+                {
+                    var (type32, type64) = delegateTypes.Value;
+                    if (SimdX86Emitter.CanEmit(type32, request.Size) ||
+                        SimdX86Emitter.CanEmitAvx2Fallback(type32, request.Size) ||
+                        SimdArmEmitter.CanEmit(type32, request.Size) ||
+                        SimdX86Emitter.CanEmit(type64, request.Size) ||
+                        SimdX86Emitter.CanEmitAvx2Fallback(type64, request.Size) ||
+                        SimdArmEmitter.CanEmit(type64, request.Size))
+                    {
+                        needsSimdUsing = true;
+                        break;
+                    }
+                }
             }
             if (needsSimdUsing)
             {
@@ -165,6 +182,8 @@ namespace SortingNetworks.Generators
             var simdStepsByRequest = new Dictionary<string, List<List<(int A, int B)>>>();
             var avx2FallbackStepsByRequest = new Dictionary<string, List<List<(int A, int B)>>>();
             var simdArmStepsByRequest = new Dictionary<string, List<List<(int A, int B)>>>();
+            // Track nint/nuint → delegate type SIMD info (keyed by delegate type key, e.g. "int_16")
+            var nativeIntSimdKeys = new Dictionary<string, HashSet<string>>();
             foreach (var request in validRequests)
             {
                 var key = $"{request.TypeName}_{request.Size}";
@@ -190,6 +209,37 @@ namespace SortingNetworks.Generators
                     if (armCanEmit)
                         simdArmStepsByRequest[key] = decomposedSteps;
                 }
+
+                // For nint/nuint, compute SIMD info for the delegate types
+                var delegateTypes = GetNativeIntDelegateTypes(request.TypeName);
+                if (delegateTypes != null)
+                {
+                    var (type32, type64) = delegateTypes.Value;
+                    var decomposedSteps = SimdX86Emitter.DecomposeIntoSteps(network);
+                    var delegateKeys = new HashSet<string>();
+
+                    foreach (var delegateType in new[] { type32, type64 })
+                    {
+                        var delegateKey = $"{delegateType}_{request.Size}";
+                        bool delegateCanEmitSimd = SimdX86Emitter.CanEmit(delegateType, request.Size);
+                        bool delegateCanEmitAvx2 = SimdX86Emitter.CanEmitAvx2Fallback(delegateType, request.Size);
+                        bool delegateCanEmitArm = SimdArmEmitter.CanEmit(delegateType, request.Size);
+
+                        if (delegateCanEmitSimd || delegateCanEmitAvx2 || delegateCanEmitArm)
+                        {
+                            delegateKeys.Add(delegateKey);
+                            if (delegateCanEmitSimd && !simdStepsByRequest.ContainsKey(delegateKey))
+                                simdStepsByRequest[delegateKey] = decomposedSteps;
+                            if (delegateCanEmitAvx2 && !avx2FallbackStepsByRequest.ContainsKey(delegateKey))
+                                avx2FallbackStepsByRequest[delegateKey] = decomposedSteps;
+                            if (delegateCanEmitArm && !simdArmStepsByRequest.ContainsKey(delegateKey))
+                                simdArmStepsByRequest[delegateKey] = decomposedSteps;
+                        }
+                    }
+
+                    if (delegateKeys.Count > 0)
+                        nativeIntSimdKeys[key] = delegateKeys;
+                }
             }
 
             // Emit one public Sort overload per type with flattened dispatch
@@ -204,6 +254,8 @@ namespace SortingNetworks.Generators
                 var simdSizes = new List<NetworkRequest>();
                 var avx2FallbackSizes = new List<NetworkRequest>();
                 var simdArmSizes = new List<NetworkRequest>();
+                // For nint/nuint, track which sizes have SIMD via delegation
+                var nativeIntSimdSizes = new List<NetworkRequest>();
                 foreach (var request in sizes)
                 {
                     var key = $"{request.TypeName}_{request.Size}";
@@ -213,6 +265,8 @@ namespace SortingNetworks.Generators
                         avx2FallbackSizes.Add(request);
                     if (simdArmStepsByRequest.ContainsKey(key))
                         simdArmSizes.Add(request);
+                    if (nativeIntSimdKeys.ContainsKey(key))
+                        nativeIntSimdSizes.Add(request);
                 }
 
                 // Determine the SIMD guard condition strings
@@ -310,6 +364,120 @@ namespace SortingNetworks.Generators
                     sb.AppendLine("                }");
                 }
 
+                // nint/nuint SIMD dispatch via MemoryMarshal.Cast to fixed-size types
+                if (nativeIntSimdSizes.Count > 0)
+                {
+                    var nativeDelegate = GetNativeIntDelegateTypes(typeName)!.Value;
+                    var (type32, type64) = nativeDelegate;
+
+                    // 64-bit path (nint.Size == 8)
+                    {
+                        var sizes64 = new List<NetworkRequest>();
+                        foreach (var request in nativeIntSimdSizes)
+                        {
+                            var delegateKey = $"{type64}_{request.Size}";
+                            if (simdStepsByRequest.ContainsKey(delegateKey) ||
+                                avx2FallbackStepsByRequest.ContainsKey(delegateKey) ||
+                                simdArmStepsByRequest.ContainsKey(delegateKey))
+                            {
+                                sizes64.Add(request);
+                            }
+                        }
+                        if (sizes64.Count > 0)
+                        {
+                            sb.AppendLine($"                if ({typeName}.Size == 8)");
+                            sb.AppendLine("                {");
+                            // x86 SIMD for 64-bit delegate type
+                            if (sizes64.Any(r => SimdX86Emitter.CanEmit(type64, r.Size)))
+                            {
+                                string guard64 = SimdX86Emitter.GetGuardCondition(type64);
+                                sb.AppendLine($"                    if ({guard64})");
+                                sb.AppendLine("                    {");
+                                foreach (var request in sizes64)
+                                {
+                                    if (SimdX86Emitter.CanEmit(type64, request.Size))
+                                        sb.AppendLine($"                        if (n == {request.Size}) {{ SortSimd{request.Size}_{type64}(System.Runtime.InteropServices.MemoryMarshal.Cast<{typeName}, {type64}>(span)); return; }}");
+                                }
+                                sb.AppendLine("                    }");
+                            }
+                            // ARM SIMD for 64-bit delegate type
+                            if (sizes64.Any(r => SimdArmEmitter.CanEmit(type64, r.Size)))
+                            {
+                                string armGuard64 = SimdArmEmitter.GetGuardCondition(type64);
+                                sb.AppendLine($"                    if ({armGuard64})");
+                                sb.AppendLine("                    {");
+                                foreach (var request in sizes64)
+                                {
+                                    if (SimdArmEmitter.CanEmit(type64, request.Size))
+                                        sb.AppendLine($"                        if (n == {request.Size}) {{ SortSimdArm{request.Size}_{type64}(System.Runtime.InteropServices.MemoryMarshal.Cast<{typeName}, {type64}>(span)); return; }}");
+                                }
+                                sb.AppendLine("                    }");
+                            }
+                            sb.AppendLine("                }");
+                        }
+                    }
+
+                    // 32-bit path (nint.Size == 4)
+                    {
+                        var sizes32 = new List<NetworkRequest>();
+                        foreach (var request in nativeIntSimdSizes)
+                        {
+                            var delegateKey = $"{type32}_{request.Size}";
+                            if (simdStepsByRequest.ContainsKey(delegateKey) ||
+                                avx2FallbackStepsByRequest.ContainsKey(delegateKey) ||
+                                simdArmStepsByRequest.ContainsKey(delegateKey))
+                            {
+                                sizes32.Add(request);
+                            }
+                        }
+                        if (sizes32.Count > 0)
+                        {
+                            sb.AppendLine($"                if ({typeName}.Size == 4)");
+                            sb.AppendLine("                {");
+                            // x86 SIMD for 32-bit delegate type
+                            if (sizes32.Any(r => SimdX86Emitter.CanEmit(type32, r.Size)))
+                            {
+                                string guard32 = SimdX86Emitter.GetGuardCondition(type32);
+                                sb.AppendLine($"                    if ({guard32})");
+                                sb.AppendLine("                    {");
+                                foreach (var request in sizes32)
+                                {
+                                    if (SimdX86Emitter.CanEmit(type32, request.Size))
+                                        sb.AppendLine($"                        if (n == {request.Size}) {{ SortSimd{request.Size}_{type32}(System.Runtime.InteropServices.MemoryMarshal.Cast<{typeName}, {type32}>(span)); return; }}");
+                                }
+                                sb.AppendLine("                    }");
+                            }
+                            // AVX2 fallback for 32-bit delegate type
+                            if (sizes32.Any(r => SimdX86Emitter.CanEmitAvx2Fallback(type32, r.Size)))
+                            {
+                                string avx2Guard = SimdX86Emitter.GetAvx2FallbackGuardCondition();
+                                sb.AppendLine($"                    if ({avx2Guard})");
+                                sb.AppendLine("                    {");
+                                foreach (var request in sizes32)
+                                {
+                                    if (SimdX86Emitter.CanEmitAvx2Fallback(type32, request.Size))
+                                        sb.AppendLine($"                        if (n == {request.Size}) {{ SortSimdAvx2_{request.Size}_{type32}(System.Runtime.InteropServices.MemoryMarshal.Cast<{typeName}, {type32}>(span)); return; }}");
+                                }
+                                sb.AppendLine("                    }");
+                            }
+                            // ARM SIMD for 32-bit delegate type
+                            if (sizes32.Any(r => SimdArmEmitter.CanEmit(type32, r.Size)))
+                            {
+                                string armGuard32 = SimdArmEmitter.GetGuardCondition(type32);
+                                sb.AppendLine($"                    if ({armGuard32})");
+                                sb.AppendLine("                    {");
+                                foreach (var request in sizes32)
+                                {
+                                    if (SimdArmEmitter.CanEmit(type32, request.Size))
+                                        sb.AppendLine($"                        if (n == {request.Size}) {{ SortSimdArm{request.Size}_{type32}(System.Runtime.InteropServices.MemoryMarshal.Cast<{typeName}, {type32}>(span)); return; }}");
+                                }
+                                sb.AppendLine("                    }");
+                            }
+                            sb.AppendLine("                }");
+                        }
+                    }
+                }
+
                 // Scalar fallback: get ref and dispatch
                 sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
                 if (sizes.Count == 1)
@@ -340,6 +508,7 @@ namespace SortingNetworks.Generators
             }
 
             // Emit private SIMD methods and scalar Sort{size} methods
+            var emittedSimdMethods = new HashSet<string>();
             foreach (var request in validRequests)
             {
                 var key = $"{request.TypeName}_{request.Size}";
@@ -351,6 +520,7 @@ namespace SortingNetworks.Generators
                     var (simdMethod, _) = SimdX86Emitter.Emit(request.Size, request.TypeName, simdSteps);
                     if (!string.IsNullOrEmpty(simdMethod))
                     {
+                        emittedSimdMethods.Add($"SortSimd{request.Size}_{request.TypeName}");
                         sb.AppendLine(simdMethod);
                         sb.AppendLine();
                     }
@@ -362,6 +532,7 @@ namespace SortingNetworks.Generators
                     var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(request.Size, request.TypeName, avx2Steps);
                     if (!string.IsNullOrEmpty(avx2Method))
                     {
+                        emittedSimdMethods.Add($"SortSimdAvx2_{request.Size}_{request.TypeName}");
                         sb.AppendLine(avx2Method);
                         sb.AppendLine();
                     }
@@ -373,8 +544,66 @@ namespace SortingNetworks.Generators
                     var (armMethod, _) = SimdArmEmitter.Emit(request.Size, request.TypeName, armSteps);
                     if (!string.IsNullOrEmpty(armMethod))
                     {
+                        emittedSimdMethods.Add($"SortSimdArm{request.Size}_{request.TypeName}");
                         sb.AppendLine(armMethod);
                         sb.AppendLine();
+                    }
+                }
+
+                // Emit SIMD methods for nint/nuint delegate types
+                if (nativeIntSimdKeys.TryGetValue(key, out var delegateKeySet))
+                {
+                    foreach (var delegateKey in delegateKeySet)
+                    {
+                        // Parse delegate type and size from key "type_size"
+                        var parts = delegateKey.Split('_');
+                        var delegateType = parts[0];
+                        var delegateSize = int.Parse(parts[1]);
+
+                        if (simdStepsByRequest.TryGetValue(delegateKey, out var delegateSimdSteps))
+                        {
+                            var methodName = $"SortSimd{delegateSize}_{delegateType}";
+                            if (!emittedSimdMethods.Contains(methodName))
+                            {
+                                var (simdMethod, _) = SimdX86Emitter.Emit(delegateSize, delegateType, delegateSimdSteps);
+                                if (!string.IsNullOrEmpty(simdMethod))
+                                {
+                                    emittedSimdMethods.Add(methodName);
+                                    sb.AppendLine(simdMethod);
+                                    sb.AppendLine();
+                                }
+                            }
+                        }
+
+                        if (avx2FallbackStepsByRequest.TryGetValue(delegateKey, out var delegateAvx2Steps))
+                        {
+                            var methodName = $"SortSimdAvx2_{delegateSize}_{delegateType}";
+                            if (!emittedSimdMethods.Contains(methodName))
+                            {
+                                var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(delegateSize, delegateType, delegateAvx2Steps);
+                                if (!string.IsNullOrEmpty(avx2Method))
+                                {
+                                    emittedSimdMethods.Add(methodName);
+                                    sb.AppendLine(avx2Method);
+                                    sb.AppendLine();
+                                }
+                            }
+                        }
+
+                        if (simdArmStepsByRequest.TryGetValue(delegateKey, out var delegateArmSteps))
+                        {
+                            var methodName = $"SortSimdArm{delegateSize}_{delegateType}";
+                            if (!emittedSimdMethods.Contains(methodName))
+                            {
+                                var (armMethod, _) = SimdArmEmitter.Emit(delegateSize, delegateType, delegateArmSteps);
+                                if (!string.IsNullOrEmpty(armMethod))
+                                {
+                                    emittedSimdMethods.Add(methodName);
+                                    sb.AppendLine(armMethod);
+                                    sb.AppendLine();
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -430,6 +659,18 @@ namespace SortingNetworks
                 Namespace = ns;
                 Requests = requests;
             }
+        }
+
+        /// <summary>
+        /// Returns the fixed-size delegate types for nint/nuint SIMD dispatch.
+        /// For nint: 32-bit=int, 64-bit=long. For nuint: 32-bit=uint, 64-bit=ulong.
+        /// Returns null for non-native integer types.
+        /// </summary>
+        private static (string Type32, string Type64)? GetNativeIntDelegateTypes(string typeName)
+        {
+            if (typeName == "nint") return ("int", "long");
+            if (typeName == "nuint") return ("uint", "ulong");
+            return null;
         }
 
         private sealed class NetworkRequest
