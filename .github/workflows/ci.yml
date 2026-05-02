@@ -34,7 +34,7 @@ jobs:
       - name: Verify NuGet package
         run: >
           dotnet run --project samples/SortingNetworks.Sample
-          -p:RestoreAdditionalProjectSources=$(pwd)/SortingNetworks/bin/Release
+          -p:RestoreSources=$(pwd)/SortingNetworks/bin/Release
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
