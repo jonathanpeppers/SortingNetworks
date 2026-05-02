@@ -1252,6 +1252,8 @@ public class GeneratedSortTests
     [Fact]
     public void Sort_OnFallback_SupportedSize_UsesNetwork()
     {
+        FallbackSorter.FallbackCallCount = 0;
+
         for (int seed = 0; seed < 50; seed++)
         {
             var rng = new Random(seed);
@@ -1264,6 +1266,8 @@ public class GeneratedSortTests
 
             Assert.Equal(expected, actual);
         }
+
+        Assert.Equal(0, FallbackSorter.FallbackCallCount);
     }
 
     [Fact]
@@ -1301,6 +1305,19 @@ public class GeneratedSortTests
         Array.Sort(expected);
 
         FallbackSorter.Sort(input.AsSpan(), Comparer<int>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_OnFallback_WithCustomComparer_SortsUnsupportedSize()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 10).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])input.Clone();
+        Array.Sort(expected, Comparer<int>.Create((a, b) => b.CompareTo(a)));
+
+        FallbackSorter.Sort(input.AsSpan(), Comparer<int>.Create((a, b) => b.CompareTo(a)));
 
         Assert.Equal(expected, input);
     }

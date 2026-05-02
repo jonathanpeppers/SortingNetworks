@@ -92,23 +92,41 @@ namespace SortingNetworks.Generators
             if (attributes.Count == 0)
                 return null;
 
-            // Detect OnFallback methods: static void OnFallback(Span<T>)
+            // Detect OnFallback methods: static void OnFallback(Span<T>) and OnFallback(Span<T>, IComparer<T>)
             var fallbackTypes = new HashSet<string>();
+            var fallbackTypesWithComparer = new HashSet<string>();
             foreach (var member in classSymbol.GetMembers("OnFallback"))
             {
                 if (member is IMethodSymbol method &&
                     method.IsStatic &&
-                    method.ReturnsVoid &&
-                    method.Parameters.Length == 1)
+                    method.ReturnsVoid)
                 {
-                    var paramType = method.Parameters[0].Type;
-                    if (paramType is INamedTypeSymbol namedType &&
-                        namedType.OriginalDefinition.ToDisplayString() == "System.Span<T>")
+                    if (method.Parameters.Length == 1)
                     {
-                        var typeArg = namedType.TypeArguments[0];
-                        var typeName = GetKeywordName(typeArg.SpecialType)
-                            ?? typeArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-                        fallbackTypes.Add(typeName);
+                        var paramType = method.Parameters[0].Type;
+                        if (paramType is INamedTypeSymbol namedType &&
+                            namedType.OriginalDefinition.ToDisplayString() == "System.Span<T>")
+                        {
+                            var typeArg = namedType.TypeArguments[0];
+                            var typeName = GetKeywordName(typeArg.SpecialType)
+                                ?? typeArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                            fallbackTypes.Add(typeName);
+                        }
+                    }
+                    else if (method.Parameters.Length == 2)
+                    {
+                        var spanParam = method.Parameters[0].Type;
+                        var comparerParam = method.Parameters[1].Type;
+                        if (spanParam is INamedTypeSymbol spanType &&
+                            spanType.OriginalDefinition.ToDisplayString() == "System.Span<T>" &&
+                            comparerParam is INamedTypeSymbol comparerType &&
+                            comparerType.OriginalDefinition.ToDisplayString() == "System.Collections.Generic.IComparer<T>")
+                        {
+                            var typeArg = spanType.TypeArguments[0];
+                            var typeName = GetKeywordName(typeArg.SpecialType)
+                                ?? typeArg.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                            fallbackTypesWithComparer.Add(typeName);
+                        }
                     }
                 }
             }
@@ -121,7 +139,8 @@ namespace SortingNetworks.Generators
                 classSymbol.Name,
                 namespaceName,
                 attributes.ToArray(),
-                fallbackTypes);
+                fallbackTypes,
+                fallbackTypesWithComparer);
         }
 
         private static void Execute(SourceProductionContext context, ImmutableArray<GenerationInfo?> infos)
@@ -599,9 +618,9 @@ namespace SortingNetworks.Generators
                     sb.AppendLine("            }");
                 }
 
-                if (info.FallbackTypes.Contains(typeName))
+                if (info.FallbackTypesWithComparer.Contains(typeName))
                 {
-                    sb.AppendLine($"            OnFallback(span);");
+                    sb.AppendLine($"            OnFallback(span, comparer);");
                 }
                 else
                 {
@@ -767,13 +786,15 @@ namespace SortingNetworks.Generators
             public string? Namespace { get; }
             public NetworkRequest[] Requests { get; }
             public HashSet<string> FallbackTypes { get; }
+            public HashSet<string> FallbackTypesWithComparer { get; }
 
-            public GenerationInfo(string className, string? ns, NetworkRequest[] requests, HashSet<string> fallbackTypes)
+            public GenerationInfo(string className, string? ns, NetworkRequest[] requests, HashSet<string> fallbackTypes, HashSet<string> fallbackTypesWithComparer)
             {
                 ClassName = className;
                 Namespace = ns;
                 Requests = requests;
                 FallbackTypes = fallbackTypes;
+                FallbackTypesWithComparer = fallbackTypesWithComparer;
             }
         }
 
