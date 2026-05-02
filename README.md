@@ -309,9 +309,9 @@ shuffles:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| int | 105 ns | 67 ns | **1.6x** |
-| uint | 122 ns | 63 ns | **1.9x** |
-| float | 2,330 ns | 92 ns | **25x** |
+| int | 98 ns | 81 ns | **1.2x** |
+| uint | 120 ns | 82 ns | **1.5x** |
+| float | 2,263 ns | 90 ns | **25x** |
 
 > **Note:** These results are from an AMD EPYC 9V74 on GitHub Actions
 > (ubuntu-latest), which double-pumps 512-bit operations through 256-bit
@@ -331,10 +331,10 @@ cross-vector shuffles are used:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,200 ns | 29 ns | **41x** |
-| sbyte | 1,230 ns | 30 ns | **41x** |
-| short | 1,264 ns | 54 ns | **23x** |
-| ushort | 1,254 ns | 54 ns | **23x** |
+| byte | 1,591 ns | 31 ns | **51x** |
+| sbyte | 1,222 ns | 34 ns | **36x** |
+| short | 1,234 ns | 48 ns | **26x** |
+| ushort | 1,232 ns | 52 ns | **24x** |
 
 For `int`, `uint`, and `float`, seven `Vector128` registers with two-stage
 TBL/TBX cross-vector shuffles are used (with TBL1 optimization for single-register
@@ -342,7 +342,7 @@ shuffles and early-exit for sorted input):
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,363 ns | 78 ns | **17x** |
+| float | 1,533 ns | 74 ns | **21x** |
 
 > **Note:** `float` benefits enormously because .NET's `Array.Sort` does not
 > have a SIMD-accelerated path for `float` on ARM64.
@@ -354,9 +354,9 @@ GeneratedSort's NEON path still provides improvements:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| char | 98 ns | 50 ns | **2.0x** |
-| int | 98 ns | 78 ns | **1.3x** |
-| uint | 108 ns | 75 ns | **1.4x** |
+| char | 104 ns | 51 ns | **2.0x** |
+| int | 100 ns | 74 ns | **1.4x** |
+| uint | 114 ns | 76 ns | **1.5x** |
 
 #### Other types (scalar unrolled network)
 
@@ -365,8 +365,8 @@ speedup over `Array.Sort` as on x86:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,523 ns | 111 ns | **14x** |
-| long | 1,254 ns | 106 ns | **12x** |
+| double | 1,521 ns | 156 ns | **10x** |
+| long | 1,297 ns | 105 ns | **12x** |
 
 ### int detailed results (AVX2 SIMD)
 
@@ -385,16 +385,16 @@ speedup over `Array.Sort` as on x86:
 
 | Size | Kind | GeneratedSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 78 ns | **0.80x** (20% faster) |
-| 27 | Sorted | 29 ns | **0.51x** (49% faster) |
-| 27 | Reversed | 79 ns | 1.33x |
-| 27 | Duplicates | 79 ns | **0.81x** (19% faster) |
-| 28 | Random | 78 ns | **0.66x** (34% faster) |
-| 28 | Sorted | 30 ns | **0.54x** (46% faster) |
-| 28 | Reversed | 75 ns | 1.21x |
-| 28 | Duplicates | 76 ns | **0.73x** (27% faster) |
+| 27 | Random | 74 ns | **0.74x** (26% faster) |
+| 27 | Sorted | 30 ns | **0.52x** (48% faster) |
+| 27 | Reversed | 78 ns | 1.22x |
+| 27 | Duplicates | 77 ns | **0.72x** (28% faster) |
+| 28 | Random | 80 ns | **0.65x** (35% faster) |
+| 28 | Sorted | 30 ns | **0.51x** (49% faster) |
+| 28 | Reversed | 73 ns | 1.15x |
+| 28 | Duplicates | 80 ns | **0.73x** (27% faster) |
 
-> With AVX2 SIMD, GeneratedSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the early-exit sorted check eliminates the previous 1.5x regression on sorted data (now 2x faster), and TBL1 optimization improves random/duplicate performance ~10%. Reversed input remains slightly slower due to the overhead of cross-vector TBL/TBX shuffles with 7 registers.
+> With AVX2 SIMD, GeneratedSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the early-exit sorted check makes sorted input ~2x faster than ArraySort. Reversed input is slightly slower due to the overhead of cross-vector TBL/TBX shuffles with 7 registers.
 
 ## Building
 
