@@ -804,7 +804,7 @@ namespace SortingNetworks.Generators
             {
                 case 1: return 64;   // 4 × Vector128<byte>
                 case 2: return 64;   // 8 × Vector128<byte>
-                case 4: return 64;   // 16 × Vector128<byte>
+                case 4: return 32;   // 8 × Vector128<byte>, multi-stage TBL too costly beyond this
                 default: return 0;   // 64-bit not supported on ARM
             }
         }
