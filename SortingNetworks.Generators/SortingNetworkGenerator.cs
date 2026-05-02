@@ -84,7 +84,7 @@ namespace SortingNetworks.Generators
                 if (sizeArg.Value is int size && typeArg.Value is INamedTypeSymbol typeSymbol)
                 {
                     var typeName = GetKeywordName(typeSymbol.SpecialType)
-                        ?? typeSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        ?? typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                     attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType));
                 }
             }
@@ -171,13 +171,6 @@ namespace SortingNetworks.Generators
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.InvalidSize, Location.None, request.Size, MinSize, MaxSize));
-                    continue;
-                }
-
-                if (!SupportedSpecialTypes.Contains(request.SpecialType))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptors.UnsupportedType, Location.None, request.TypeName));
                     continue;
                 }
 
@@ -319,6 +312,10 @@ namespace SortingNetworks.Generators
                 var sizes = kvp.Value;
                 sizes.Sort((a, b) => a.Size.CompareTo(b.Size));
 
+                bool isCustomType = sizes[0].IsCustomType;
+
+                if (!isCustomType)
+                {
                 // Check which sizes have SIMD support
                 var simdSizes = new List<NetworkRequest>();
                 var avx2FallbackSizes = new List<NetworkRequest>();
@@ -366,7 +363,7 @@ namespace SortingNetworks.Generators
                 sb.AppendLine("            {");
 
                 // SIMD dispatch blocks (grouped by guard condition, ordered deterministically)
-                foreach (var guardGroup in simdGuardGroups.OrderBy(kvp => kvp.Key))
+                foreach (var guardGroup in simdGuardGroups.OrderBy(kvp2 => kvp2.Key))
                 {
                     var simdGuard = guardGroup.Key;
                     var guardSizes = guardGroup.Value;
@@ -590,10 +587,12 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            Sort((System.Span<{typeName}>)array);");
                 sb.AppendLine("        }");
                 sb.AppendLine();
+                } // end if (!isCustomType)
 
                 // Emit comparer Span overload
+                string comparerDefault = isCustomType ? " = null" : "";
                 sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network with a custom comparer.</summary>");
-                sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer)");
+                sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
                 sb.AppendLine("        {");
                 sb.AppendLine($"            comparer ??= System.Collections.Generic.Comparer<{typeName}>.Default;");
                 sb.AppendLine("            int n = span.Length;");
@@ -631,7 +630,7 @@ namespace SortingNetworks.Generators
 
                 // Emit comparer array overload
                 sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network with a custom comparer.</summary>");
-                sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer)");
+                sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
                 sb.AppendLine("        {");
                 sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
                 sb.AppendLine($"            Sort((System.Span<{typeName}>)array, comparer);");
@@ -740,9 +739,12 @@ namespace SortingNetworks.Generators
                     }
                 }
 
-                // Emit scalar method (takes ref T first, matches library pattern)
-                sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
-                sb.AppendLine();
+                // Emit scalar method (takes ref T first, matches library pattern) — skip for custom types
+                if (!request.IsCustomType)
+                {
+                    sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
+                    sb.AppendLine();
+                }
             }
 
             // Emit static network data fields (one per size, shared across types)
@@ -815,12 +817,14 @@ namespace SortingNetworks.Generators
             public int Size { get; }
             public string TypeName { get; }
             public SpecialType SpecialType { get; }
+            public bool IsCustomType { get; }
 
             public NetworkRequest(int size, string typeName, SpecialType specialType)
             {
                 Size = size;
                 TypeName = typeName;
                 SpecialType = specialType;
+                IsCustomType = !SupportedSpecialTypes.Contains(specialType);
             }
         }
     }

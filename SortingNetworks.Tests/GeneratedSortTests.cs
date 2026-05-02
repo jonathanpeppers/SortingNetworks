@@ -1328,4 +1328,146 @@ public class GeneratedSortTests
         var arr = new int[5];
         Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr));
     }
+
+    // --- Custom type (Point) tests ---
+
+    private static Point RandomPoint(Random rng) => new Point(rng.Next(-1000, 1000), rng.Next(-1000, 1000));
+
+    [Theory]
+    [InlineData(4)]
+    [InlineData(27)]
+    [InlineData(28)]
+    public void Sort_CustomType_MatchesArraySort(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => RandomPoint(rng)).ToArray();
+        var expected = (Point[])input.Clone();
+        Array.Sort(expected);
+
+        var actual = (Point[])input.Clone();
+        GeneratedSorters.Sort(actual.AsSpan());
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(27)]
+    [InlineData(28)]
+    public void Sort_CustomType_StressTest(int size)
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, size).Select(_ => RandomPoint(rng)).ToArray();
+            var expected = (Point[])input.Clone();
+            Array.Sort(expected);
+
+            var actual = (Point[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort_CustomType_WithExplicitComparer()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => RandomPoint(rng)).ToArray();
+        var expected = (Point[])input.Clone();
+        Array.Sort(expected);
+
+        var actual = (Point[])input.Clone();
+        GeneratedSorters.Sort(actual.AsSpan(), Comparer<Point>.Default);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Sort_CustomType_ReverseComparer()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => RandomPoint(rng)).ToArray();
+        var expected = (Point[])input.Clone();
+        Array.Sort(expected, Comparer<Point>.Create((a, b) => b.CompareTo(a)));
+
+        var actual = (Point[])input.Clone();
+        GeneratedSorters.Sort(actual.AsSpan(), Comparer<Point>.Create((a, b) => b.CompareTo(a)));
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Sort_CustomType_NullComparer_UsesDefault()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => RandomPoint(rng)).ToArray();
+        var expected = (Point[])input.Clone();
+        Array.Sort(expected);
+
+        var actual = (Point[])input.Clone();
+        GeneratedSorters.Sort(actual.AsSpan(), (IComparer<Point>?)null);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Sort_CustomType_ArrayOverload()
+    {
+        var rng = new Random(42);
+        var input = Enumerable.Range(0, 27).Select(_ => RandomPoint(rng)).ToArray();
+        var expected = (Point[])input.Clone();
+        Array.Sort(expected);
+
+        GeneratedSorters.Sort(input, Comparer<Point>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_CustomType_ArrayOverload_NullArray_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => GeneratedSorters.Sort((Point[]?)null!, Comparer<Point>.Default));
+    }
+
+    [Fact]
+    public void Sort_CustomType_WrongSize_Throws()
+    {
+        var arr = new Point[10];
+        Assert.Throws<ArgumentException>(() => GeneratedSorters.Sort(arr.AsSpan()));
+    }
+
+    [Fact]
+    public void Sort_CustomType_AlreadySorted()
+    {
+        var input = Enumerable.Range(0, 27).Select(i => new Point(i, 0)).ToArray();
+        var expected = (Point[])input.Clone();
+
+        GeneratedSorters.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_CustomType_ReverseSorted()
+    {
+        var input = Enumerable.Range(0, 27).Select(i => new Point(27 - i, 0)).ToArray();
+        var expected = (Point[])input.Clone();
+        Array.Sort(expected);
+
+        GeneratedSorters.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
+
+    [Fact]
+    public void Sort_CustomType_AllDuplicates()
+    {
+        var input = Enumerable.Range(0, 27).Select(_ => new Point(42, 7)).ToArray();
+        var expected = (Point[])input.Clone();
+
+        GeneratedSorters.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
 }
