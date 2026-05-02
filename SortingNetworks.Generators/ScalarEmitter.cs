@@ -27,11 +27,15 @@ namespace SortingNetworks.Generators
             sb.AppendLine();
 
             // Emit compare-and-swap for each pair
+            bool isString = typeName == "string";
             for (int i = 0; i < network.Length; i += 2)
             {
                 int a = network[i];
                 int b = network[i + 1];
-                sb.AppendLine($"            if (e{a} > e{b}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
+                string condition = isString
+                    ? $"string.CompareOrdinal(e{a}, e{b}) > 0"
+                    : $"e{a} > e{b}";
+                sb.AppendLine($"            if ({condition}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
             }
             sb.AppendLine();
 
