@@ -45,4 +45,6 @@ namespace SortingNetworks.Tests;
 [SortingNetwork(27, typeof(double))]
 [SortingNetwork(28, typeof(double))]
 [SortingNetwork(16, typeof(double))]
+[SortingNetwork(27, typeof(string))]
+[SortingNetwork(28, typeof(string))]
 partial class GeneratedSorters { }

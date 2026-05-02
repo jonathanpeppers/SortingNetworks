@@ -26,7 +26,8 @@ namespace SortingNetworks.Generators
             SpecialType.System_Int64, SpecialType.System_UInt64,
             SpecialType.System_Char,
             SpecialType.System_Single, SpecialType.System_Double,
-            SpecialType.System_IntPtr, SpecialType.System_UIntPtr
+            SpecialType.System_IntPtr, SpecialType.System_UIntPtr,
+            SpecialType.System_String
         };
 
         /// <summary>
@@ -49,6 +50,7 @@ namespace SortingNetworks.Generators
             SpecialType.System_Double => "double",
             SpecialType.System_IntPtr => "nint",
             SpecialType.System_UIntPtr => "nuint",
+            SpecialType.System_String => "string",
             _ => null,
         };
 

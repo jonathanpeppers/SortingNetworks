@@ -397,6 +397,32 @@ public partial class MySorter { }
             generatedSource);
     }
 
+    [Fact]
+    public void Sort_String_GeneratesCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(8, typeof(string))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify string.CompareOrdinal is used instead of > operator
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort8"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("string.CompareOrdinal", generatedSource);
+    }
+
     [Theory]
     [InlineData(8, "ushort")]
     [InlineData(16, "ushort")]
