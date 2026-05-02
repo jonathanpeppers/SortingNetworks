@@ -430,8 +430,8 @@ For other types without SIMD-optimized `Array.Sort` in the BCL:
 | short | 1,719 ns | 154 ns | **11x** |
 | ushort | 1,589 ns | 154 ns | **10x** |
 | long | 1,696 ns | 147 ns | **12x** |
-| nint | 1,867 ns | 166 ns | **11x** |
-| nuint | 1,742 ns | 175 ns | **10x** |
+| nint | 1,854 ns | 155 ns | **12x** |
+| nuint | 1,780 ns | 142 ns | **13x** |
 | string | 941 ns | 678 ns | **1.4x** |
 
 > **Note:** These results are from an AMD EPYC 9V74 on GitHub Actions
@@ -490,6 +490,8 @@ speedup over `Array.Sort` as on x86:
 |---|---|---|---|
 | double | 1,461 ns | 110 ns | **13x** |
 | long | 1,122 ns | 100 ns | **11x** |
+| nint | 1,133 ns | 101 ns | **11x** |
+| nuint | 1,135 ns | 101 ns | **11x** |
 
 ### ARM64 (Ampere Neoverse-N2, AdvSimd/NEON)
 
@@ -508,6 +510,15 @@ Apple Silicon. The TBL1 optimization for intra-register shuffles is critical her
 > **Note:** Without the TBL1 optimization, `char` size 27 was 135 ns — slower
 > than ArraySort (97 ns). The optimization reduced it to 68 ns, a **2x
 > improvement** that made GeneratedSort 1.6x faster than ArraySort.
+
+#### Other types (scalar unrolled network)
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| long | 2,059 ns | 139 ns | **15x** |
+| nint | 2,081 ns | 147 ns | **14x** |
+| nuint | 2,083 ns | 142 ns | **15x** |
+| double | 2,442 ns | 149 ns | **16x** |
 
 ### int detailed results (AVX2 SIMD)
 
