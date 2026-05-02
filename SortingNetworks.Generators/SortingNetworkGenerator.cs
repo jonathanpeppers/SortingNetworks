@@ -302,11 +302,16 @@ namespace SortingNetworks.Generators
                 }
 
                 // Determine the SIMD guard condition strings
-                string? simdGuard = null;
-                if (simdSizes.Count > 0)
+                // Group sizes by guard condition (e.g., byte ≤32 uses AVX2, byte >32 uses VBMI)
+                var simdGuardGroups = new Dictionary<string, List<NetworkRequest>>();
+                foreach (var request in simdSizes)
                 {
-                    simdGuard = SimdX86Emitter.GetGuardCondition(sizes[0].SpecialType);
+                    var guard = SimdX86Emitter.GetGuardCondition(request.SpecialType, request.Size);
+                    if (!simdGuardGroups.ContainsKey(guard))
+                        simdGuardGroups[guard] = new List<NetworkRequest>();
+                    simdGuardGroups[guard].Add(request);
                 }
+
                 string? simdArmGuard = null;
                 if (simdArmSizes.Count > 0)
                 {
@@ -323,23 +328,25 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            if ({sizeChecks})");
                 sb.AppendLine("            {");
 
-                // SIMD dispatch block (if any sizes support SIMD)
-                if (simdGuard != null && simdSizes.Count > 0)
+                // SIMD dispatch blocks (grouped by guard condition)
+                foreach (var guardGroup in simdGuardGroups)
                 {
+                    var simdGuard = guardGroup.Key;
+                    var guardSizes = guardGroup.Value;
                     sb.AppendLine($"                if ({simdGuard})");
                     sb.AppendLine("                {");
-                    if (simdSizes.Count == 1)
+                    if (guardSizes.Count == 1)
                     {
                         // Single SIMD size: guard by length check
-                        sb.AppendLine($"                    if (n == {simdSizes[0].Size})");
+                        sb.AppendLine($"                    if (n == {guardSizes[0].Size})");
                         sb.AppendLine("                    {");
-                        sb.AppendLine($"                        SortSimd{simdSizes[0].Size}_{typeName}(span);");
+                        sb.AppendLine($"                        SortSimd{guardSizes[0].Size}_{typeName}(span);");
                         sb.AppendLine("                        return;");
                         sb.AppendLine("                    }");
                     }
                     else
                     {
-                        foreach (var request in simdSizes)
+                        foreach (var request in guardSizes)
                         {
                             sb.AppendLine($"                    if (n == {request.Size}) {{ SortSimd{request.Size}_{typeName}(span); return; }}");
                         }
@@ -352,7 +359,7 @@ namespace SortingNetworks.Generators
                 {
                     string avx2Guard = SimdX86Emitter.GetAvx2FallbackGuardCondition();
                     // Use "else if" when there's a primary SIMD block above, plain "if" otherwise
-                    string prefix = (simdGuard != null && simdSizes.Count > 0) ? "else if" : "if";
+                    string prefix = simdGuardGroups.Count > 0 ? "else if" : "if";
                     sb.AppendLine($"                {prefix} ({avx2Guard})");
                     sb.AppendLine("                {");
                     if (avx2FallbackSizes.Count == 1)

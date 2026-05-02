@@ -32,10 +32,22 @@ namespace SortingNetworks.Generators
         /// </summary>
         internal static string GetGuardCondition(SpecialType specialType)
         {
+            return GetGuardCondition(specialType, 0);
+        }
+
+        /// <summary>
+        /// Returns the SIMD guard condition string for the given element type and size.
+        /// For byte/sbyte sizes > 32, AVX-512 VBMI is required instead of AVX2.
+        /// </summary>
+        internal static string GetGuardCondition(SpecialType specialType, int size)
+        {
             int elemBytes = ElementSize(specialType);
             switch (elemBytes)
             {
-                case 1: return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
+                case 1:
+                    return size > 32
+                        ? "System.Runtime.Intrinsics.X86.Avx512Vbmi.IsSupported"
+                        : "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
                 case 2: return "System.Runtime.Intrinsics.X86.Avx512BW.IsSupported";
                 case 4: return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
                 case 8: return "System.Runtime.Intrinsics.X86.Avx512F.IsSupported";
@@ -57,8 +69,8 @@ namespace SortingNetworks.Generators
             if (specialType == SpecialType.System_Double)
             {
                 int regSize = 4; // Vector256<double> holds 4 elements
-                int maxRegs = 7;
-                int maxElements = regSize * maxRegs; // 28
+                int maxRegs = 16;
+                int maxElements = regSize * maxRegs; // 64
                 int minSize = 8; // Match the AVX-512 minimum for consistency
                 return size >= minSize && size <= maxElements;
             }
@@ -134,11 +146,11 @@ namespace SortingNetworks.Generators
             return steps;
         }
 
-        // --- Byte (8-bit) types: single Vector256 for sizes ≤ 32 ---
+        // --- Byte (8-bit) types: single Vector256 for sizes ≤ 32, Vector512 for 33-64 ---
 
         private static (string, string) EmitByte(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (size > 32) return ("", "");
+            if (size > 32) return EmitByteAvx512Vbmi(size, typeName, specialType, steps);
 
             var sb = new StringBuilder();
             string suffix = $"_{typeName}";
@@ -234,6 +246,115 @@ namespace SortingNetworks.Generators
             // Dispatch code
             string dispatchSb =
                 $"            if (System.Runtime.Intrinsics.X86.Avx2.IsSupported)\n" +
+                $"            {{\n" +
+                $"                SortSimd{size}{suffix}(span);\n" +
+                $"                return;\n" +
+                $"            }}\n";
+
+            return (sb.ToString(), dispatchSb);
+        }
+
+        // --- Byte (8-bit) types: single Vector512 for sizes 33-64 using AVX-512 VBMI ---
+
+        private static (string, string) EmitByteAvx512Vbmi(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
+        {
+            if (size > 64) return ("", "");
+
+            var sb = new StringBuilder();
+            string suffix = $"_{typeName}";
+
+            sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
+            sb.AppendLine($"        private static void SortSimd{size}{suffix}(System.Span<{typeName}> span)");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
+
+            // Load into Vector512<byte>
+            if (size == 64)
+            {
+                sb.AppendLine("            var vec = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector512<byte>>(ref first);");
+            }
+            else
+            {
+                // Partial: read lower 256 bits directly, upper 256 bits with overlap
+                int hiReadOffset = size - 32;
+                sb.AppendLine("            var lo = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<byte>>(ref first);");
+                sb.AppendLine($"            var hiRaw = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset}));");
+                // Build permutation to rearrange combined [lo | hiRaw] into proper element order.
+                // lo[j] = element j for j in [0..31]
+                // hiRaw[j] = element (hiReadOffset + j) for j in [0..31]
+                // Combined Vector512 index: lo at [0..31], hiRaw at [32..63]
+                // We need position j to hold element j:
+                //   j < 32: element j is at lo[j] → source index j
+                //   j >= 32: element j is at hiRaw[j - hiReadOffset] → source index 32 + (j - hiReadOffset)
+                byte[] loadPerm = new byte[64];
+                for (int i = 0; i < 64; i++)
+                {
+                    if (i < 32)
+                        loadPerm[i] = (byte)i;
+                    else if (i < size)
+                        loadPerm[i] = (byte)(32 + (i - size + 32));
+                    else
+                        loadPerm[i] = 0;
+                }
+                sb.AppendLine($"            var vec = System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(");
+                sb.AppendLine($"                System.Runtime.Intrinsics.Vector512.Create(lo, hiRaw),");
+                sb.AppendLine($"                {FmtVec512Byte(loadPerm)});");
+            }
+
+            // Emit each step
+            for (int si = 0; si < steps.Count; si++)
+            {
+                var step = steps[si];
+                // Build 64-byte permutation
+                byte[] perm = new byte[64];
+                for (int i = 0; i < 64; i++) perm[i] = (byte)i;
+                foreach (var (a, b) in step) { perm[a] = (byte)b; perm[b] = (byte)a; }
+
+                // Build blend mask
+                byte[] blend = new byte[64];
+                foreach (var (a, b) in step)
+                    blend[Math.Max(a, b)] = 0xFF;
+
+                string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+
+                sb.AppendLine();
+                sb.AppendLine($"            // Step {si}: {pairStr}");
+                sb.AppendLine("            {");
+                sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(vec, {FmtVec512Byte(perm)});");
+                sb.AppendLine($"                var mins = {MinExprByte512(specialType, "vec", "shuffled")};");
+                sb.AppendLine($"                var maxs = {MaxExprByte512(specialType, "vec", "shuffled")};");
+                sb.AppendLine($"                vec = System.Runtime.Intrinsics.Vector512.ConditionalSelect({FmtVec512Byte(blend)}, maxs, mins);");
+                sb.AppendLine("            }");
+            }
+
+            // Store results
+            sb.AppendLine();
+            if (size == 64)
+            {
+                sb.AppendLine("            vec.StoreUnsafe(ref first);");
+            }
+            else
+            {
+                int hiReadOffset = size - 32;
+                // Build permutation to extract upper portion for overlapping store
+                byte[] hiStorePerm = new byte[64];
+                for (int i = 0; i < 64; i++) hiStorePerm[i] = 0;
+                for (int i = 0; i < 32; i++)
+                {
+                    int elem = hiReadOffset + i;
+                    if (elem >= 0 && elem < size)
+                        hiStorePerm[32 + i] = (byte)elem;
+                }
+                sb.AppendLine($"            System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(vec, {FmtVec512Byte(hiStorePerm)})");
+                sb.AppendLine($"                .GetUpper().StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset}));");
+                sb.AppendLine("            vec.GetLower().StoreUnsafe(ref first);");
+            }
+
+            sb.AppendLine("        }");
+
+            // Dispatch: requires AVX-512 VBMI
+            string dispatchSb =
+                $"            if (System.Runtime.Intrinsics.X86.Avx512Vbmi.IsSupported)\n" +
                 $"            {{\n" +
                 $"                SortSimd{size}{suffix}(span);\n" +
                 $"                return;\n" +
@@ -511,8 +632,6 @@ namespace SortingNetworks.Generators
 
         private static (string, string) EmitInt32(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (size > 32) return ("", "");
-
             int regSize = 8; // Vector256<int> holds 8 elements
             int numRegs = (size + regSize - 1) / regSize;
             // Pad to numRegs * regSize virtual elements
@@ -759,8 +878,6 @@ namespace SortingNetworks.Generators
         private static (string, string) EmitInt64(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             // AVX-512 required for 64-bit SIMD sort
-            if (size > 32) return ("", "");
-
             int regSize = 8; // Vector512<long> holds 8 elements
             int numRegs = (size + regSize - 1) / regSize;
             int totalSlots = numRegs * regSize;
@@ -951,7 +1068,7 @@ namespace SortingNetworks.Generators
 
         private static (string, string) EmitDoubleAvx2(int size, List<List<(int A, int B)>> steps)
         {
-            if (size < 8 || size > 28) return ("", "");
+            if (size < 8) return ("", "");
 
             int regSize = 4; // Vector256<double> holds 4 elements
             int numRegs = (size + regSize - 1) / regSize;
@@ -1171,10 +1288,10 @@ namespace SortingNetworks.Generators
             // Max elements we support with SIMD
             switch (elemBytes)
             {
-                case 1: return 32;   // Vector256<byte>
+                case 1: return 64;   // Vector256<byte> (≤32) or Vector512<byte> with VBMI (33-64)
                 case 2: return 32;   // Vector512<ushort>
-                case 4: return 32;   // 4x Vector256<int>
-                case 8: return 32;   // 4x Vector512<long>
+                case 4: return 64;   // 8x Vector256<int>
+                case 8: return 64;   // 8x Vector512<long>
                 default: return 0;
             }
         }
@@ -1207,6 +1324,9 @@ namespace SortingNetworks.Generators
         private static string FmtVec512UShort(ushort[] values) =>
             $"System.Runtime.Intrinsics.Vector512.Create((ushort){string.Join(", ", values.Select(v => $"0x{v:X4}"))})";
 
+        private static string FmtVec512Byte(byte[] values) =>
+            $"System.Runtime.Intrinsics.Vector512.Create((byte){string.Join(", ", values.Select(v => $"0x{v:X2}"))})";
+
         private static string FmtVec256UShort(ushort[] values) =>
             $"System.Runtime.Intrinsics.Vector256.Create((ushort){string.Join(", ", values.Select(v => $"0x{v:X4}"))})";
 
@@ -1222,6 +1342,16 @@ namespace SortingNetworks.Generators
             specialType == SpecialType.System_SByte
                 ? $"System.Runtime.Intrinsics.Vector256.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()"
                 : $"System.Runtime.Intrinsics.Vector256.Max({v}, {s})";
+
+        private static string MinExprByte512(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_SByte
+                ? $"System.Runtime.Intrinsics.Vector512.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()"
+                : $"System.Runtime.Intrinsics.Vector512.Min({v}, {s})";
+
+        private static string MaxExprByte512(SpecialType specialType, string v, string s) =>
+            specialType == SpecialType.System_SByte
+                ? $"System.Runtime.Intrinsics.Vector512.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()"
+                : $"System.Runtime.Intrinsics.Vector512.Max({v}, {s})";
 
         private static string MinExprShort(SpecialType specialType, string v, string s) =>
             specialType == SpecialType.System_Int16
