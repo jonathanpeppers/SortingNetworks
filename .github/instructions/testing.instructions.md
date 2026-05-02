@@ -5,7 +5,7 @@ applyTo: "SortingNetworks.Tests/**/*.cs"
 # Testing Conventions
 
 - Use xUnit (`[Fact]`, `[Theory]`, `[MemberData]`).
-- Verify correctness by comparing `NetworkSort.Sort` output against `Array.Sort` on the same input.
+- Verify correctness by comparing `GeneratedSorters.Sort` output against `Array.Sort` on the same input.
 - Test naming: `Sort_<Scenario>` or `Sort_<Size>Elements_<Type>` (e.g., `Sort_27Elements_Int`, `Sort_RandomInts_MatchesArraySort`).
 - Use `VerifySort<T>(length, generator, sort)` helper for parameterized single-seed tests across all lengths.
 - Use `StressSort<T>(size, generator, sort)` helper for multi-seed stress tests (100 seeds) on specific sizes like 27 and 28.

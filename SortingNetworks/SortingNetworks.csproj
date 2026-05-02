@@ -1,18 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>SortingNetworks</PackageId>
-    <Description>Sorting-network-based specializations for small arrays, including depth-13 networks for 27 and 28 channels from arXiv:2511.04107.</Description>
+    <Description>Source generator for sorting-network-based sorting of small arrays, including depth-13 networks for 27 and 28 channels from arXiv:2511.04107.</Description>
     <Authors>Jonathan Peppers</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/jonathanpeppers/SortingNetworks</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jonathanpeppers/SortingNetworks</RepositoryUrl>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
+
+  <!-- Build the generator project (for packing), but don't reference its output -->
+  <ItemGroup>
+    <ProjectReference Include="..\SortingNetworks.Generators\SortingNetworks.Generators.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <!-- Pack the generator DLL as an analyzer -->
+    <None Include="..\SortingNetworks.Generators\bin\$(Configuration)\netstandard2.0\SortingNetworks.Generators.dll"
+          Pack="true"
+          PackagePath="analyzers\dotnet\cs"
+          Visible="false" />
   </ItemGroup>
 
 </Project>

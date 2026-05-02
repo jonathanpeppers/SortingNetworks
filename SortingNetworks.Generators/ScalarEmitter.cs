@@ -4,7 +4,7 @@ namespace SortingNetworks.Generators
 {
     /// <summary>
     /// Emits unrolled scalar compare-and-swap sorting network code.
-    /// Follows the same patterns as the existing NetworkSort.Unrolled.cs:
+    /// Emits unrolled scalar sorting code for a given network size and element type.
     /// uses ref + Unsafe.Add for element access, inline compare-and-swap.
     /// </summary>
     internal static class ScalarEmitter
@@ -68,7 +68,7 @@ namespace SortingNetworks.Generators
 
         /// <summary>
         /// Emits a private ApplyNetworkWithComparer method for the given element type.
-        /// Uses the same loop-based pattern as the library's NetworkSort.cs.
+        /// Uses a loop-based pattern to apply the network with a comparer.
         /// </summary>
         internal static string EmitApplyNetworkWithComparer(string typeName)
         {

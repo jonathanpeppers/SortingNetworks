@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using SortingNetworks;
 
 namespace SortingNetworks.Benchmarks;
 
@@ -43,13 +42,6 @@ public class NUIntSortingBenchmarks
     }
 
     [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
-    public void NetworkSort()
-    {
-        for (int i = 0; i < OpsPerInvoke; i++)
-            SortingNetworks.NetworkSort.Sort(_batch[i]);
-    }
-
-    [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
     public void SpanSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
@@ -57,9 +49,9 @@ public class NUIntSortingBenchmarks
     }
 
     [Benchmark(OperationsPerInvoke = OpsPerInvoke)]
-    public void NetworkSort_Span()
+    public void GeneratedSort()
     {
         for (int i = 0; i < OpsPerInvoke; i++)
-            SortingNetworks.NetworkSort.Sort(_batch[i].AsSpan());
-    }}
-
+            GeneratedSorters.Sort(_batch[i].AsSpan());
+    }
+}
