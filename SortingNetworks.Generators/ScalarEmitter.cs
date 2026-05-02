@@ -12,7 +12,7 @@ namespace SortingNetworks.Generators
         /// <summary>
         /// Emits a scalar Sort method for the given network size and element type.
         /// </summary>
-        internal static string EmitSortMethod(int size, string typeName, int[] network)
+        internal static string EmitSortMethod(int size, string typeName, int[] network, bool useCompareTo = false)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"        private static void Sort{size}(ref {typeName} first)");
@@ -32,9 +32,13 @@ namespace SortingNetworks.Generators
             {
                 int a = network[i];
                 int b = network[i + 1];
-                string condition = isString
-                    ? $"string.CompareOrdinal(e{a}, e{b}) > 0"
-                    : $"e{a} > e{b}";
+                string condition;
+                if (useCompareTo)
+                    condition = $"e{a}.CompareTo(e{b}) > 0";
+                else if (isString)
+                    condition = $"string.CompareOrdinal(e{a}, e{b}) > 0";
+                else
+                    condition = $"e{a} > e{b}";
                 sb.AppendLine($"            if ({condition}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
             }
             sb.AppendLine();

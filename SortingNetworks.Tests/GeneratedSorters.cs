@@ -56,4 +56,7 @@ namespace SortingNetworks.Tests;
 [SortingNetwork(28, typeof(nuint))]
 [SortingNetwork(27, typeof(string))]
 [SortingNetwork(28, typeof(string))]
+[SortingNetwork(4, typeof(Point))]
+[SortingNetwork(27, typeof(Point))]
+[SortingNetwork(28, typeof(Point))]
 partial class GeneratedSorters { }
