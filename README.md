@@ -46,6 +46,40 @@ MySorter.Sort(array);
 MySorter.Sort(data, Comparer<int>.Create((a, b) => b.CompareTo(a)));
 ```
 
+### Handling unsupported sizes
+
+By default, calling `Sort` with a span length that doesn't match any
+`[SortingNetwork]` size throws `ArgumentException`. To handle unsupported
+sizes gracefully, define a static `OnFallback` method in your partial class:
+
+```csharp
+[SortingNetwork(27, typeof(int))]
+partial class MySorter
+{
+    static void OnFallback(Span<int> span)
+    {
+        span.Sort(); // or log, throw a custom exception, etc.
+    }
+
+    // Optional: comparer-aware fallback
+    static void OnFallback(Span<int> span, IComparer<int> comparer)
+    {
+        int[] temp = span.ToArray();
+        Array.Sort(temp, comparer);
+        temp.CopyTo(span);
+    }
+}
+
+MySorter.Sort(data);           // size 27 → sorting network
+MySorter.Sort(otherData);      // any other size → OnFallback
+```
+
+- If no `OnFallback` is defined, unsupported sizes throw (same as before).
+- The 1-parameter overload handles `Sort(Span<T>)` and `Sort(T[])`.
+- The 2-parameter overload handles `Sort(Span<T>, IComparer<T>)` and
+  `Sort(T[], IComparer<T>)`. If only the 1-parameter overload is defined,
+  the comparer path still throws.
+
 The source generator emits optimized sort methods with:
 - **Scalar unrolled** compare-and-swap for all sizes/types
 - **x86 SIMD** (AVX2, AVX-512) when the type and size fit in SIMD registers
