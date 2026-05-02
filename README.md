@@ -16,10 +16,11 @@ Overloads are generated for every primitive .NET type: `byte`, `sbyte`,
 Add the `SortingNetworks` NuGet package, then decorate a `partial class` with
 `[SortingNetwork(size, typeof(T))]` for each size/type combination you need.
 
-> **Target framework:** The generated code uses `System.Runtime.CompilerServices.Unsafe`
-> and `System.Runtime.Intrinsics` (for SIMD paths), which require **.NET 8 or later**.
-> The SIMD paths are guarded by runtime `IsSupported` checks so they compile on all
-> .NET 8+ targets but only execute on hardware that supports them.
+> **Target framework:** The generated SIMD code uses `System.Runtime.Intrinsics`
+> APIs that require **.NET 8 or later**. The scalar-only path uses
+> `System.Runtime.CompilerServices.Unsafe` which is available on **.NET 5+**.
+> Projects targeting older frameworks (e.g., netstandard2.0, .NET Framework)
+> will get compile errors from the generated code.
 
 ```csharp
 using SortingNetworks;
