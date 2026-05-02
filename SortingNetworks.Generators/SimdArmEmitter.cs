@@ -759,7 +759,6 @@ namespace SortingNetworks.Generators
 
         /// <summary>
         /// Emits an early-exit check that returns immediately if the input is already sorted.
-        /// Matches the pattern used in the hand-written generate_unrolled.cs ARM SIMD code.
         /// </summary>
         private static void EmitEarlyExit(StringBuilder sb, int size, string typeName)
         {
