@@ -199,9 +199,13 @@ On CPUs with AVX-512F, an AVX-512F path uses two `Vector512<int>` registers
 
 For `short`, `ushort`, and `char` (16-bit types), AVX-512 SIMD is emitted on x86
 when available, packing all elements into a single `Vector512<ushort>`. On
-ARM64, four `Vector128<byte>` vectors with `VectorTableLookup` (TBL4) provide
-cross-vector shuffles for the same 16-bit types. On platforms without SIMD
-support, this falls back to the scalar unrolled sort.
+ARM64, four `Vector128<byte>` vectors are used for the same 16-bit types.
+When all elements of a shuffled vector come from a single source register,
+`Vector128.Shuffle` (TBL1) is used; otherwise `VectorTableLookup` (TBL4)
+provides cross-vector shuffles. This TBL1 optimization is critical for ARM64
+processors like Ampere Altra/Neoverse where TBL4 has significantly higher
+latency than TBL1. On platforms without SIMD support, this falls back to the
+scalar unrolled sort.
 
 For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is emitted when
 available. The 27-28 elements require seven `Vector128` registers — exceeding
@@ -326,8 +330,10 @@ On ARM64, the library uses AdvSimd (NEON) intrinsics for `byte`, `sbyte`,
 #### SIMD-accelerated types
 
 For `byte` and `sbyte`, all elements fit in two `Vector128<byte>` registers.
-For `short` and `ushort`, four `Vector128<byte>` registers with TBL4
-cross-vector shuffles are used:
+For `short`, `ushort`, and `char`, four `Vector128<byte>` registers are used with
+`Vector128.Shuffle` (TBL1) for intra-register shuffles and TBL4 only for
+cross-register shuffles — avoiding expensive multi-register table lookups on
+ARM cores where TBL4 has high latency:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
@@ -367,6 +373,24 @@ speedup over `Array.Sort` as on x86:
 |---|---|---|---|
 | double | 1,521 ns | 156 ns | **10x** |
 | long | 1,297 ns | 105 ns | **12x** |
+
+### ARM64 (Ampere Neoverse-N2, AdvSimd/NEON)
+
+On Ampere/Neoverse ARM64 cores, TBL4 has significantly higher latency than on
+Apple Silicon. The TBL1 optimization for intra-register shuffles is critical here:
+
+#### char (16-bit) — the key improvement
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| char | 109 ns | 68 ns | **1.6x** |
+| ushort | 1,986 ns | 71 ns | **28x** |
+| short | 1,983 ns | 60 ns | **33x** |
+| byte | 1,962 ns | 57 ns | **34x** |
+
+> **Note:** Without the TBL1 optimization, `char` size 27 was 135 ns — slower
+> than ArraySort (97 ns). The optimization reduced it to 68 ns, a **2x
+> improvement** that made GeneratedSort 1.6x faster than ArraySort.
 
 ### int detailed results (AVX2 SIMD)
 
