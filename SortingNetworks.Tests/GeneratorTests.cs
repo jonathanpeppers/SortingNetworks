@@ -212,8 +212,16 @@ public partial class MySorter { }
     [InlineData(16, "int")]
     [InlineData(28, "int")]
     [InlineData(32, "int")]
+    [InlineData(48, "int")]
+    [InlineData(64, "int")]
+    [InlineData(48, "uint")]
+    [InlineData(64, "uint")]
+    [InlineData(48, "float")]
+    [InlineData(64, "float")]
     [InlineData(8, "byte")]
     [InlineData(16, "byte")]
+    [InlineData(48, "byte")]
+    [InlineData(64, "byte")]
     [InlineData(8, "ushort")]
     [InlineData(16, "ushort")]
     [InlineData(8, "short")]
@@ -223,6 +231,9 @@ public partial class MySorter { }
     [InlineData(8, "double")]
     [InlineData(16, "double")]
     [InlineData(28, "double")]
+    [InlineData(48, "double")]
+    [InlineData(64, "double")]
+    [InlineData(16, "long")]
     [InlineData(16, "nint")]
     [InlineData(16, "nuint")]
     public void SimdCode_Compiles(int size, string typeName)
@@ -253,6 +264,8 @@ public partial class MySorter {{ }}
     [InlineData(8)]
     [InlineData(16)]
     [InlineData(28)]
+    [InlineData(48)]
+    [InlineData(64)]
     public void Sort_Double_GeneratesAvx2Fallback(int size)
     {
         var source = $@"
@@ -276,9 +289,11 @@ public partial class MySorter {{ }}
             .FirstOrDefault(s => s.Contains($"SortSimdAvx2_{size}_double"));
         Assert.NotNull(generatedSource);
 
-        // Verify dispatch includes both AVX-512 and AVX2 paths
-        Assert.Contains("Avx512F.IsSupported", generatedSource);
+        // Verify dispatch includes AVX2 path
         Assert.Contains("Avx2.IsSupported", generatedSource);
+        // Sizes ≤32 also have an AVX-512F primary path
+        if (size <= 32)
+            Assert.Contains("Avx512F.IsSupported", generatedSource);
     }
 
     [Theory]
