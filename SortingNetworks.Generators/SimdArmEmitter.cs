@@ -268,7 +268,7 @@ namespace SortingNetworks.Generators
                 for (int d = 0; d < numRegs; d++)
                 {
                     if (!IsVectorModified(perm, d, regSize, totalSlots)) continue;
-                    EmitShortShuffle(sb, perm, d, regSize, elemBytes, totalSlots, numRegs);
+                    EmitShortShuffle(sb, perm, d, regSize, elemBytes, totalSlots, numRegs, size);
                 }
 
                 // Min/Max/Blend phase
@@ -304,15 +304,15 @@ namespace SortingNetworks.Generators
         /// This avoids expensive TBL4 instructions on processors like Ampere Altra where
         /// TBL4 has significantly higher latency than TBL1.
         /// </summary>
-        private static void EmitShortShuffle(StringBuilder sb, int[] perm, int d, int regSize, int elemBytes, int totalSlots, int numRegs)
+        private static void EmitShortShuffle(StringBuilder sb, int[] perm, int d, int regSize, int elemBytes, int totalSlots, int numRegs, int size)
         {
-            // Check if all sources from a single register
+            // Check if all active (non-padding) sources come from a single register
             int singleSrc = -1;
             bool allFromSame = true;
             for (int j = 0; j < regSize; j++)
             {
                 int pos = d * regSize + j;
-                if (pos >= totalSlots) break;
+                if (pos >= size) break; // skip padding lanes
                 int sr = perm[pos] / regSize;
                 if (singleSrc == -1) singleSrc = sr;
                 else if (sr != singleSrc) { allFromSame = false; break; }
@@ -325,7 +325,7 @@ namespace SortingNetworks.Generators
                 for (int j = 0; j < regSize; j++)
                 {
                     int pos = d * regSize + j;
-                    if (pos < totalSlots)
+                    if (pos < size)
                     {
                         int srcLane = perm[pos] % regSize;
                         for (int k = 0; k < elemBytes; k++)
@@ -333,6 +333,7 @@ namespace SortingNetworks.Generators
                     }
                     else
                     {
+                        // Padding lane: use 0x80 to zero it out
                         for (int k = 0; k < elemBytes; k++)
                             mask[j * elemBytes + k] = 0x80;
                     }
@@ -342,7 +343,7 @@ namespace SortingNetworks.Generators
                 for (int j = 0; j < regSize; j++)
                 {
                     int pos = d * regSize + j;
-                    if (pos < totalSlots && perm[pos] != pos) { isIdentity = false; break; }
+                    if (pos < size && perm[pos] != pos) { isIdentity = false; break; }
                 }
 
                 if (isIdentity)
