@@ -9,7 +9,9 @@ from the paper
 
 Overloads are generated for every primitive .NET type: `byte`, `sbyte`,
 `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `nint`, `nuint`,
-`char`, `float`, and `double`.
+`char`, `float`, `double`, and `string`. Custom value types that implement
+`IComparable<T>` are also supported with unrolled `.CompareTo()` calls,
+and arbitrary types can be sorted via an `IComparer<T>` overload.
 
 ## Usage
 
@@ -44,6 +46,46 @@ MySorter.Sort(array);
 
 // IComparer<T> overload
 MySorter.Sort(data, Comparer<int>.Create((a, b) => b.CompareTo(a)));
+```
+
+### Custom types
+
+Any type can be used with `[SortingNetwork]`. For value types implementing
+`IComparable<T>`, the generator emits unrolled `Sort{N}` methods using
+`.CompareTo()` — the same strategy as primitives, just with `CompareTo`
+instead of `>`:
+
+```csharp
+public record struct Point(int X, int Y) : IComparable<Point>
+{
+    public int CompareTo(Point other)
+    {
+        int cmp = X.CompareTo(other.X);
+        return cmp != 0 ? cmp : Y.CompareTo(other.Y);
+    }
+}
+
+[SortingNetwork(27, typeof(Point))]
+partial class MySorter { }
+
+// Parameterless Sort uses unrolled CompareTo
+Span<Point> points = /* ... */;
+MySorter.Sort(points);
+
+// IComparer<T> overload also available for custom comparers
+MySorter.Sort(points, Comparer<Point>.Create((a, b) => a.Y.CompareTo(b.Y)));
+```
+
+For types that do **not** implement `IComparable<T>`, only the
+`IComparer<T>` overload is generated (the comparer parameter defaults to
+`null` and uses `Comparer<T>.Default` at runtime):
+
+```csharp
+[SortingNetwork(10, typeof(MyClass))]
+partial class MySorter { }
+
+// Must provide a comparer (or rely on Comparer<T>.Default)
+MySorter.Sort(items, myComparer);
 ```
 
 ### Handling unsupported sizes
@@ -85,6 +127,8 @@ The source generator emits optimized sort methods with:
 - **x86 SIMD** (AVX2, AVX-512) when the type and size fit in SIMD registers
 - **ARM64 SIMD** (AdvSimd/NEON) for supported types
 - **IComparer&lt;T&gt;** overloads using loop-based network application
+- **Custom types** via unrolled `.CompareTo()` for `IComparable<T>` value types,
+  or `IComparer<T>` for arbitrary types
 
 ## How it works
 
@@ -215,9 +259,11 @@ paper's reflection-symmetric construction that improved the previous best depth
 bound from 14 to 13.
 
 The source generator emits unrolled methods using type-specific comparisons
-(`>` operator) instead of generic `CompareTo()` calls, which compiles to a
-single CPU comparison instruction and matches the performance of the BCL's
-internal sort helpers.
+(`>` operator) for primitives, `string.CompareOrdinal` for strings, and
+`.CompareTo()` for custom `IComparable<T>` value types. For primitives this
+compiles to a single CPU comparison instruction matching the BCL's internal
+sort helpers; for custom types the JIT can devirtualize `CompareTo` on value
+types, keeping the call nearly as cheap.
 
 For `byte` and `sbyte`, the generator additionally emits SIMD vectorization
 when available — AVX2 on x86 and AdvSimd (NEON) on ARM64. All 27-28 elements
@@ -338,6 +384,22 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
 | string | 1,106 ns | 524 ns | **2.1x** |
+
+#### Custom types (unrolled `.CompareTo()` path)
+
+For custom value types implementing `IComparable<T>`, the generator emits
+unrolled `Sort{N}` methods using `.CompareTo()`. The JIT devirtualizes and
+inlines the call for value types, keeping overhead low:
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| Record (2× int) | 3,839 ns | 1,129 ns | **3.4x** |
+
+> **Note:** These results are from GitHub Actions (ubuntu-latest, AMD EPYC).
+> The `Record` type is a `record struct` with two `int` fields sorted
+> lexicographically. Performance depends on the cost of `CompareTo` — cheap
+> comparisons (like two-int) show ~2-3x on random data; more expensive
+> comparisons would show even larger gains.
 
 ### x86 AVX-512F (AMD EPYC 9V74, GitHub Actions)
 
@@ -495,10 +557,11 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
 - **SortingNetworks.Generators** -- Roslyn incremental source generator that
   emits optimized sorting network code (scalar + SIMD)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering sizes 2-64
-  across all 13 primitive types, with stress tests using 100 random seeds
-  (392 tests)
+  across all 13 primitive types plus custom types, with stress tests using
+  100 random seeds (420 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   generated sort vs `Array.Sort` for sizes 23-64 across all primitive types
+  and custom record structs
 
 ## Paper reference
 
