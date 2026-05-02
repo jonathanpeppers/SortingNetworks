@@ -18,11 +18,38 @@ namespace SortingNetworks.Generators
         private const int MinSize = 2;
         private const int MaxSize = 64;
 
-        private static readonly HashSet<string> SupportedTypes = new HashSet<string>
+        private static readonly HashSet<SpecialType> SupportedSpecialTypes = new HashSet<SpecialType>
         {
-            "byte", "sbyte", "short", "ushort", "int", "uint",
-            "long", "ulong", "char", "float", "double",
-            "nint", "nuint"
+            SpecialType.System_Byte, SpecialType.System_SByte,
+            SpecialType.System_Int16, SpecialType.System_UInt16,
+            SpecialType.System_Int32, SpecialType.System_UInt32,
+            SpecialType.System_Int64, SpecialType.System_UInt64,
+            SpecialType.System_Char,
+            SpecialType.System_Single, SpecialType.System_Double,
+            SpecialType.System_IntPtr, SpecialType.System_UIntPtr
+        };
+
+        /// <summary>
+        /// Maps a <see cref="SpecialType"/> to its C# keyword form so the
+        /// generated code is always in-scope, operator-compatible, and stable
+        /// regardless of target framework or <c>using</c> directives.
+        /// </summary>
+        private static string? GetKeywordName(SpecialType specialType) => specialType switch
+        {
+            SpecialType.System_Byte => "byte",
+            SpecialType.System_SByte => "sbyte",
+            SpecialType.System_Int16 => "short",
+            SpecialType.System_UInt16 => "ushort",
+            SpecialType.System_Int32 => "int",
+            SpecialType.System_UInt32 => "uint",
+            SpecialType.System_Int64 => "long",
+            SpecialType.System_UInt64 => "ulong",
+            SpecialType.System_Char => "char",
+            SpecialType.System_Single => "float",
+            SpecialType.System_Double => "double",
+            SpecialType.System_IntPtr => "nint",
+            SpecialType.System_UIntPtr => "nuint",
+            _ => null,
         };
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -60,7 +87,9 @@ namespace SortingNetworks.Generators
 
                 if (sizeArg.Value is int size && typeArg.Value is INamedTypeSymbol typeSymbol)
                 {
-                    attributes.Add(new NetworkRequest(size, typeSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+                    var typeName = GetKeywordName(typeSymbol.SpecialType)
+                        ?? typeSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                    attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType));
                 }
             }
 
@@ -108,7 +137,7 @@ namespace SortingNetworks.Generators
                     continue;
                 }
 
-                if (!SupportedTypes.Contains(request.TypeName))
+                if (!SupportedSpecialTypes.Contains(request.SpecialType))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.UnsupportedType, Location.None, request.TypeName));
@@ -125,9 +154,9 @@ namespace SortingNetworks.Generators
             bool needsSimdUsing = false;
             foreach (var request in validRequests)
             {
-                if (SimdX86Emitter.CanEmit(request.TypeName, request.Size) ||
-                    SimdX86Emitter.CanEmitAvx2Fallback(request.TypeName, request.Size) ||
-                    SimdArmEmitter.CanEmit(request.TypeName, request.Size))
+                if (SimdX86Emitter.CanEmit(request.SpecialType, request.Size) ||
+                    SimdX86Emitter.CanEmitAvx2Fallback(request.SpecialType, request.Size) ||
+                    SimdArmEmitter.CanEmit(request.SpecialType, request.Size))
                 {
                     needsSimdUsing = true;
                     break;
@@ -195,9 +224,9 @@ namespace SortingNetworks.Generators
                 networksByRequest[key] = network;
 
                 // Decompose the network into steps once, shared by all emitters
-                bool canEmitSimd = SimdX86Emitter.CanEmit(request.TypeName, request.Size);
-                bool canEmitAvx2Fallback = SimdX86Emitter.CanEmitAvx2Fallback(request.TypeName, request.Size);
-                bool armCanEmit = SimdArmEmitter.CanEmit(request.TypeName, request.Size);
+                bool canEmitSimd = SimdX86Emitter.CanEmit(request.SpecialType, request.Size);
+                bool canEmitAvx2Fallback = SimdX86Emitter.CanEmitAvx2Fallback(request.SpecialType, request.Size);
+                bool armCanEmit = SimdArmEmitter.CanEmit(request.SpecialType, request.Size);
 
                 if (canEmitSimd || canEmitAvx2Fallback || armCanEmit)
                 {
@@ -273,12 +302,12 @@ namespace SortingNetworks.Generators
                 string? simdGuard = null;
                 if (simdSizes.Count > 0)
                 {
-                    simdGuard = SimdX86Emitter.GetGuardCondition(typeName);
+                    simdGuard = SimdX86Emitter.GetGuardCondition(sizes[0].SpecialType);
                 }
                 string? simdArmGuard = null;
                 if (simdArmSizes.Count > 0)
                 {
-                    simdArmGuard = SimdArmEmitter.GetGuardCondition(typeName);
+                    simdArmGuard = SimdArmEmitter.GetGuardCondition(sizes[0].SpecialType);
                 }
 
                 sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network based on span length.</summary>");
@@ -517,7 +546,7 @@ namespace SortingNetworks.Generators
                 // Emit x86 SIMD method if applicable
                 if (simdStepsByRequest.TryGetValue(key, out var simdSteps))
                 {
-                    var (simdMethod, _) = SimdX86Emitter.Emit(request.Size, request.TypeName, simdSteps);
+                    var (simdMethod, _) = SimdX86Emitter.Emit(request.Size, request.TypeName, request.SpecialType, simdSteps);
                     if (!string.IsNullOrEmpty(simdMethod))
                     {
                         emittedSimdMethods.Add($"SortSimd{request.Size}_{request.TypeName}");
@@ -529,7 +558,7 @@ namespace SortingNetworks.Generators
                 // Emit AVX2 fallback SIMD method if applicable (16-bit types and double)
                 if (avx2FallbackStepsByRequest.TryGetValue(key, out var avx2Steps))
                 {
-                    var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(request.Size, request.TypeName, avx2Steps);
+                    var (avx2Method, _) = SimdX86Emitter.EmitAvx2Fallback(request.Size, request.TypeName, request.SpecialType, avx2Steps);
                     if (!string.IsNullOrEmpty(avx2Method))
                     {
                         emittedSimdMethods.Add($"SortSimdAvx2_{request.Size}_{request.TypeName}");
@@ -541,7 +570,7 @@ namespace SortingNetworks.Generators
                 // Emit ARM SIMD method if applicable
                 if (simdArmStepsByRequest.TryGetValue(key, out var armSteps))
                 {
-                    var (armMethod, _) = SimdArmEmitter.Emit(request.Size, request.TypeName, armSteps);
+                    var (armMethod, _) = SimdArmEmitter.Emit(request.Size, request.TypeName, request.SpecialType, armSteps);
                     if (!string.IsNullOrEmpty(armMethod))
                     {
                         emittedSimdMethods.Add($"SortSimdArm{request.Size}_{request.TypeName}");
@@ -677,11 +706,13 @@ namespace SortingNetworks
         {
             public int Size { get; }
             public string TypeName { get; }
+            public SpecialType SpecialType { get; }
 
-            public NetworkRequest(int size, string typeName)
+            public NetworkRequest(int size, string typeName, SpecialType specialType)
             {
                 Size = size;
                 TypeName = typeName;
+                SpecialType = specialType;
             }
         }
     }

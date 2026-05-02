@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace SortingNetworks.Generators
 {
@@ -16,9 +17,9 @@ namespace SortingNetworks.Generators
         /// Returns true if this type can be SIMD-accelerated on ARM.
         /// 64-bit types are not supported (no AdvSimd 64-bit integer comparison).
         /// </summary>
-        internal static bool CanEmit(string typeName, int size)
+        internal static bool CanEmit(SpecialType specialType, int size)
         {
-            int elemBytes = ElementSize(typeName);
+            int elemBytes = ElementSize(specialType);
             if (elemBytes <= 0) return false;
             int maxElements = MaxElements(elemBytes);
             if (size > maxElements) return false;
@@ -30,9 +31,9 @@ namespace SortingNetworks.Generators
         /// Returns the SIMD guard condition string for the given element type on ARM.
         /// All supported types require AdvSimd.Arm64 (for VectorTableLookup).
         /// </summary>
-        internal static string GetGuardCondition(string typeName)
+        internal static string GetGuardCondition(SpecialType specialType)
         {
-            int elemBytes = ElementSize(typeName);
+            int elemBytes = ElementSize(specialType);
             switch (elemBytes)
             {
                 case 1: return "System.Runtime.Intrinsics.Arm.AdvSimd.Arm64.IsSupported";
@@ -46,22 +47,22 @@ namespace SortingNetworks.Generators
         /// Emits a SIMD sort method + dispatch from the public Sort method.
         /// Returns the SIMD method source and the dispatch check to insert into Sort.
         /// </summary>
-        internal static (string MethodSource, string DispatchCode) Emit(int size, string typeName, List<List<(int A, int B)>> steps)
+        internal static (string MethodSource, string DispatchCode) Emit(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            int elemBytes = ElementSize(typeName);
+            int elemBytes = ElementSize(specialType);
 
             switch (elemBytes)
             {
-                case 1: return EmitByte(size, typeName, steps);
-                case 2: return EmitShort(size, typeName, steps);
-                case 4: return EmitInt32(size, typeName, steps);
+                case 1: return EmitByte(size, typeName, specialType, steps);
+                case 2: return EmitShort(size, typeName, specialType, steps);
+                case 4: return EmitInt32(size, typeName, specialType, steps);
                 default: return ("", "");
             }
         }
 
         // --- Byte (8-bit) types: 1-2 Vector128<byte> ---
 
-        private static (string, string) EmitByte(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitByte(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             if (size > 32) return ("", "");
 
@@ -122,8 +123,8 @@ namespace SortingNetworks.Generators
                     for (int i = 0; i < 16; i++) mask[i] = perm[i];
 
                     sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.Vector128.Shuffle(v0, {FmtVec128(mask)});");
-                    sb.AppendLine($"                var mins = {MinExpr(typeName, "v0", "shuffled")};");
-                    sb.AppendLine($"                var maxs = {MaxExpr(typeName, "v0", "shuffled")};");
+                    sb.AppendLine($"                var mins = {MinExpr(specialType, "v0", "shuffled")};");
+                    sb.AppendLine($"                var maxs = {MaxExpr(specialType, "v0", "shuffled")};");
 
                     byte[] blendSlice = new byte[16];
                     Array.Copy(blend, 0, blendSlice, 0, 16);
@@ -133,7 +134,7 @@ namespace SortingNetworks.Generators
                 {
                     // Two registers: per-register shuffle + min/max/blend
                     EmitByteShufflePhase(sb, perm, totalSlots, regSize, numRegs);
-                    EmitMinMaxBlendPhase(sb, perm, blend, totalSlots, regSize, numRegs, 1, typeName);
+                    EmitMinMaxBlendPhase(sb, perm, blend, totalSlots, regSize, numRegs, 1, specialType);
                 }
 
                 sb.AppendLine("            }");
@@ -224,7 +225,7 @@ namespace SortingNetworks.Generators
 
         // --- Short (16-bit) types: 1-4 Vector128<byte> ---
 
-        private static (string, string) EmitShort(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitShort(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             if (size > 32) return ("", "");
 
@@ -281,7 +282,7 @@ namespace SortingNetworks.Generators
                     if (!IsVectorModified(perm, d, regSize, totalSlots)) continue;
 
                     byte[] blendSlice = BuildBlendSlice(isMaxPos, d, regSize, elemBytes);
-                    EmitMinMaxBlendForRegister(sb, d, blendSlice, typeName);
+                    EmitMinMaxBlendForRegister(sb, d, blendSlice, specialType);
                 }
 
                 sb.AppendLine("            }");
@@ -304,7 +305,7 @@ namespace SortingNetworks.Generators
 
         // --- Int32 (32-bit) types: 1-8 Vector128<byte> ---
 
-        private static (string, string) EmitInt32(int size, string typeName, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitInt32(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             if (size > 32) return ("", "");
 
@@ -355,7 +356,7 @@ namespace SortingNetworks.Generators
                     if (!IsVectorModified(perm, d, regSize, totalSlots)) continue;
 
                     byte[] blendSlice = BuildBlendSlice(isMaxPos, d, regSize, elemBytes);
-                    EmitMinMaxBlendForRegister(sb, d, blendSlice, typeName);
+                    EmitMinMaxBlendForRegister(sb, d, blendSlice, specialType);
                 }
 
                 sb.AppendLine("            }");
@@ -651,23 +652,23 @@ namespace SortingNetworks.Generators
         /// Emits min/max/blend for a single register using ConditionalSelect.
         /// Optimizes for all-min and all-max cases.
         /// </summary>
-        private static void EmitMinMaxBlendForRegister(StringBuilder sb, int d, byte[] blendSlice, string typeName)
+        private static void EmitMinMaxBlendForRegister(StringBuilder sb, int d, byte[] blendSlice, SpecialType specialType)
         {
             bool allMin = blendSlice.All(v => v == 0);
             bool allMax = blendSlice.All(v => v == 0xFF);
 
             if (allMin)
             {
-                sb.AppendLine($"                v{d} = {MinExpr(typeName, $"v{d}", $"s{d}")};");
+                sb.AppendLine($"                v{d} = {MinExpr(specialType, $"v{d}", $"s{d}")};");
             }
             else if (allMax)
             {
-                sb.AppendLine($"                v{d} = {MaxExpr(typeName, $"v{d}", $"s{d}")};");
+                sb.AppendLine($"                v{d} = {MaxExpr(specialType, $"v{d}", $"s{d}")};");
             }
             else
             {
-                sb.AppendLine($"                var min{d} = {MinExpr(typeName, $"v{d}", $"s{d}")};");
-                sb.AppendLine($"                var max{d} = {MaxExpr(typeName, $"v{d}", $"s{d}")};");
+                sb.AppendLine($"                var min{d} = {MinExpr(specialType, $"v{d}", $"s{d}")};");
+                sb.AppendLine($"                var max{d} = {MaxExpr(specialType, $"v{d}", $"s{d}")};");
                 sb.AppendLine($"                v{d} = System.Runtime.Intrinsics.Vector128.ConditionalSelect({FmtVec128(blendSlice)}, max{d}, min{d});");
             }
         }
@@ -691,7 +692,7 @@ namespace SortingNetworks.Generators
         /// <summary>
         /// Emits min/max/blend for each register in the byte 2-register path.
         /// </summary>
-        private static void EmitMinMaxBlendPhase(StringBuilder sb, byte[] perm, byte[] blend, int totalSlots, int regSize, int numRegs, int elemBytes, string typeName)
+        private static void EmitMinMaxBlendPhase(StringBuilder sb, byte[] perm, byte[] blend, int totalSlots, int regSize, int numRegs, int elemBytes, SpecialType specialType)
         {
             for (int d = 0; d < numRegs; d++)
             {
@@ -705,16 +706,16 @@ namespace SortingNetworks.Generators
 
                 if (allMin)
                 {
-                    sb.AppendLine($"                v{d} = {MinExpr(typeName, $"v{d}", $"s{d}")};");
+                    sb.AppendLine($"                v{d} = {MinExpr(specialType, $"v{d}", $"s{d}")};");
                 }
                 else if (allMax)
                 {
-                    sb.AppendLine($"                v{d} = {MaxExpr(typeName, $"v{d}", $"s{d}")};");
+                    sb.AppendLine($"                v{d} = {MaxExpr(specialType, $"v{d}", $"s{d}")};");
                 }
                 else
                 {
-                    sb.AppendLine($"                var min{d} = {MinExpr(typeName, $"v{d}", $"s{d}")};");
-                    sb.AppendLine($"                var max{d} = {MaxExpr(typeName, $"v{d}", $"s{d}")};");
+                    sb.AppendLine($"                var min{d} = {MinExpr(specialType, $"v{d}", $"s{d}")};");
+                    sb.AppendLine($"                var max{d} = {MaxExpr(specialType, $"v{d}", $"s{d}")};");
                     sb.AppendLine($"                v{d} = System.Runtime.Intrinsics.Vector128.ConditionalSelect({FmtVec128(blendSlice)}, max{d}, min{d});");
                 }
             }
@@ -722,14 +723,14 @@ namespace SortingNetworks.Generators
 
         // --- Type helpers ---
 
-        private static int ElementSize(string typeName)
+        private static int ElementSize(SpecialType specialType)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "byte": case "sbyte": return 1;
-                case "short": case "ushort": case "char": return 2;
-                case "int": case "uint": case "float": return 4;
-                case "long": case "ulong": case "double": return 8;
+                case SpecialType.System_Byte: case SpecialType.System_SByte: return 1;
+                case SpecialType.System_Int16: case SpecialType.System_UInt16: case SpecialType.System_Char: return 2;
+                case SpecialType.System_Int32: case SpecialType.System_UInt32: case SpecialType.System_Single: return 4;
+                case SpecialType.System_Int64: case SpecialType.System_UInt64: case SpecialType.System_Double: return 8;
                 default: return -1;
             }
         }
@@ -783,48 +784,48 @@ namespace SortingNetworks.Generators
 
         // --- Min/Max expression helpers ---
 
-        private static string MinExpr(string typeName, string v, string s)
+        private static string MinExpr(SpecialType specialType, string v, string s)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "byte":
+                case SpecialType.System_Byte:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}, {s})";
-                case "sbyte":
+                case SpecialType.System_SByte:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}.AsSByte(), {s}.AsSByte()).AsByte()";
-                case "short":
+                case SpecialType.System_Int16:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}.AsInt16(), {s}.AsInt16()).AsByte()";
-                case "ushort":
-                case "char":
+                case SpecialType.System_UInt16:
+                case SpecialType.System_Char:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}.AsUInt16(), {s}.AsUInt16()).AsByte()";
-                case "int":
+                case SpecialType.System_Int32:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}.AsInt32(), {s}.AsInt32()).AsByte()";
-                case "uint":
+                case SpecialType.System_UInt32:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}.AsUInt32(), {s}.AsUInt32()).AsByte()";
-                case "float":
+                case SpecialType.System_Single:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Min({v}.AsSingle(), {s}.AsSingle()).AsByte()";
                 default:
                     return "";
             }
         }
 
-        private static string MaxExpr(string typeName, string v, string s)
+        private static string MaxExpr(SpecialType specialType, string v, string s)
         {
-            switch (typeName)
+            switch (specialType)
             {
-                case "byte":
+                case SpecialType.System_Byte:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}, {s})";
-                case "sbyte":
+                case SpecialType.System_SByte:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}.AsSByte(), {s}.AsSByte()).AsByte()";
-                case "short":
+                case SpecialType.System_Int16:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}.AsInt16(), {s}.AsInt16()).AsByte()";
-                case "ushort":
-                case "char":
+                case SpecialType.System_UInt16:
+                case SpecialType.System_Char:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}.AsUInt16(), {s}.AsUInt16()).AsByte()";
-                case "int":
+                case SpecialType.System_Int32:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}.AsInt32(), {s}.AsInt32()).AsByte()";
-                case "uint":
+                case SpecialType.System_UInt32:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}.AsUInt32(), {s}.AsUInt32()).AsByte()";
-                case "float":
+                case SpecialType.System_Single:
                     return $"System.Runtime.Intrinsics.Arm.AdvSimd.Max({v}.AsSingle(), {s}.AsSingle()).AsByte()";
                 default:
                     return "";
