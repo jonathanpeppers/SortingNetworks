@@ -46,6 +46,40 @@ MySorter.Sort(array);
 MySorter.Sort(data, Comparer<int>.Create((a, b) => b.CompareTo(a)));
 ```
 
+### Handling unsupported sizes
+
+By default, calling `Sort` with a span length that doesn't match any
+`[SortingNetwork]` size throws `ArgumentException`. To handle unsupported
+sizes gracefully, define a static `OnFallback` method in your partial class:
+
+```csharp
+[SortingNetwork(27, typeof(int))]
+partial class MySorter
+{
+    static void OnFallback(Span<int> span)
+    {
+        span.Sort(); // or log, throw a custom exception, etc.
+    }
+
+    // Optional: comparer-aware fallback
+    static void OnFallback(Span<int> span, IComparer<int> comparer)
+    {
+        int[] temp = span.ToArray();
+        Array.Sort(temp, comparer);
+        temp.CopyTo(span);
+    }
+}
+
+MySorter.Sort(data);           // size 27 → sorting network
+MySorter.Sort(otherData);      // any other size → OnFallback
+```
+
+- If no `OnFallback` is defined, unsupported sizes throw (same as before).
+- The 1-parameter overload handles `Sort(Span<T>)` and `Sort(T[])`.
+- The 2-parameter overload handles `Sort(Span<T>, IComparer<T>)` and
+  `Sort(T[], IComparer<T>)`. If only the 1-parameter overload is defined,
+  the comparer path still throws.
+
 The source generator emits optimized sort methods with:
 - **Scalar unrolled** compare-and-swap for all sizes/types
 - **x86 SIMD** (AVX2, AVX-512) when the type and size fit in SIMD registers
@@ -172,7 +206,7 @@ registers with cross-vector shuffles.
 |---|---|
 | 2–22 | Batcher's odd-even merge sort networks |
 | 23–32 | Optimal/best-known networks (Dobbelaere SorterHunter, arXiv:2511.04107) |
-| 33–64 | Batcher's odd-even merge sort networks |
+| 33–64 | Best-known networks ([Dobbelaere SorterHunter](https://github.com/bertdobbelaere/SorterHunter/tree/main/Networks/Sorters)) |
 
 Sorting networks execute a fixed sequence of compare-and-swap operations
 determined entirely by the input length. This eliminates branches and enables
@@ -199,9 +233,13 @@ On CPUs with AVX-512F, an AVX-512F path uses two `Vector512<int>` registers
 
 For `short`, `ushort`, and `char` (16-bit types), AVX-512 SIMD is emitted on x86
 when available, packing all elements into a single `Vector512<ushort>`. On
-ARM64, four `Vector128<byte>` vectors with `VectorTableLookup` (TBL4) provide
-cross-vector shuffles for the same 16-bit types. On platforms without SIMD
-support, this falls back to the scalar unrolled sort.
+ARM64, four `Vector128<byte>` vectors are used for the same 16-bit types.
+When all elements of a shuffled vector come from a single source register,
+`Vector128.Shuffle` (TBL1) is used; otherwise `VectorTableLookup` (TBL4)
+provides cross-vector shuffles. This TBL1 optimization is critical for ARM64
+processors like Ampere Altra/Neoverse where TBL4 has significantly higher
+latency than TBL1. On platforms without SIMD support, this falls back to the
+scalar unrolled sort.
 
 For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is emitted when
 available. The 27-28 elements require seven `Vector128` registers — exceeding
@@ -346,8 +384,10 @@ On ARM64, the library uses AdvSimd (NEON) intrinsics for `byte`, `sbyte`,
 #### SIMD-accelerated types
 
 For `byte` and `sbyte`, all elements fit in two `Vector128<byte>` registers.
-For `short` and `ushort`, four `Vector128<byte>` registers with TBL4
-cross-vector shuffles are used:
+For `short`, `ushort`, and `char`, four `Vector128<byte>` registers are used with
+`Vector128.Shuffle` (TBL1) for intra-register shuffles and TBL4 only for
+cross-register shuffles — avoiding expensive multi-register table lookups on
+ARM cores where TBL4 has high latency:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
@@ -388,6 +428,24 @@ speedup over `Array.Sort` as on x86:
 | double | 1,461 ns | 110 ns | **13x** |
 | long | 1,122 ns | 100 ns | **11x** |
 
+### ARM64 (Ampere Neoverse-N2, AdvSimd/NEON)
+
+On Ampere/Neoverse ARM64 cores, TBL4 has significantly higher latency than on
+Apple Silicon. The TBL1 optimization for intra-register shuffles is critical here:
+
+#### char (16-bit) — the key improvement
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| char | 109 ns | 68 ns | **1.6x** |
+| ushort | 1,986 ns | 71 ns | **28x** |
+| short | 1,983 ns | 60 ns | **33x** |
+| byte | 1,962 ns | 57 ns | **34x** |
+
+> **Note:** Without the TBL1 optimization, `char` size 27 was 135 ns — slower
+> than ArraySort (97 ns). The optimization reduced it to 68 ns, a **2x
+> improvement** that made GeneratedSort 1.6x faster than ArraySort.
+
 ### int detailed results (AVX2 SIMD)
 
 | Size | Kind | GeneratedSort | Ratio vs ArraySort |
@@ -416,6 +474,32 @@ speedup over `Array.Sort` as on x86:
 
 > With AVX2 SIMD, GeneratedSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the early-exit sorted check makes sorted input ~2x faster than ArraySort. Reversed input is slightly slower due to the overhead of cross-vector TBL/TBX shuffles with 7 registers.
 
+### Sizes 33-64 (x86, scalar unrolled)
+
+Networks for sizes 33-64 use best-known networks from [Dobbelaere's SorterHunter](https://github.com/bertdobbelaere/SorterHunter).
+These are scalar unrolled (no SIMD), but still significantly faster than `Array.Sort` / `Span.Sort` for most types:
+
+| Type | Size | SpanSort | GeneratedSort | Speedup |
+|---|---|---|---|---|
+| byte | 34 | 1,952 ns | 131 ns | **15x** |
+| float | 36 | 2,170 ns | 90 ns | **24x** |
+| sbyte | 38 | 2,489 ns | 155 ns | **16x** |
+| short | 40 | 2,382 ns | 165 ns | **14x** |
+| ushort | 42 | 2,495 ns | 174 ns | **14x** |
+| double | 44 | 3,364 ns | 255 ns | **13x** |
+| int | 48 | 302 ns | 113 ns | **2.7x** |
+| uint | 50 | 296 ns | 219 ns | **1.4x** |
+| long | 52 | 3,856 ns | 257 ns | **15x** |
+| ulong | 54 | 435 ns | 268 ns | **1.6x** |
+| nint | 56 | 4,129 ns | 289 ns | **14x** |
+| nuint | 58 | 3,990 ns | 315 ns | **13x** |
+| char | 60 | 391 ns | 258 ns | **1.5x** |
+| string | 64 | 3,528 ns | 1,920 ns | **1.8x** |
+
+> For types where .NET already has a SIMD-optimized sort path (`int`, `uint`, `char`, `ulong`),
+> the speedup is smaller but GeneratedSort is still faster. For all other types, the unrolled
+> sorting network provides 13-24x speedups.
+
 ## Building
 
 ```
@@ -430,11 +514,11 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
   and bundled source generator
 - **SortingNetworks.Generators** -- Roslyn incremental source generator that
   emits optimized sorting network code (scalar + SIMD)
-- **SortingNetworks.Tests** -- xUnit correctness tests covering sizes 4-64
+- **SortingNetworks.Tests** -- xUnit correctness tests covering sizes 2-64
   across all 13 primitive types, with stress tests using 100 random seeds
-  (232 tests)
+  (392 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
-  generated sort vs `Array.Sort` for sizes 23-32 across all primitive types
+  generated sort vs `Array.Sort` for sizes 23-64 across all primitive types
 
 ## Paper reference
 

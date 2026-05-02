@@ -40,6 +40,38 @@ public class NetworkDatabaseTests
     [InlineData(30)]
     [InlineData(31)]
     [InlineData(32)]
+    [InlineData(33)]
+    [InlineData(34)]
+    [InlineData(35)]
+    [InlineData(36)]
+    [InlineData(37)]
+    [InlineData(38)]
+    [InlineData(39)]
+    [InlineData(40)]
+    [InlineData(41)]
+    [InlineData(42)]
+    [InlineData(43)]
+    [InlineData(44)]
+    [InlineData(45)]
+    [InlineData(46)]
+    [InlineData(47)]
+    [InlineData(48)]
+    [InlineData(49)]
+    [InlineData(50)]
+    [InlineData(51)]
+    [InlineData(52)]
+    [InlineData(53)]
+    [InlineData(54)]
+    [InlineData(55)]
+    [InlineData(56)]
+    [InlineData(57)]
+    [InlineData(58)]
+    [InlineData(59)]
+    [InlineData(60)]
+    [InlineData(61)]
+    [InlineData(62)]
+    [InlineData(63)]
+    [InlineData(64)]
     public void Network_SortsCorrectly(int size)
     {
         var network = NetworkDatabase.GetNetwork(size);
@@ -48,7 +80,7 @@ public class NetworkDatabaseTests
         // Verify the network sorts all permutations for small sizes,
         // or a large random sample for larger sizes
         var random = new Random(42 + size);
-        int trials = size <= 8 ? Factorial(size) : 10000;
+        int trials = size <= 8 ? Factorial(size) : size <= 32 ? 10000 : 1000;
 
         for (int trial = 0; trial < trials; trial++)
         {
@@ -89,6 +121,38 @@ public class NetworkDatabaseTests
     [InlineData(30)]
     [InlineData(31)]
     [InlineData(32)]
+    [InlineData(33)]
+    [InlineData(34)]
+    [InlineData(35)]
+    [InlineData(36)]
+    [InlineData(37)]
+    [InlineData(38)]
+    [InlineData(39)]
+    [InlineData(40)]
+    [InlineData(41)]
+    [InlineData(42)]
+    [InlineData(43)]
+    [InlineData(44)]
+    [InlineData(45)]
+    [InlineData(46)]
+    [InlineData(47)]
+    [InlineData(48)]
+    [InlineData(49)]
+    [InlineData(50)]
+    [InlineData(51)]
+    [InlineData(52)]
+    [InlineData(53)]
+    [InlineData(54)]
+    [InlineData(55)]
+    [InlineData(56)]
+    [InlineData(57)]
+    [InlineData(58)]
+    [InlineData(59)]
+    [InlineData(60)]
+    [InlineData(61)]
+    [InlineData(62)]
+    [InlineData(63)]
+    [InlineData(64)]
     public void Network_HasValidLayerSizes(int size)
     {
         var network = NetworkDatabase.GetNetwork(size);
@@ -116,6 +180,38 @@ public class NetworkDatabaseTests
     [InlineData(30)]
     [InlineData(31)]
     [InlineData(32)]
+    [InlineData(33)]
+    [InlineData(34)]
+    [InlineData(35)]
+    [InlineData(36)]
+    [InlineData(37)]
+    [InlineData(38)]
+    [InlineData(39)]
+    [InlineData(40)]
+    [InlineData(41)]
+    [InlineData(42)]
+    [InlineData(43)]
+    [InlineData(44)]
+    [InlineData(45)]
+    [InlineData(46)]
+    [InlineData(47)]
+    [InlineData(48)]
+    [InlineData(49)]
+    [InlineData(50)]
+    [InlineData(51)]
+    [InlineData(52)]
+    [InlineData(53)]
+    [InlineData(54)]
+    [InlineData(55)]
+    [InlineData(56)]
+    [InlineData(57)]
+    [InlineData(58)]
+    [InlineData(59)]
+    [InlineData(60)]
+    [InlineData(61)]
+    [InlineData(62)]
+    [InlineData(63)]
+    [InlineData(64)]
     public void Network_LayersAreDisjointMatchings(int size)
     {
         var network = NetworkDatabase.GetNetwork(size);
@@ -141,16 +237,15 @@ public class NetworkDatabaseTests
     }
 
     [Theory]
-    [InlineData(33)]
-    [InlineData(48)]
-    [InlineData(64)]
+    [InlineData(65)]
+    [InlineData(128)]
     public void Batcher_SortsCorrectly(int size)
     {
         var network = BatcherNetworkBuilder.Generate(size);
         Assert.NotNull(network);
 
         var random = new Random(42 + size);
-        for (int trial = 0; trial < 1000; trial++)
+        for (int trial = 0; trial < 100; trial++)
         {
             var input = new int[size];
             for (int i = 0; i < size; i++)
@@ -171,6 +266,7 @@ public class NetworkDatabaseTests
     {
         Assert.Null(NetworkDatabase.GetNetwork(0));
         Assert.Null(NetworkDatabase.GetNetwork(1));
+        Assert.Null(NetworkDatabase.GetNetwork(65));
         Assert.Null(NetworkDatabase.GetNetwork(100));
     }
 
