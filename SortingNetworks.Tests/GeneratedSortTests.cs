@@ -1353,21 +1353,8 @@ public class GeneratedSortTests
     [Theory]
     [InlineData(27)]
     [InlineData(28)]
-    public void Sort_CustomType_StressTest(int size)
-    {
-        for (int seed = 0; seed < 100; seed++)
-        {
-            var rng = new Random(seed);
-            var input = Enumerable.Range(0, size).Select(_ => RandomPoint(rng)).ToArray();
-            var expected = (Point[])input.Clone();
-            Array.Sort(expected);
-
-            var actual = (Point[])input.Clone();
-            GeneratedSorters.Sort(actual.AsSpan());
-
-            Assert.Equal(expected, actual);
-        }
-    }
+    public void Sort_CustomType_StressTest(int size) =>
+        StressSort(size, RandomPoint, a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
     public void Sort_CustomType_WithExplicitComparer()
