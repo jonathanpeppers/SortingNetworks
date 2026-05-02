@@ -835,4 +835,42 @@ public partial class MySorter { }
             .FirstOrDefault(s => s.Contains("Sort(System.Span<int> span)") && s.Contains("IComparer<global::MyRecord>"));
         Assert.NotNull(generatedSource);
     }
+
+    [Theory]
+    [InlineData("nint", "long", "int")]
+    [InlineData("nuint", "ulong", "uint")]
+    public void NativeInt_ScalarFallback_DelegatesToFixedSizeType(string nativeType, string type64, string type32)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork(16, typeof({nativeType}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort16"));
+        Assert.NotNull(generatedSource);
+
+        // Scalar fallback should delegate to the fixed-size type via Unsafe.As
+        Assert.Contains($"Unsafe.As<{nativeType}, {type64}>", generatedSource);
+        Assert.Contains($"Unsafe.As<{nativeType}, {type32}>", generatedSource);
+        Assert.Contains($"Sort16(ref first)", generatedSource);
+
+        // Should NOT have a scalar Sort16 method with the native type
+        Assert.DoesNotContain($"private static void Sort16(ref {nativeType} first)", generatedSource);
+
+        // Should have scalar Sort16 methods for both delegate types
+        Assert.Contains($"private static void Sort16(ref {type64} first)", generatedSource);
+        Assert.Contains($"private static void Sort16(ref {type32} first)", generatedSource);
+    }
 }
