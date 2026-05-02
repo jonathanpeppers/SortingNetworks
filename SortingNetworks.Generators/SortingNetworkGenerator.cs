@@ -29,6 +29,29 @@ namespace SortingNetworks.Generators
             SpecialType.System_IntPtr, SpecialType.System_UIntPtr
         };
 
+        /// <summary>
+        /// Maps a <see cref="SpecialType"/> to its C# keyword form so the
+        /// generated code is always in-scope, operator-compatible, and stable
+        /// regardless of target framework or <c>using</c> directives.
+        /// </summary>
+        private static string? GetKeywordName(SpecialType specialType) => specialType switch
+        {
+            SpecialType.System_Byte => "byte",
+            SpecialType.System_SByte => "sbyte",
+            SpecialType.System_Int16 => "short",
+            SpecialType.System_UInt16 => "ushort",
+            SpecialType.System_Int32 => "int",
+            SpecialType.System_UInt32 => "uint",
+            SpecialType.System_Int64 => "long",
+            SpecialType.System_UInt64 => "ulong",
+            SpecialType.System_Char => "char",
+            SpecialType.System_Single => "float",
+            SpecialType.System_Double => "double",
+            SpecialType.System_IntPtr => "nint",
+            SpecialType.System_UIntPtr => "nuint",
+            _ => null,
+        };
+
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Register the attribute source so users don't need a separate package
@@ -64,7 +87,9 @@ namespace SortingNetworks.Generators
 
                 if (sizeArg.Value is int size && typeArg.Value is INamedTypeSymbol typeSymbol)
                 {
-                    attributes.Add(new NetworkRequest(size, typeSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat), typeSymbol.SpecialType));
+                    var typeName = GetKeywordName(typeSymbol.SpecialType)
+                        ?? typeSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                    attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType));
                 }
             }
 
