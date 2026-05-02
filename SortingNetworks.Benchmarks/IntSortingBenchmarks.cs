@@ -8,7 +8,7 @@ public class IntSortingBenchmarks
 {
     private const int OpsPerInvoke = 1000;
 
-    [Params(23, 24, 25, 26, 27, 28, 29, 30, 31, 32)]
+    [Params(23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 48)]
     public int Length { get; set; }
 
     [ParamsAllValues]
