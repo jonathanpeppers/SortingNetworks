@@ -266,10 +266,11 @@ sort helpers; for custom types the JIT can devirtualize `CompareTo` on value
 types, keeping the call nearly as cheap.
 
 For `byte` and `sbyte`, the generator additionally emits SIMD vectorization
-when available — AVX2 on x86 and AdvSimd (NEON) on ARM64. All 27-28 elements
-fit in a single vector register, allowing each of the 13 network steps to
-execute as a vectorized shuffle + min/max + blend operation instead of
-individual scalar compare-and-swap branches.
+when available — AVX2 on x86 and AdvSimd (NEON) on ARM64. For sizes up to 32,
+all elements fit in a single vector register (or two on ARM64), allowing each
+network step to execute as a vectorized shuffle + min/max + blend operation.
+On ARM64, SIMD extends up to 64 elements using up to four `Vector128<byte>`
+registers with single-group TBL4 lookups.
 
 For `int` and `uint`, AVX2 SIMD is emitted on x86 with four `Vector256<int>`
 registers (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
@@ -281,21 +282,25 @@ For `short`, `ushort`, and `char` (16-bit types), AVX-512 SIMD is emitted on x86
 when available. For sizes up to 32, all elements fit in a single `Vector512<ushort>`
 using `PermuteVar32x16`. For sizes 33-64, two `Vector512<ushort>` registers are
 used with `PermuteVar32x16x2` for cross-vector shuffles. On
-ARM64, four `Vector128<byte>` vectors are used for the same 16-bit types.
+ARM64, `Vector128<byte>` registers are used for the same 16-bit types — up to
+four registers for sizes ≤32 and up to eight registers for sizes 33-64 using
+multi-stage TBL/TBX chains.
 When all elements of a shuffled vector come from a single source register,
 `Vector128.Shuffle` (TBL1) is used; otherwise `VectorTableLookup` (TBL4)
-provides cross-vector shuffles. This TBL1 optimization is critical for ARM64
-processors like Ampere Altra/Neoverse where TBL4 has significantly higher
-latency than TBL1. On platforms without SIMD support, this falls back to the
-scalar unrolled sort.
+provides cross-vector shuffles, with `VectorTableLookupExtension` (TBX)
+chaining additional groups when registers exceed the 4-register TBL limit.
+This TBL1 optimization is critical for ARM64 processors like Ampere
+Altra/Neoverse where TBL4 has significantly higher latency than TBL1.
+On platforms without SIMD support, this falls back to the scalar unrolled sort.
 
-For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is emitted when
-available. The 27-28 elements require seven `Vector128` registers — exceeding
-TBL4's 4-register table limit. When all elements of a shuffled vector come from
-a single source register, `Vector128.Shuffle` (TBL1) is used directly; otherwise
-a two-stage TBL/TBX lookup splits elements into Table A (0-15) and Table B
-(16-27) with `VectorTableLookupExtension` (TBX) chaining. An early-exit check
-detects already-sorted input and skips the SIMD path entirely.
+For `int`, `uint`, and `float` (32-bit types), ARM64 AdvSimd SIMD is emitted for
+sizes up to 32, using up to eight `Vector128` registers. For sizes 27-28, seven
+registers are used with two-stage TBL/TBX cross-vector shuffles. When all
+elements of a shuffled vector come from a single source register,
+`Vector128.Shuffle` (TBL1) is used directly; otherwise a multi-stage TBL/TBX
+lookup chains register groups. An early-exit check detects already-sorted input
+and skips the SIMD path entirely. For sizes beyond 32, multi-stage TBL overhead
+exceeds the SIMD benefit for 4-byte types, so the scalar unrolled path is used.
 
 For `float`, AVX2 SIMD uses four `Vector256<float>` registers
 (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
@@ -522,6 +527,27 @@ Apple Silicon. The TBL1 optimization for intra-register shuffles is critical her
 | nuint | 2,083 ns | 142 ns | **15x** |
 | double | 2,442 ns | 149 ns | **16x** |
 
+#### Sizes 33-64 (ARM64 SIMD for byte/short)
+
+For sizes 33-64, ARM64 SIMD is extended for `byte`/`sbyte` (up to 4 registers,
+single TBL4 group) and `short`/`ushort`/`char` (up to 8 registers, multi-stage
+TBL/TBX). For `int`/`uint`/`float`, the scalar unrolled path is used since
+multi-stage TBL overhead exceeds SIMD benefit at these sizes:
+
+| Type | Size | ArraySort | GeneratedSort | Speedup |
+|---|---|---|---|---|
+| byte | 34 | 2,831 ns | 85 ns | **33x** |
+| sbyte | 38 | 3,340 ns | 94 ns | **36x** |
+| short | 40 | 3,439 ns | 164 ns | **21x** |
+| ushort | 42 | 3,671 ns | 198 ns | **19x** |
+| char | 60 | 292 ns | 216 ns | **1.4x** |
+| float | 36 | 3,269 ns | 220 ns | **15x** |
+
+> **Note:** `float` at size 36 uses the scalar unrolled path on ARM64 (not SIMD)
+> and is still 15x faster than `Array.Sort`. For types where .NET already has
+> SIMD-optimized sort (`int`, `uint`, `char`), the scalar network provides 1.3-1.4x
+> speedups at these sizes.
+
 ### int detailed results (AVX2 SIMD)
 
 | Size | Kind | GeneratedSort | Ratio vs ArraySort |
@@ -553,8 +579,7 @@ Apple Silicon. The TBL1 optimization for intra-register shuffles is critical her
 ### Sizes 33-64 (x86, scalar unrolled)
 
 Networks for sizes 33-64 use best-known networks from [Dobbelaere's SorterHunter](https://github.com/bertdobbelaere/SorterHunter).
-On the i9-9900K (no AVX-512), these use scalar unrolled compare-and-swap, but are still
-significantly faster than `Array.Sort` / `Span.Sort` for most types:
+On x86 without AVX-512, these use scalar unrolled compare-and-swap. On ARM64, SIMD is used for `byte`/`sbyte` (up to 64 elements) and `short`/`ushort`/`char` (up to 64 elements) — see ARM64 section above. For all other types, the scalar path still provides significant speedups:
 
 | Type | Size | SpanSort | GeneratedSort | Speedup |
 |---|---|---|---|---|
@@ -593,7 +618,7 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
   emits optimized sorting network code (scalar + SIMD)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering sizes 2-64
   across all 13 primitive types plus custom types, with stress tests using
-  100 random seeds (420 tests)
+  100 random seeds (419 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   generated sort vs `Array.Sort` for sizes 23-64 across all primitive types
   and custom record structs
