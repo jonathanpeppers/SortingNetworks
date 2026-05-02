@@ -382,4 +382,38 @@ public class GeneratedSortTests
             Assert.Equal(expected, input);
         }
     }
+
+    [Fact]
+    public void Sort27_String_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+            var expected = (string[])input.Clone();
+            Array.Sort(expected, StringComparer.Ordinal);
+
+            var actual = (string[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan());
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Sort27_String_WithComparer_MatchesArraySort()
+    {
+        for (int seed = 0; seed < 50; seed++)
+        {
+            var rng = new Random(seed);
+            var input = Enumerable.Range(0, 27).Select(_ => rng.Next(0, 10000).ToString()).ToArray();
+            var expected = (string[])input.Clone();
+            Array.Sort(expected, StringComparer.Ordinal);
+
+            var actual = (string[])input.Clone();
+            GeneratedSorters.Sort(actual.AsSpan(), StringComparer.Ordinal);
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }
