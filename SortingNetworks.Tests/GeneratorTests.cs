@@ -723,4 +723,116 @@ public partial class MySorter
         Assert.Contains("throw new System.ArgumentException", generatedSource);
         Assert.DoesNotContain("OnFallback(span, comparer)", generatedSource);
     }
+
+    [Fact]
+    public void CustomType_GeneratesComparerOnlyCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+public record struct MyRecord(int X, int Y) : System.IComparable<MyRecord>
+{
+    public int CompareTo(MyRecord other)
+    {
+        int cmp = X.CompareTo(other.X);
+        return cmp != 0 ? cmp : Y.CompareTo(other.Y);
+    }
+}
+
+[SortingNetwork(4, typeof(MyRecord))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        // No SN0002 diagnostic
+        var sn0002 = result.Diagnostics.Where(d => d.Id == "SN0002").ToArray();
+        Assert.Empty(sn0002);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("IComparer<global::MyRecord>"));
+        Assert.NotNull(generatedSource);
+
+        // IComparable<T> value types get a parameterless Sort(Span<T>) with unrolled CompareTo
+        Assert.Contains("public static void Sort(System.Span<global::MyRecord> span)", generatedSource);
+        Assert.Contains(".CompareTo(", generatedSource);
+        Assert.Contains("Sort4(ref first)", generatedSource);
+
+        // Should also have comparer overload (without default null, since parameterless exists)
+        Assert.Contains("ApplyNetworkWithComparer", generatedSource);
+        Assert.DoesNotContain("comparer = null", generatedSource);
+    }
+
+    [Fact]
+    public void CustomType_WithNamespace_GeneratesCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+namespace MyApp.Models
+{
+    public record struct Widget(string Name) : System.IComparable<Widget>
+    {
+        public int CompareTo(Widget other) => string.Compare(Name, other.Name, System.StringComparison.Ordinal);
+    }
+}
+
+namespace MyApp.Sorting
+{
+    [SortingNetwork(8, typeof(MyApp.Models.Widget))]
+    public partial class WidgetSorter { }
+}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Generated code should use fully qualified type name
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("global::MyApp.Models.Widget"));
+        Assert.NotNull(generatedSource);
+    }
+
+    [Fact]
+    public void CustomType_MixedWithPrimitive_GeneratesCode()
+    {
+        var source = @"
+using SortingNetworks;
+
+public record struct MyRecord(int Value) : System.IComparable<MyRecord>
+{
+    public int CompareTo(MyRecord other) => Value.CompareTo(other.Value);
+}
+
+[SortingNetwork(4, typeof(int))]
+[SortingNetwork(4, typeof(MyRecord))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort(System.Span<int> span)") && s.Contains("IComparer<global::MyRecord>"));
+        Assert.NotNull(generatedSource);
+    }
 }

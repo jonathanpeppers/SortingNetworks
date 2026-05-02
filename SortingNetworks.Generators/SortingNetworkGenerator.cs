@@ -84,8 +84,28 @@ namespace SortingNetworks.Generators
                 if (sizeArg.Value is int size && typeArg.Value is INamedTypeSymbol typeSymbol)
                 {
                     var typeName = GetKeywordName(typeSymbol.SpecialType)
-                        ?? typeSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-                    attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType));
+                        ?? typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                    // Check if custom value type implements IComparable<T> (enables unrolled CompareTo path)
+                    bool isComparable = false;
+                    if (!SupportedSpecialTypes.Contains(typeSymbol.SpecialType) && typeSymbol.IsValueType)
+                    {
+                        var comparableOfT = context.SemanticModel.Compilation.GetTypeByMetadataName("System.IComparable`1");
+                        if (comparableOfT != null)
+                        {
+                            var comparableOfType = comparableOfT.Construct(typeSymbol);
+                            foreach (var iface in typeSymbol.AllInterfaces)
+                            {
+                                if (SymbolEqualityComparer.Default.Equals(iface, comparableOfType))
+                                {
+                                    isComparable = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType, isComparable));
                 }
             }
 
@@ -171,13 +191,6 @@ namespace SortingNetworks.Generators
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.InvalidSize, Location.None, request.Size, MinSize, MaxSize));
-                    continue;
-                }
-
-                if (!SupportedSpecialTypes.Contains(request.SpecialType))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptors.UnsupportedType, Location.None, request.TypeName));
                     continue;
                 }
 
@@ -319,6 +332,56 @@ namespace SortingNetworks.Generators
                 var sizes = kvp.Value;
                 sizes.Sort((a, b) => a.Size.CompareTo(b.Size));
 
+                bool isCustomType = sizes[0].IsCustomType;
+
+                // Custom types: emit comparer-only overloads and skip SIMD/scalar
+                if (isCustomType)
+                {
+                    bool isComparable = sizes[0].IsComparable;
+
+                    // IComparable<T> value types: emit parameterless Sort with unrolled CompareTo
+                    if (isComparable)
+                    {
+                        sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network based on span length.</summary>");
+                        sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span)");
+                        sb.AppendLine("        {");
+                        sb.AppendLine("            int n = span.Length;");
+                        var customSizeChecks = string.Join(" || ", sizes.Select(s => $"n == {s.Size}"));
+                        sb.AppendLine($"            if ({customSizeChecks})");
+                        sb.AppendLine("            {");
+                        sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
+                        if (sizes.Count == 1)
+                        {
+                            sb.AppendLine($"                Sort{sizes[0].Size}(ref first);");
+                        }
+                        else
+                        {
+                            foreach (var request in sizes)
+                            {
+                                sb.AppendLine($"                if (n == {request.Size}) {{ Sort{request.Size}(ref first); return; }}");
+                            }
+                        }
+                        sb.AppendLine("                return;");
+                        sb.AppendLine("            }");
+                        sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
+
+                        // Array overload
+                        sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network based on array length.</summary>");
+                        sb.AppendLine($"        public static void Sort({typeName}[] array)");
+                        sb.AppendLine("        {");
+                        sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
+                        sb.AppendLine($"            Sort((System.Span<{typeName}>)array);");
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
+                    }
+
+                    // Comparer overloads: defaultNull only when no parameterless Sort exists
+                    EmitComparerOverloads(sb, typeName, sizes, defaultNull: !isComparable);
+                    continue;
+                }
+
                 // Check which sizes have SIMD support
                 var simdSizes = new List<NetworkRequest>();
                 var avx2FallbackSizes = new List<NetworkRequest>();
@@ -366,7 +429,7 @@ namespace SortingNetworks.Generators
                 sb.AppendLine("            {");
 
                 // SIMD dispatch blocks (grouped by guard condition, ordered deterministically)
-                foreach (var guardGroup in simdGuardGroups.OrderBy(kvp => kvp.Key))
+                foreach (var guardGroup in simdGuardGroups.OrderBy(kvp2 => kvp2.Key))
                 {
                     var simdGuard = guardGroup.Key;
                     var guardSizes = guardGroup.Value;
@@ -740,9 +803,17 @@ namespace SortingNetworks.Generators
                     }
                 }
 
-                // Emit scalar method (takes ref T first, matches library pattern)
-                sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
-                sb.AppendLine();
+                // Emit scalar method (takes ref T first, matches library pattern) — skip for non-comparable custom types
+                if (!request.IsCustomType)
+                {
+                    sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
+                    sb.AppendLine();
+                }
+                else if (request.IsComparable)
+                {
+                    sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network, useCompareTo: true));
+                    sb.AppendLine();
+                }
             }
 
             // Emit static network data fields (one per size, shared across types)
@@ -780,6 +851,53 @@ namespace SortingNetworks.Generators
         }
 
 
+        /// <summary>
+        /// Emits Sort(Span&lt;T&gt;, IComparer&lt;T&gt;?) and Sort(T[], IComparer&lt;T&gt;?) overloads.
+        /// When <paramref name="defaultNull"/> is true the comparer parameter gets a <c>= null</c> default.
+        /// </summary>
+        private static void EmitComparerOverloads(StringBuilder sb, string typeName, List<NetworkRequest> sizes, bool defaultNull)
+        {
+            string comparerDefault = defaultNull ? " = null" : "";
+
+            sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using an optimal sorting network with a custom comparer.</summary>");
+            sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            comparer ??= System.Collections.Generic.Comparer<{typeName}>.Default;");
+            sb.AppendLine("            int n = span.Length;");
+
+            if (sizes.Count == 1)
+            {
+                sb.AppendLine($"            if (n == {sizes[0].Size})");
+                sb.AppendLine("            {");
+                sb.AppendLine($"                ApplyNetworkWithComparer(span, Network{sizes[0].Size}, comparer);");
+                sb.AppendLine("                return;");
+                sb.AppendLine("            }");
+            }
+            else
+            {
+                var comparerSizeChecks = string.Join(" || ", sizes.Select(s => $"n == {s.Size}"));
+                sb.AppendLine($"            if ({comparerSizeChecks})");
+                sb.AppendLine("            {");
+                foreach (var request in sizes)
+                {
+                    sb.AppendLine($"                if (n == {request.Size}) {{ ApplyNetworkWithComparer(span, Network{request.Size}, comparer); return; }}");
+                }
+                sb.AppendLine("            }");
+            }
+
+            sb.AppendLine($"            throw new System.ArgumentException($\"No sorting network for length {{n}}. Supported lengths: {string.Join(", ", sizes.Select(s => s.Size.ToString()))}.\", nameof(span));");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using an optimal sorting network with a custom comparer.</summary>");
+            sb.AppendLine($"        public static void Sort({typeName}[] array, System.Collections.Generic.IComparer<{typeName}>? comparer{comparerDefault})");
+            sb.AppendLine("        {");
+            sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
+            sb.AppendLine($"            Sort((System.Span<{typeName}>)array, comparer);");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+        }
+
         private sealed class GenerationInfo
         {
             public string ClassName { get; }
@@ -815,12 +933,16 @@ namespace SortingNetworks.Generators
             public int Size { get; }
             public string TypeName { get; }
             public SpecialType SpecialType { get; }
+            public bool IsCustomType { get; }
+            public bool IsComparable { get; }
 
-            public NetworkRequest(int size, string typeName, SpecialType specialType)
+            public NetworkRequest(int size, string typeName, SpecialType specialType, bool isComparable)
             {
                 Size = size;
                 TypeName = typeName;
                 SpecialType = specialType;
+                IsCustomType = !SupportedSpecialTypes.Contains(specialType);
+                IsComparable = isComparable;
             }
         }
     }
