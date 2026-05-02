@@ -208,7 +208,26 @@ namespace SortingNetworks.Generators
                 sb.AppendLine();
                 sb.AppendLine($"            // Step {si}: {pairStr}");
                 sb.AppendLine("            {");
-                sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.Vector256.Shuffle(vec, {FmtVec256(perm)});");
+
+                // Use direct Avx2 intrinsics for the shuffle to avoid the expensive
+                // cross-lane emulation that Vector256.Shuffle generates on AVX2.
+                // vpshufb only shuffles within each 128-bit lane, so for cross-lane
+                // pairs we use vperm2i128 to swap lanes first.
+                if (HasCrossLanePairs(step))
+                {
+                    byte[] loMask = ComputeAvx2LoMask(perm);
+                    byte[] hiMask = ComputeAvx2HiMask(perm);
+                    sb.AppendLine($"                var swapped = System.Runtime.Intrinsics.X86.Avx2.Permute2x128(vec, vec, 0x01);");
+                    sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.X86.Avx2.Or(");
+                    sb.AppendLine($"                    System.Runtime.Intrinsics.X86.Avx2.Shuffle(vec, {FmtVec256(loMask)}),");
+                    sb.AppendLine($"                    System.Runtime.Intrinsics.X86.Avx2.Shuffle(swapped, {FmtVec256(hiMask)}));");
+                }
+                else
+                {
+                    byte[] laneMask = ComputeAvx2LoMask(perm);
+                    sb.AppendLine($"                var shuffled = System.Runtime.Intrinsics.X86.Avx2.Shuffle(vec, {FmtVec256(laneMask)});");
+                }
+
                 sb.AppendLine($"                var mins = {MinExprByte(specialType, "vec", "shuffled")};");
                 sb.AppendLine($"                var maxs = {MaxExprByte(specialType, "vec", "shuffled")};");
                 sb.AppendLine($"                vec = System.Runtime.Intrinsics.Vector256.ConditionalSelect({FmtVec256(blend)}, maxs, mins);");
@@ -1415,6 +1434,60 @@ namespace SortingNetworks.Generators
                 case SpecialType.System_Double: return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}.AsDouble(), {s}.AsDouble()).AsInt64()";
                 default: return $"System.Runtime.Intrinsics.X86.Avx512F.Max({v}, {s})";
             }
+        }
+
+        // --- AVX2 lane-aware byte shuffle helpers ---
+
+        /// <summary>
+        /// Returns true if any pair in the step crosses the 128-bit lane boundary (positions 0-15 vs 16-31).
+        /// </summary>
+        private static bool HasCrossLanePairs(List<(int A, int B)> step)
+        {
+            foreach (var (a, b) in step)
+            {
+                if ((a < 16 && b >= 16) || (a >= 16 && b < 16))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Computes the vpshufb mask for within-lane elements of a permutation.
+        /// For positions where the source is in the same 128-bit lane, the mask contains the lane-local index.
+        /// For positions where the source is in the other lane, the mask contains 0x80 (zero output).
+        /// </summary>
+        private static byte[] ComputeAvx2LoMask(byte[] perm)
+        {
+            byte[] lo = new byte[32];
+            for (int i = 0; i < 32; i++)
+            {
+                int src = perm[i];
+                if (i < 16)
+                    lo[i] = src < 16 ? (byte)src : (byte)0x80;
+                else
+                    lo[i] = src >= 16 ? (byte)(src - 16) : (byte)0x80;
+            }
+            return lo;
+        }
+
+        /// <summary>
+        /// Computes the vpshufb mask for cross-lane elements of a permutation,
+        /// to be applied after Avx2.Permute2x128 (which swaps the two 128-bit lanes).
+        /// For positions where the source is in the other lane, the mask contains the lane-local index
+        /// into the swapped vector. For within-lane positions, the mask contains 0x80 (zero output).
+        /// </summary>
+        private static byte[] ComputeAvx2HiMask(byte[] perm)
+        {
+            byte[] hi = new byte[32];
+            for (int i = 0; i < 32; i++)
+            {
+                int src = perm[i];
+                if (i < 16)
+                    hi[i] = src >= 16 ? (byte)(src - 16) : (byte)0x80;
+                else
+                    hi[i] = src < 16 ? (byte)src : (byte)0x80;
+            }
+            return hi;
         }
     }
 }

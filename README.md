@@ -280,41 +280,41 @@ to execute as a vectorized min/max/blend operation:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,330 ns | 38 ns | **35x** |
-| sbyte | 1,496 ns | 42 ns | **36x** |
+| byte | 1,310 ns | 37 ns | **35x** |
+| sbyte | 1,478 ns | 40 ns | **37x** |
 
 For `int` and `uint`, AVX2 SIMD uses four `Vector256<int>` registers with
 cross-vector shuffles via `PermuteVar8x32`:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| int | 109 ns | 57 ns | **1.9x** |
-| uint | 113 ns | 53 ns | **2.1x** |
+| int | 108 ns | 56 ns | **1.9x** |
+| uint | 112 ns | 54 ns | **2.1x** |
 
 For `float`, AVX2 SIMD uses four `Vector256<float>` registers with
 `PermuteVar8x32` shuffles and `Avx.Min`/`Avx.Max` comparisons:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,591 ns | 67 ns | **24x** |
+| float | 1,667 ns | 65 ns | **26x** |
 
 For `double`, AVX2 SIMD uses seven `Vector256<double>` registers with
 `Permute4x64` shuffles (on CPUs with AVX-512F, an AVX-512 path is used instead):
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,630 ns | 94 ns | **17x** |
+| double | 1,641 ns | 102 ns | **16x** |
 
 For other types without a SIMD-optimized `Array.Sort` in the BCL, the unrolled
 sorting network dominates:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| short | 1,436 ns | 100 ns | **14x** |
-| ushort | 1,329 ns | 100 ns | **13x** |
-| long | 1,444 ns | 102 ns | **14x** |
-| nint | 1,492 ns | 109 ns | **14x** |
-| nuint | 1,433 ns | 106 ns | **14x** |
+| short | 1,434 ns | 100 ns | **14x** |
+| ushort | 1,333 ns | 100 ns | **13x** |
+| long | 1,459 ns | 104 ns | **14x** |
+| nint | 1,417 ns | 107 ns | **13x** |
+| nuint | 1,452 ns | 107 ns | **14x** |
 
 > **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, `int`, `uint`, and `float` use AVX-512F SIMD, and `nint`/`nuint` dispatch to `long`/`ulong` for even greater speedups.
 
@@ -325,8 +325,8 @@ types the BCL is already very fast and GeneratedSort provides a smaller benefit:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Ratio |
 |---|---|---|---|
-| char | 99 ns | 96 ns | ~1x |
-| ulong | 155 ns | 99 ns | **1.6x** |
+| char | 97 ns | 98 ns | ~1x |
+| ulong | 160 ns | 100 ns | **1.6x** |
 
 > **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and GeneratedSort may be slower for these types.
 
@@ -337,22 +337,42 @@ unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| string | 1,106 ns | 524 ns | **2.1x** |
+| string | 1,120 ns | 523 ns | **2.1x** |
 
 ### x86 AVX-512F (AMD EPYC 9V74, GitHub Actions)
 
-On CPUs with AVX-512F (e.g., AMD EPYC, Intel Ice Lake+), `int`, `uint`, and
-`float` use two `Vector512` registers with `PermuteVar16x32x2` cross-vector
-shuffles:
+On CPUs with AVX-512F (e.g., AMD EPYC, Intel Ice Lake+), additional SIMD paths
+are available. For `byte` and `sbyte`, the AVX2 path uses optimized direct
+`Avx2.Shuffle` intrinsics (vpshufb) avoiding the expensive cross-lane emulation:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| int | 98 ns | 81 ns | **1.2x** |
-| uint | 120 ns | 82 ns | **1.5x** |
-| float | 2,263 ns | 90 ns | **25x** |
+| byte | 1,591 ns | 61 ns | **26x** |
+| sbyte | 1,714 ns | 68 ns | **25x** |
+
+For `int`, `uint`, and `float`, AVX-512F uses two `Vector512` registers with
+`PermuteVar16x32x2` cross-vector shuffles:
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| int | 103 ns | 88 ns | **1.2x** |
+| uint | 119 ns | 83 ns | **1.4x** |
+| float | 2,049 ns | 92 ns | **22x** |
+| double | 1,994 ns | 166 ns | **12x** |
+
+For other types without SIMD-optimized `Array.Sort` in the BCL:
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| short | 1,719 ns | 154 ns | **11x** |
+| ushort | 1,589 ns | 154 ns | **10x** |
+| long | 1,696 ns | 147 ns | **12x** |
+| nint | 1,867 ns | 166 ns | **11x** |
+| nuint | 1,742 ns | 175 ns | **10x** |
+| string | 941 ns | 678 ns | **1.4x** |
 
 > **Note:** These results are from an AMD EPYC 9V74 on GitHub Actions
-> (ubuntu-latest), which double-pumps 512-bit operations through 256-bit
+> (windows-latest), which double-pumps 512-bit operations through 256-bit
 > execution ports. Intel CPUs with native 512-bit execution units (e.g.,
 > Sapphire Rapids) may see additional gains.
 
@@ -371,10 +391,10 @@ ARM cores where TBL4 has high latency:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| byte | 1,591 ns | 31 ns | **51x** |
-| sbyte | 1,222 ns | 34 ns | **36x** |
-| short | 1,234 ns | 48 ns | **26x** |
-| ushort | 1,232 ns | 52 ns | **24x** |
+| byte | 1,132 ns | 31 ns | **37x** |
+| sbyte | 1,206 ns | 32 ns | **38x** |
+| short | 1,124 ns | 48 ns | **23x** |
+| ushort | 1,134 ns | 48 ns | **24x** |
 
 For `int`, `uint`, and `float`, seven `Vector128` registers with two-stage
 TBL/TBX cross-vector shuffles are used (with TBL1 optimization for single-register
@@ -382,7 +402,7 @@ shuffles and early-exit for sorted input):
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| float | 1,533 ns | 74 ns | **21x** |
+| float | 1,363 ns | 74 ns | **18x** |
 
 > **Note:** `float` benefits enormously because .NET's `Array.Sort` does not
 > have a SIMD-accelerated path for `float` on ARM64.
@@ -394,9 +414,9 @@ GeneratedSort's NEON path still provides improvements:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| char | 104 ns | 51 ns | **2.0x** |
-| int | 100 ns | 74 ns | **1.4x** |
-| uint | 114 ns | 76 ns | **1.5x** |
+| char | 97 ns | 50 ns | **1.9x** |
+| int | 99 ns | 74 ns | **1.3x** |
+| uint | 108 ns | 72 ns | **1.5x** |
 
 #### Other types (scalar unrolled network)
 
@@ -405,8 +425,8 @@ speedup over `Array.Sort` as on x86:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
-| double | 1,521 ns | 156 ns | **10x** |
-| long | 1,297 ns | 105 ns | **12x** |
+| double | 1,461 ns | 110 ns | **13x** |
+| long | 1,122 ns | 100 ns | **11x** |
 
 ### ARM64 (Ampere Neoverse-N2, AdvSimd/NEON)
 
@@ -430,14 +450,14 @@ Apple Silicon. The TBL1 optimization for intra-register shuffles is critical her
 
 | Size | Kind | GeneratedSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 57 ns | **0.53x** (47% faster) |
-| 27 | Sorted | 56 ns | **0.64x** (36% faster) |
-| 27 | Reversed | 55 ns | **0.59x** (41% faster) |
-| 27 | Duplicates | 56 ns | **0.50x** (50% faster) |
-| 28 | Random | 55 ns | **0.41x** (59% faster) |
-| 28 | Sorted | 56 ns | **0.62x** (38% faster) |
-| 28 | Reversed | 56 ns | **0.51x** (49% faster) |
-| 28 | Duplicates | 55 ns | **0.49x** (51% faster) |
+| 27 | Random | 56 ns | **0.52x** (48% faster) |
+| 27 | Sorted | 57 ns | **0.66x** (34% faster) |
+| 27 | Reversed | 57 ns | **0.60x** (40% faster) |
+| 27 | Duplicates | 56 ns | **0.51x** (49% faster) |
+| 28 | Random | 55 ns | **0.40x** (60% faster) |
+| 28 | Sorted | 57 ns | **0.65x** (35% faster) |
+| 28 | Reversed | 56 ns | **0.52x** (48% faster) |
+| 28 | Duplicates | 55 ns | **0.48x** (52% faster) |
 
 ### int detailed results (ARM64)
 
