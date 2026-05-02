@@ -14,7 +14,12 @@ Overloads are generated for every primitive .NET type: `byte`, `sbyte`,
 ## Usage
 
 Add the `SortingNetworks` NuGet package, then decorate a `partial class` with
-`[SortingNetwork(size, typeof(T))]` for each size/type combination you need:
+`[SortingNetwork(size, typeof(T))]` for each size/type combination you need.
+
+> **Target framework:** The generated code uses `System.Runtime.CompilerServices.Unsafe`
+> and `System.Runtime.Intrinsics` (for SIMD paths), which require **.NET 8 or later**.
+> The SIMD paths are guarded by runtime `IsSupported` checks so they compile on all
+> .NET 8+ targets but only execute on hardware that supports them.
 
 ```csharp
 using SortingNetworks;
@@ -286,9 +291,10 @@ types the BCL is already very fast and GeneratedSort provides a smaller benefit:
 
 > **Note:** These results are from an Intel Core i9-9900K. On processors with AVX-512 (e.g., Xeon), Array.Sort is even more optimized and GeneratedSort may be slower for these types.
 
-#### string (specialized `Sort(string[])` path)
+#### string (scalar `string.CompareOrdinal` path)
 
-The generated `Sort(Span<string>)` method uses `string.CompareOrdinal` in the unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
+The generated `Sort(Span<string>)` method uses `string.CompareOrdinal` in the
+unrolled network, avoiding `IComparer<T>` interface dispatch overhead:
 
 | Type | ArraySort (27) | GeneratedSort (27) | Speedup |
 |---|---|---|---|
