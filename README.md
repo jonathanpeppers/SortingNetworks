@@ -9,7 +9,7 @@ from the paper
 
 Overloads are generated for every primitive .NET type: `byte`, `sbyte`,
 `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `nint`, `nuint`,
-`char`, `float`, `double`, and `string`. Custom value types that implement
+`char`, `float`, `double`, `decimal`, and `string`. Custom value types that implement
 `IComparable<T>` are also supported with unrolled `.CompareTo()` calls,
 and arbitrary types can be sorted via an `IComparer<T>` overload.
 
@@ -368,6 +368,7 @@ sorting network dominates:
 | long | 1,465 ns | 100 ns | **15x** |
 | nint | 1,423 ns | 107 ns | **13x** |
 | nuint | 1,427 ns | 105 ns | **14x** |
+| decimal | 2,376 ns | 794 ns | **3.0x** |
 
 > **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, `int`, `uint`, and `float` use AVX-512F SIMD, and `nint`/`nuint` dispatch to `long`/`ulong` for even greater speedups.
 
@@ -445,6 +446,7 @@ For other types without SIMD-optimized `Array.Sort` in the BCL:
 | long | 1,696 ns | 147 ns | **12x** |
 | nint | 1,854 ns | 155 ns | **12x** |
 | nuint | 1,780 ns | 142 ns | **13x** |
+| decimal | 2,863 ns | 1,208 ns | **2.4x** |
 | string | 941 ns | 678 ns | **1.4x** |
 
 > **Note:** These results are from an AMD EPYC 9V74 on GitHub Actions
@@ -505,6 +507,7 @@ speedup over `Array.Sort` as on x86:
 | long | 1,122 ns | 100 ns | **11x** |
 | nint | 1,133 ns | 101 ns | **11x** |
 | nuint | 1,135 ns | 101 ns | **11x** |
+| decimal | 1,676 ns | 673 ns | **2.5x** |
 
 ### ARM64 (Ampere Neoverse-N2, AdvSimd/NEON)
 
@@ -532,6 +535,7 @@ Apple Silicon. The TBL1 optimization for intra-register shuffles is critical her
 | nint | 2,081 ns | 147 ns | **14x** |
 | nuint | 2,083 ns | 142 ns | **15x** |
 | double | 2,442 ns | 149 ns | **16x** |
+| decimal | 2,897 ns | 1,181 ns | **2.5x** |
 
 #### Sizes 33-64 (ARM64 SIMD for byte/short)
 
@@ -624,7 +628,7 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
   emits optimized sorting network code (scalar + SIMD)
 - **SortingNetworks.Tests** -- xUnit correctness tests covering sizes 2-64
   across all 13 primitive types plus custom types, with stress tests using
-  100 random seeds (419 tests)
+  100 random seeds (471 tests)
 - **SortingNetworks.Benchmarks** -- BenchmarkDotNet benchmarks comparing
   generated sort vs `Array.Sort` for sizes 23-64 across all primitive types
   and custom record structs
