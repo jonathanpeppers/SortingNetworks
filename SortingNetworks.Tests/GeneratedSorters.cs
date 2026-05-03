@@ -12,6 +12,8 @@ namespace SortingNetworks.Tests;
 [SortingNetwork(27, typeof(sbyte))]
 [SortingNetwork(28, typeof(sbyte))]
 [SortingNetwork(32, typeof(sbyte))]
+[SortingNetwork(48, typeof(sbyte))]
+[SortingNetwork(64, typeof(sbyte))]
 [SortingNetwork(8, typeof(short))]
 [SortingNetwork(12, typeof(short))]
 [SortingNetwork(16, typeof(short))]
