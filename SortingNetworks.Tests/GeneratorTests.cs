@@ -873,4 +873,40 @@ public partial class MySorter {{ }}
         Assert.Contains($"private static void Sort16(ref {type64} first)", generatedSource);
         Assert.Contains($"private static void Sort16(ref {type32} first)", generatedSource);
     }
+
+    [Theory]
+    [InlineData("int")]
+    [InlineData("byte")]
+    [InlineData("short")]
+    [InlineData("long")]
+    [InlineData("float")]
+    [InlineData("double")]
+    public void HybridSort_GeneratesCode(string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[HybridSortingNetwork(typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("HybridQuickSort"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("HybridSortSmall", generatedSource);
+        Assert.Contains("HybridPartition3Way", generatedSource);
+        Assert.Contains("HybridMedianOfThree", generatedSource);
+        Assert.Contains("PartialSort", generatedSource);
+        Assert.Contains("NthElement", generatedSource);
+        Assert.Contains("HybridNetworkData", generatedSource);
+    }
 }
