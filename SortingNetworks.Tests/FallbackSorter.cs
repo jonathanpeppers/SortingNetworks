@@ -17,9 +17,7 @@ partial class FallbackSorter
     static void OnFallback(Span<int> span, System.Collections.Generic.IComparer<int> comparer)
     {
         FallbackCallCount++;
-        int[] temp = span.ToArray();
-        Array.Sort(temp, comparer);
-        temp.CopyTo(span);
+        span.Sort(comparer.Compare);
     }
 
     static void OnFallback(Span<double> span)
@@ -31,8 +29,6 @@ partial class FallbackSorter
     static void OnFallback(Span<double> span, System.Collections.Generic.IComparer<double> comparer)
     {
         FallbackCallCount++;
-        double[] temp = span.ToArray();
-        Array.Sort(temp, comparer);
-        temp.CopyTo(span);
+        span.Sort(comparer.Compare);
     }
 }

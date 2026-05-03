@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace SortingNetworks.Generators
             SpecialType.System_Int64, SpecialType.System_UInt64,
             SpecialType.System_Char,
             SpecialType.System_Single, SpecialType.System_Double,
+            SpecialType.System_Decimal,
             SpecialType.System_IntPtr, SpecialType.System_UIntPtr,
             SpecialType.System_String
         };
@@ -48,6 +50,7 @@ namespace SortingNetworks.Generators
             SpecialType.System_Char => "char",
             SpecialType.System_Single => "float",
             SpecialType.System_Double => "double",
+            SpecialType.System_Decimal => "decimal",
             SpecialType.System_IntPtr => "nint",
             SpecialType.System_UIntPtr => "nuint",
             SpecialType.System_String => "string",
@@ -169,9 +172,9 @@ namespace SortingNetworks.Generators
             return new GenerationInfo(
                 classSymbol.Name,
                 namespaceName,
-                attributes.ToArray(),
-                fallbackTypes,
-                fallbackTypesWithComparer);
+                attributes.ToImmutableArray(),
+                fallbackTypes.OrderBy(s => s, StringComparer.Ordinal).ToImmutableArray(),
+                fallbackTypesWithComparer.OrderBy(s => s, StringComparer.Ordinal).ToImmutableArray());
         }
 
         private static void Execute(SourceProductionContext context, ImmutableArray<GenerationInfo?> infos)
@@ -1074,21 +1077,48 @@ namespace SortingNetworks.Generators
             return sb.ToString();
         }
 
-        private sealed class GenerationInfo
+        private sealed class GenerationInfo : IEquatable<GenerationInfo>
         {
             public string ClassName { get; }
             public string? Namespace { get; }
-            public NetworkRequest[] Requests { get; }
-            public HashSet<string> FallbackTypes { get; }
-            public HashSet<string> FallbackTypesWithComparer { get; }
+            public ImmutableArray<NetworkRequest> Requests { get; }
+            public ImmutableArray<string> FallbackTypes { get; }
+            public ImmutableArray<string> FallbackTypesWithComparer { get; }
 
-            public GenerationInfo(string className, string? ns, NetworkRequest[] requests, HashSet<string> fallbackTypes, HashSet<string> fallbackTypesWithComparer)
+            public GenerationInfo(string className, string? ns, ImmutableArray<NetworkRequest> requests, ImmutableArray<string> fallbackTypes, ImmutableArray<string> fallbackTypesWithComparer)
             {
                 ClassName = className;
                 Namespace = ns;
                 Requests = requests;
                 FallbackTypes = fallbackTypes;
                 FallbackTypesWithComparer = fallbackTypesWithComparer;
+            }
+
+            public bool Equals(GenerationInfo? other)
+            {
+                if (other is null) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return ClassName == other.ClassName
+                    && Namespace == other.Namespace
+                    && Requests.SequenceEqual(other.Requests)
+                    && FallbackTypes.SequenceEqual(other.FallbackTypes)
+                    && FallbackTypesWithComparer.SequenceEqual(other.FallbackTypesWithComparer);
+            }
+
+            public override bool Equals(object? obj) => Equals(obj as GenerationInfo);
+
+            public override int GetHashCode()
+            {
+                var hc = new HashCode();
+                hc.Add(ClassName);
+                hc.Add(Namespace);
+                foreach (var r in Requests)
+                    hc.Add(r);
+                foreach (var f in FallbackTypes)
+                    hc.Add(f);
+                foreach (var f in FallbackTypesWithComparer)
+                    hc.Add(f);
+                return hc.ToHashCode();
             }
         }
 
@@ -1132,7 +1162,7 @@ namespace SortingNetworks.Generators
             return null;
         }
 
-        private sealed class NetworkRequest
+        private sealed class NetworkRequest : IEquatable<NetworkRequest>
         {
             public int Size { get; }
             public string TypeName { get; }
@@ -1147,6 +1177,23 @@ namespace SortingNetworks.Generators
                 SpecialType = specialType;
                 IsCustomType = !SupportedSpecialTypes.Contains(specialType);
                 IsComparable = isComparable;
+            }
+
+            public bool Equals(NetworkRequest? other)
+            {
+                if (other is null) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return Size == other.Size
+                    && TypeName == other.TypeName
+                    && SpecialType == other.SpecialType
+                    && IsComparable == other.IsComparable;
+            }
+
+            public override bool Equals(object? obj) => Equals(obj as NetworkRequest);
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Size, TypeName, SpecialType, IsComparable);
             }
         }
     }
