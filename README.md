@@ -593,16 +593,38 @@ multi-stage TBL overhead exceeds SIMD benefit at these sizes:
 
 | Size | Kind | GeneratedSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 74 ns | **0.74x** (26% faster) |
-| 27 | Sorted | 30 ns | **0.52x** (48% faster) |
-| 27 | Reversed | 78 ns | 1.22x |
-| 27 | Duplicates | 77 ns | **0.72x** (28% faster) |
-| 28 | Random | 80 ns | **0.65x** (35% faster) |
-| 28 | Sorted | 30 ns | **0.51x** (49% faster) |
-| 28 | Reversed | 73 ns | 1.15x |
-| 28 | Duplicates | 80 ns | **0.73x** (27% faster) |
+| 27 | Random | 74 ns | **0.76x** (24% faster) |
+| 27 | Sorted | 28 ns | **0.52x** (48% faster) |
+| 27 | Reversed | 73 ns | 1.21x |
+| 27 | Duplicates | 77 ns | **0.77x** (23% faster) |
+| 28 | Random | 72 ns | **0.60x** (40% faster) |
+| 28 | Sorted | 30 ns | **0.52x** (48% faster) |
+| 28 | Reversed | 72 ns | 1.17x |
+| 28 | Duplicates | 71 ns | **0.68x** (32% faster) |
 
 > With AVX2 SIMD, GeneratedSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the early-exit sorted check makes sorted input ~2x faster than ArraySort. Reversed input is slightly slower due to the overhead of cross-vector TBL/TBX shuffles with 7 registers.
+
+### int scalar sizes 23-32 (platform-adaptive)
+
+For sizes outside the SIMD range, the scalar unrolled network uses a runtime
+`X86Base.IsSupported` check: branchless `Math.Min`/`Math.Max` on x86 (JIT
+lowers to `cmov`), branching `if/swap` on ARM (where branch prediction
+outperforms `csel` data-dependency chains):
+
+| Size | Ubuntu x64 (EPYC) | Windows x64 (EPYC) | macOS ARM (M1) |
+|---|---|---|---|
+| 23 | **0.82x** (18% faster) | **0.68x** (32% faster) | **0.75x** (25% faster) |
+| 24 | **0.73x** (27% faster) | 1.02x | **0.77x** (23% faster) |
+| 25 | **0.87x** (13% faster) | **0.85x** (15% faster) | **0.75x** (25% faster) |
+| 26 | **0.81x** (19% faster) | **0.84x** (16% faster) | **0.76x** (24% faster) |
+| 29 | **0.95x** | — | — |
+| 30 | **0.93x** | — | — |
+| 31 | **0.75x** (25% faster) | — | — |
+| 32 | **0.78x** (22% faster) | — | — |
+
+> **Note:** The `Branchless` attribute property can force one strategy on all
+> platforms: `[SortingNetwork(27, typeof(int), Branchless = true)]` for
+> branchless-only, `Branchless = false` for branching-only.
 
 ### Sizes 33-64 (x86, scalar unrolled)
 
