@@ -981,6 +981,7 @@ namespace SortingNetworks.Generators
         {
             var classSymbol = (INamedTypeSymbol)context.TargetSymbol;
 
+            var seen = new HashSet<SpecialType>();
             var types = new List<HybridTypeRequest>();
             foreach (var attr in context.Attributes)
             {
@@ -996,6 +997,9 @@ namespace SortingNetworks.Generators
                     if (!SupportedSpecialTypes.Contains(typeSymbol.SpecialType))
                         continue;
 
+                    if (!seen.Add(typeSymbol.SpecialType))
+                        continue;
+
                     types.Add(new HybridTypeRequest(typeName, typeSymbol.SpecialType));
                 }
             }
@@ -1007,7 +1011,20 @@ namespace SortingNetworks.Generators
                 ? null
                 : classSymbol.ContainingNamespace.ToDisplayString();
 
-            return new HybridGenerationInfo(classSymbol.Name, namespaceName, types.ToArray());
+            // Build fully-qualified class name for hint (handles nested classes)
+            var classChain = new List<string>();
+            var current = classSymbol;
+            while (current != null)
+            {
+                classChain.Insert(0, current.Name);
+                current = current.ContainingType;
+            }
+            var qualifiedClassName = string.Join(".", classChain);
+            var hintName = namespaceName != null
+                ? $"{namespaceName}.{qualifiedClassName}"
+                : qualifiedClassName;
+
+            return new HybridGenerationInfo(classSymbol.Name, namespaceName, types.ToArray(), hintName);
         }
 
         private static void ExecuteHybrid(SourceProductionContext context, ImmutableArray<HybridGenerationInfo?> infos)
@@ -1018,7 +1035,7 @@ namespace SortingNetworks.Generators
                 var source = GenerateHybridSource(info);
                 if (source != null)
                 {
-                    context.AddSource($"{info.ClassName}.Hybrid.g.cs", SourceText.From(source, Encoding.UTF8));
+                    context.AddSource($"{info.HintName}.Hybrid.g.cs", SourceText.From(source, Encoding.UTF8));
                 }
             }
         }
@@ -1080,12 +1097,14 @@ namespace SortingNetworks.Generators
             public string ClassName { get; }
             public string? Namespace { get; }
             public HybridTypeRequest[] Types { get; }
+            public string HintName { get; }
 
-            public HybridGenerationInfo(string className, string? ns, HybridTypeRequest[] types)
+            public HybridGenerationInfo(string className, string? ns, HybridTypeRequest[] types, string hintName)
             {
                 ClassName = className;
                 Namespace = ns;
                 Types = types;
+                HintName = hintName;
             }
         }
 

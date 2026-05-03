@@ -5,7 +5,7 @@ namespace SortingNetworks
     /// <summary>
     /// Marks a partial class for hybrid sorting network code generation.
     /// The source generator will emit <c>Sort</c>, <c>PartialSort</c>,
-    /// and <c>NthElement</c> methods that use AVX-512 SIMD partitioning
+    /// and <c>NthElement</c> methods that use quicksort partitioning
     /// for large arrays and optimal sorting networks for small sub-arrays.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]

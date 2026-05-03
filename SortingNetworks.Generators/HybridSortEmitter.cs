@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 namespace SortingNetworks.Generators
 {
     /// <summary>
-    /// Emits hybrid sorting code that combines AVX-512 SIMD partitioning
+    /// Emits hybrid sorting code that combines quicksort partitioning
     /// for large arrays with sorting-network base cases for small sub-arrays.
     /// Generates Sort, PartialSort, and NthElement methods.
     /// </summary>
@@ -61,7 +61,7 @@ namespace SortingNetworks.Generators
 
         private static void EmitSortMethods(StringBuilder sb, string typeName, bool isString)
         {
-            sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using a hybrid SIMD quicksort with sorting network base case.</summary>");
+            sb.AppendLine($"        /// <summary>Sorts a span of {typeName} using a hybrid quicksort with sorting network base case.</summary>");
             sb.AppendLine($"        public static void Sort(System.Span<{typeName}> span)");
             sb.AppendLine("        {");
             sb.AppendLine("            if (span.Length <= 1) return;");
@@ -70,10 +70,11 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"                HybridSortSmall(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span), span.Length);");
             sb.AppendLine("                return;");
             sb.AppendLine("            }");
-            sb.AppendLine("            HybridQuickSort(span);");
+            sb.AppendLine("            int depthLimit = 2 * System.Numerics.BitOperations.Log2((uint)span.Length);");
+            sb.AppendLine("            HybridQuickSort(span, depthLimit);");
             sb.AppendLine("        }");
             sb.AppendLine();
-            sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using a hybrid SIMD quicksort with sorting network base case.</summary>");
+            sb.AppendLine($"        /// <summary>Sorts an array of {typeName} using a hybrid quicksort with sorting network base case.</summary>");
             sb.AppendLine($"        public static void Sort({typeName}[] array)");
             sb.AppendLine("        {");
             sb.AppendLine("            System.ArgumentNullException.ThrowIfNull(array);");
@@ -88,13 +89,16 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"        public static void PartialSort(System.Span<{typeName}> span, int k)");
             sb.AppendLine("        {");
             sb.AppendLine("            if (k < 0 || k > span.Length) throw new System.ArgumentOutOfRangeException(nameof(k));");
-            sb.AppendLine("            if (k <= 1 || span.Length <= 1) return;");
+            sb.AppendLine("            if (k <= 0 || span.Length <= 1) return;");
             sb.AppendLine("            HybridQuickSelect(span, k);");
             sb.AppendLine($"            var left = span.Slice(0, k);");
             sb.AppendLine($"            if (left.Length <= {BaseThreshold})");
             sb.AppendLine($"                HybridSortSmall(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(left), left.Length);");
             sb.AppendLine("            else");
-            sb.AppendLine("                HybridQuickSort(left);");
+            sb.AppendLine("            {");
+            sb.AppendLine("                int depthLimit = 2 * System.Numerics.BitOperations.Log2((uint)left.Length);");
+            sb.AppendLine("                HybridQuickSort(left, depthLimit);");
+            sb.AppendLine("            }");
             sb.AppendLine("        }");
             sb.AppendLine();
             sb.AppendLine($"        /// <summary>Partially sorts an array so that the first <paramref name=\"k\"/> elements are the smallest in sorted order.</summary>");
@@ -129,10 +133,17 @@ namespace SortingNetworks.Generators
         {
             string gt = GetGreaterThan(typeName, isString);
 
-            sb.AppendLine($"        private static void HybridQuickSort(System.Span<{typeName}> span)");
+            sb.AppendLine($"        private static void HybridQuickSort(System.Span<{typeName}> span, int depthLimit)");
             sb.AppendLine("        {");
             sb.AppendLine($"            while (span.Length > {BaseThreshold})");
             sb.AppendLine("            {");
+            sb.AppendLine("                if (depthLimit == 0)");
+            sb.AppendLine("                {");
+            sb.AppendLine("                    System.MemoryExtensions.Sort(span);");
+            sb.AppendLine("                    return;");
+            sb.AppendLine("                }");
+            sb.AppendLine("                depthLimit--;");
+            sb.AppendLine();
             sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
             sb.AppendLine($"                {typeName} pivot = HybridMedianOfThree(");
             sb.AppendLine("                    first,");
@@ -151,7 +162,7 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"                        if (left.Length <= {BaseThreshold})");
             sb.AppendLine($"                            HybridSortSmall(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(left), left.Length);");
             sb.AppendLine("                        else");
-            sb.AppendLine("                            HybridQuickSort(left);");
+            sb.AppendLine("                            HybridQuickSort(left, depthLimit);");
             sb.AppendLine("                    }");
             sb.AppendLine("                    span = right;");
             sb.AppendLine("                }");
@@ -162,7 +173,7 @@ namespace SortingNetworks.Generators
             sb.AppendLine($"                        if (right.Length <= {BaseThreshold})");
             sb.AppendLine($"                            HybridSortSmall(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(right), right.Length);");
             sb.AppendLine("                        else");
-            sb.AppendLine("                            HybridQuickSort(right);");
+            sb.AppendLine("                            HybridQuickSort(right, depthLimit);");
             sb.AppendLine("                    }");
             sb.AppendLine("                    span = left;");
             sb.AppendLine("                }");
@@ -208,7 +219,7 @@ namespace SortingNetworks.Generators
             sb.AppendLine("        {");
             sb.AppendLine("            int offset = HybridGetNetworkOffset(length);");
             sb.AppendLine("            int pairCount = HybridGetNetworkOffset(length + 1) - offset;");
-            sb.AppendLine("            System.ReadOnlySpan<byte> data = HybridNetworkData;");
+            sb.AppendLine("            byte[] data = HybridNetworkData;");
             sb.AppendLine("            for (int i = 0; i < pairCount; i += 2)");
             sb.AppendLine("            {");
             sb.AppendLine($"                ref {typeName} a = ref System.Runtime.CompilerServices.Unsafe.Add(ref first, data[offset + i]);");
@@ -315,29 +326,28 @@ namespace SortingNetworks.Generators
             sb.AppendLine("        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
             sb.AppendLine("        private static int HybridGetNetworkOffset(int size)");
             sb.AppendLine("        {");
-            sb.AppendLine("            System.ReadOnlySpan<int> offsets = HybridNetworkOffsets;");
-            sb.AppendLine("            return offsets[size];");
+            sb.AppendLine("            return HybridNetworkOffsets[size];");
             sb.AppendLine("        }");
             sb.AppendLine();
 
-            // Emit the offset table
-            sb.Append("        private static System.ReadOnlySpan<int> HybridNetworkOffsets => new int[] { ");
+            // Emit the offset table as a static readonly array (avoids per-access allocation)
+            sb.Append("        private static readonly int[] HybridNetworkOffsets = [");
             for (int i = 0; i < offsets.Length; i++)
             {
                 if (i > 0) sb.Append(", ");
                 sb.Append(offsets[i]);
             }
-            sb.AppendLine(" };");
+            sb.AppendLine("];");
             sb.AppendLine();
 
-            // Emit the network data as a byte array
-            sb.Append("        private static System.ReadOnlySpan<byte> HybridNetworkData => new byte[] { ");
+            // Emit the network data as a static readonly byte array (avoids per-access allocation)
+            sb.Append("        private static readonly byte[] HybridNetworkData = [");
             for (int i = 0; i < allNetworkPairs.Count; i++)
             {
                 if (i > 0) sb.Append(", ");
                 sb.Append(allNetworkPairs[i]);
             }
-            sb.AppendLine(" };");
+            sb.AppendLine("];");
             sb.AppendLine();
             return sb.ToString();
         }

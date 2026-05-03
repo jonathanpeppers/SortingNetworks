@@ -150,6 +150,61 @@ public class HybridSortTests
         Assert.Equal(expected, data);
     }
 
+    [Fact]
+    public void Sort_SByte_200Elements()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 200).Select(_ => (sbyte)rng.Next(-128, 128)).ToArray();
+        var expected = (sbyte[])data.Clone();
+        Array.Sort(expected);
+        HybridSorter.Sort(data.AsSpan());
+        Assert.Equal(expected, data);
+    }
+
+    [Fact]
+    public void Sort_UShort_200Elements()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 200).Select(_ => (ushort)rng.Next(0, 65536)).ToArray();
+        var expected = (ushort[])data.Clone();
+        Array.Sort(expected);
+        HybridSorter.Sort(data.AsSpan());
+        Assert.Equal(expected, data);
+    }
+
+    [Fact]
+    public void Sort_UInt_200Elements()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 200).Select(_ => (uint)rng.Next(0, int.MaxValue)).ToArray();
+        var expected = (uint[])data.Clone();
+        Array.Sort(expected);
+        HybridSorter.Sort(data.AsSpan());
+        Assert.Equal(expected, data);
+    }
+
+    [Fact]
+    public void Sort_ULong_200Elements()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 200).Select(_ => (ulong)rng.Next(0, int.MaxValue)).ToArray();
+        var expected = (ulong[])data.Clone();
+        Array.Sort(expected);
+        HybridSorter.Sort(data.AsSpan());
+        Assert.Equal(expected, data);
+    }
+
+    [Fact]
+    public void Sort_Char_200Elements()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 200).Select(_ => (char)rng.Next('A', 'z')).ToArray();
+        var expected = (char[])data.Clone();
+        Array.Sort(expected);
+        HybridSorter.Sort(data.AsSpan());
+        Assert.Equal(expected, data);
+    }
+
     // --- Stress test ---
 
     [Fact]
@@ -202,6 +257,18 @@ public class HybridSortTests
     {
         var data = new int[] { 3, 1, 2 };
         HybridSorter.PartialSort(data.AsSpan(), 0); // Should not throw
+    }
+
+    [Fact]
+    public void PartialSort_K_One()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 100).Select(_ => rng.Next(-1000, 1000)).ToArray();
+        var expected = (int[])data.Clone();
+        Array.Sort(expected);
+
+        HybridSorter.PartialSort(data.AsSpan(), 1);
+        Assert.Equal(expected[0], data[0]);
     }
 
     [Fact]
