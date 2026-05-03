@@ -926,11 +926,14 @@ public partial class MySorter { }
 
         var generatorResult = result.Results.Single();
 
-        // The ForAttributeWithMetadataName step should report Cached on the second run
-        var outputStep = generatorResult.TrackedOutputSteps
-            .SelectMany(s => s.Value)
-            .SelectMany(s => s.Outputs);
-        Assert.All(outputStep, o =>
+        // Target the specific SourceOutput step to avoid brittleness if more steps are added
+        Assert.True(generatorResult.TrackedOutputSteps.ContainsKey("SourceOutput"),
+            "Expected 'SourceOutput' tracked step");
+        var outputs = generatorResult.TrackedOutputSteps["SourceOutput"]
+            .SelectMany(s => s.Outputs)
+            .ToArray();
+        Assert.NotEmpty(outputs);
+        Assert.All(outputs, o =>
             Assert.Equal(IncrementalStepRunReason.Cached, o.Reason));
     }
 
@@ -959,11 +962,13 @@ public class Unrelated { public void Foo() { } }
 
         var generatorResult = result.Results.Single();
 
-        // Output should still be cached — the SortingNetwork attribute didn't change
-        var outputStep = generatorResult.TrackedOutputSteps
-            .SelectMany(s => s.Value)
-            .SelectMany(s => s.Outputs);
-        Assert.All(outputStep, o =>
+        Assert.True(generatorResult.TrackedOutputSteps.ContainsKey("SourceOutput"),
+            "Expected 'SourceOutput' tracked step");
+        var outputs = generatorResult.TrackedOutputSteps["SourceOutput"]
+            .SelectMany(s => s.Outputs)
+            .ToArray();
+        Assert.NotEmpty(outputs);
+        Assert.All(outputs, o =>
             Assert.Equal(IncrementalStepRunReason.Cached, o.Reason));
     }
 
@@ -988,11 +993,13 @@ public partial class MySorter { }
 
         var generatorResult = result.Results.Single();
 
-        // Output should be Modified — the attribute size changed
-        var outputStep = generatorResult.TrackedOutputSteps
-            .SelectMany(s => s.Value)
-            .SelectMany(s => s.Outputs);
-        Assert.Contains(outputStep, o =>
+        Assert.True(generatorResult.TrackedOutputSteps.ContainsKey("SourceOutput"),
+            "Expected 'SourceOutput' tracked step");
+        var outputs = generatorResult.TrackedOutputSteps["SourceOutput"]
+            .SelectMany(s => s.Outputs)
+            .ToArray();
+        Assert.NotEmpty(outputs);
+        Assert.Contains(outputs, o =>
             o.Reason == IncrementalStepRunReason.Modified);
     }
 
@@ -1017,11 +1024,13 @@ public partial class MySorter { }
 
         var generatorResult = result.Results.Single();
 
-        // Output should be Modified — the element type changed
-        var outputStep = generatorResult.TrackedOutputSteps
-            .SelectMany(s => s.Value)
-            .SelectMany(s => s.Outputs);
-        Assert.Contains(outputStep, o =>
+        Assert.True(generatorResult.TrackedOutputSteps.ContainsKey("SourceOutput"),
+            "Expected 'SourceOutput' tracked step");
+        var outputs = generatorResult.TrackedOutputSteps["SourceOutput"]
+            .SelectMany(s => s.Outputs)
+            .ToArray();
+        Assert.NotEmpty(outputs);
+        Assert.Contains(outputs, o =>
             o.Reason == IncrementalStepRunReason.Modified);
     }
 }

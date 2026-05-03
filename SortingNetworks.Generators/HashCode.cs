@@ -11,7 +11,6 @@ using System.Runtime.CompilerServices;
 
 namespace SortingNetworks.Generators
 {
-#pragma warning disable CS0809
     internal struct HashCode
     {
         private const uint Prime1 = 2654435761U;
@@ -164,5 +163,4 @@ namespace SortingNetworks.Generators
             return (value << offset) | (value >> (32 - offset));
         }
     }
-#pragma warning restore CS0809
 }
