@@ -620,16 +620,59 @@ namespace SortingNetworks.Generators
                 }
 
                 // Scalar fallback: get ref and dispatch
-                sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
-                if (sizes.Count == 1)
+                // For nint/nuint, delegate to the fixed-size type's scalar sort via Unsafe.As
+                // for optimal JIT codegen — matches the pattern used by dotnet/runtime SpanHelpers.
+                var scalarDelegateTypes = GetNativeIntDelegateTypes(typeName);
+                if (scalarDelegateTypes != null)
                 {
-                    sb.AppendLine($"                Sort{sizes[0].Size}(ref first);");
+                    var (scalarType32, scalarType64) = scalarDelegateTypes.Value;
+                    var scalarTypeName64 = GetKeywordName(scalarType64)!;
+                    var scalarTypeName32 = GetKeywordName(scalarType32)!;
+
+                    sb.AppendLine($"                if ({typeName}.Size == 8)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine($"                    ref {scalarTypeName64} first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, {scalarTypeName64}>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
+                    if (sizes.Count == 1)
+                    {
+                        sb.AppendLine($"                    Sort{sizes[0].Size}(ref first);");
+                    }
+                    else
+                    {
+                        foreach (var request in sizes)
+                        {
+                            sb.AppendLine($"                    if (n == {request.Size}) {{ Sort{request.Size}(ref first); return; }}");
+                        }
+                    }
+                    sb.AppendLine("                }");
+                    sb.AppendLine($"                if ({typeName}.Size == 4)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine($"                    ref {scalarTypeName32} first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, {scalarTypeName32}>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
+                    if (sizes.Count == 1)
+                    {
+                        sb.AppendLine($"                    Sort{sizes[0].Size}(ref first);");
+                    }
+                    else
+                    {
+                        foreach (var request in sizes)
+                        {
+                            sb.AppendLine($"                    if (n == {request.Size}) {{ Sort{request.Size}(ref first); return; }}");
+                        }
+                    }
+                    sb.AppendLine("                }");
                 }
                 else
                 {
-                    foreach (var request in sizes)
+                    sb.AppendLine($"                ref {typeName} first = ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span);");
+                    if (sizes.Count == 1)
                     {
-                        sb.AppendLine($"                if (n == {request.Size}) {{ Sort{request.Size}(ref first); return; }}");
+                        sb.AppendLine($"                Sort{sizes[0].Size}(ref first);");
+                    }
+                    else
+                    {
+                        foreach (var request in sizes)
+                        {
+                            sb.AppendLine($"                if (n == {request.Size}) {{ Sort{request.Size}(ref first); return; }}");
+                        }
                     }
                 }
                 sb.AppendLine("                return;");
@@ -704,6 +747,7 @@ namespace SortingNetworks.Generators
 
             // Emit private SIMD methods and scalar Sort{size} methods
             var emittedSimdMethods = new HashSet<string>();
+            var emittedScalarMethods = new HashSet<string>();
             foreach (var request in validRequests)
             {
                 var key = $"{request.TypeName}_{request.Size}";
@@ -803,16 +847,40 @@ namespace SortingNetworks.Generators
                     }
                 }
 
-                // Emit scalar method (takes ref T first, matches library pattern) — skip for non-comparable custom types
-                if (!request.IsCustomType)
+                // Emit scalar method (takes ref T first, matches library pattern)
+                // For nint/nuint, emit the delegate type's scalar method instead
+                var nativeDelegate = GetNativeIntDelegateTypes(request.TypeName);
+                if (nativeDelegate != null)
                 {
-                    sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
-                    sb.AppendLine();
+                    var (delegateType32, delegateType64) = nativeDelegate.Value;
+                    foreach (var delegateSpecialType in new[] { delegateType32, delegateType64 })
+                    {
+                        var delegateTypeName = GetKeywordName(delegateSpecialType)!;
+                        var scalarKey = $"Sort{request.Size}_{delegateTypeName}";
+                        if (emittedScalarMethods.Add(scalarKey))
+                        {
+                            sb.Append(ScalarEmitter.EmitSortMethod(request.Size, delegateTypeName, network));
+                            sb.AppendLine();
+                        }
+                    }
+                }
+                else if (!request.IsCustomType)
+                {
+                    var scalarKey = $"Sort{request.Size}_{request.TypeName}";
+                    if (emittedScalarMethods.Add(scalarKey))
+                    {
+                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
+                        sb.AppendLine();
+                    }
                 }
                 else if (request.IsComparable)
                 {
-                    sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network, useCompareTo: true));
-                    sb.AppendLine();
+                    var scalarKey = $"Sort{request.Size}_{request.TypeName}";
+                    if (emittedScalarMethods.Add(scalarKey))
+                    {
+                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network, useCompareTo: true));
+                        sb.AppendLine();
+                    }
                 }
             }
 

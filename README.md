@@ -305,12 +305,13 @@ For `double`, AVX-512F SIMD is emitted on x86 when available (four `Vector512`
 registers). On CPUs without AVX-512F, an AVX2 fallback uses seven
 `Vector256<double>` registers (4 elements each) with `Permute4x64` shuffles.
 
-For `nint` and `nuint`, the generated code dispatches to the corresponding fixed-size
-integer sort via `MemoryMarshal.Cast` when SIMD is available for the target type.
-On 64-bit platforms with AVX-512, `nint`/`nuint` dispatch to `long`/`ulong` to
-use AVX-512F SIMD. On 32-bit platforms, they dispatch to `int`/`uint`. When no
-SIMD path exists for the target type (e.g., ARM64 or AVX2-only x86 for 64-bit),
-the scalar unrolled network is used directly to avoid dispatch overhead.
+For `nint` and `nuint`, the generated code delegates to the corresponding fixed-size
+integer sort (`int`/`uint` on 32-bit, `long`/`ulong` on 64-bit) for both SIMD and
+scalar paths. The SIMD path uses `MemoryMarshal.Cast` to reinterpret the span,
+while the scalar path uses `Unsafe.As` to reinterpret the element reference —
+matching the pattern used by dotnet/runtime's `SpanHelpers` for native-sized types.
+This ensures optimal JIT codegen on all platforms by avoiding separate `nint`/`nuint`
+sort methods.
 
 ## Benchmarks
 
@@ -429,8 +430,8 @@ For other types without SIMD-optimized `Array.Sort` in the BCL:
 | short | 1,719 ns | 154 ns | **11x** |
 | ushort | 1,589 ns | 154 ns | **10x** |
 | long | 1,696 ns | 147 ns | **12x** |
-| nint | 1,867 ns | 166 ns | **11x** |
-| nuint | 1,742 ns | 175 ns | **10x** |
+| nint | 1,854 ns | 155 ns | **12x** |
+| nuint | 1,780 ns | 142 ns | **13x** |
 | string | 941 ns | 678 ns | **1.4x** |
 
 > **Note:** These results are from an AMD EPYC 9V74 on GitHub Actions
@@ -489,6 +490,8 @@ speedup over `Array.Sort` as on x86:
 |---|---|---|---|
 | double | 1,461 ns | 110 ns | **13x** |
 | long | 1,122 ns | 100 ns | **11x** |
+| nint | 1,133 ns | 101 ns | **11x** |
+| nuint | 1,135 ns | 101 ns | **11x** |
 
 ### ARM64 (Ampere Neoverse-N2, AdvSimd/NEON)
 
@@ -507,6 +510,15 @@ Apple Silicon. The TBL1 optimization for intra-register shuffles is critical her
 > **Note:** Without the TBL1 optimization, `char` size 27 was 135 ns — slower
 > than ArraySort (97 ns). The optimization reduced it to 68 ns, a **2x
 > improvement** that made GeneratedSort 1.6x faster than ArraySort.
+
+#### Other types (scalar unrolled network)
+
+| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
+|---|---|---|---|
+| long | 2,059 ns | 139 ns | **15x** |
+| nint | 2,081 ns | 147 ns | **14x** |
+| nuint | 2,083 ns | 142 ns | **15x** |
+| double | 2,442 ns | 149 ns | **16x** |
 
 ### int detailed results (AVX2 SIMD)
 
