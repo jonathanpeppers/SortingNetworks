@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 
 namespace SortingNetworks.Generators
@@ -9,6 +10,15 @@ namespace SortingNetworks.Generators
     /// </summary>
     internal static class ScalarEmitter
     {
+        /// <summary>
+        /// Types that have direct System.Math.Min/Max overloads.
+        /// The JIT lowers these to branchless cmov instructions on x64.
+        /// </summary>
+        private static readonly HashSet<string> MathMinMaxTypes = new HashSet<string>
+        {
+            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"
+        };
+
         /// <summary>
         /// Emits a scalar Sort method for the given network size and element type.
         /// </summary>
@@ -28,18 +38,27 @@ namespace SortingNetworks.Generators
 
             // Emit compare-and-swap for each pair
             bool isString = typeName == "string";
+            bool useMathMinMax = !useCompareTo && !isString && MathMinMaxTypes.Contains(typeName);
             for (int i = 0; i < network.Length; i += 2)
             {
                 int a = network[i];
                 int b = network[i + 1];
-                string condition;
-                if (useCompareTo)
-                    condition = $"e{a}.CompareTo(e{b}) > 0";
-                else if (isString)
-                    condition = $"string.CompareOrdinal(e{a}, e{b}) > 0";
+                if (useMathMinMax)
+                {
+                    // Branchless: Math.Min/Max → JIT emits cmov on x64
+                    sb.AppendLine($"            {{ {typeName} t0 = System.Math.Min(e{a}, e{b}); {typeName} t1 = System.Math.Max(e{a}, e{b}); e{a} = t0; e{b} = t1; }}");
+                }
                 else
-                    condition = $"e{a} > e{b}";
-                sb.AppendLine($"            if ({condition}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
+                {
+                    string condition;
+                    if (useCompareTo)
+                        condition = $"e{a}.CompareTo(e{b}) > 0";
+                    else if (isString)
+                        condition = $"string.CompareOrdinal(e{a}, e{b}) > 0";
+                    else
+                        condition = $"e{a} > e{b}";
+                    sb.AppendLine($"            if ({condition}) {{ {typeName} temp = e{a}; e{a} = e{b}; e{b} = temp; }}");
+                }
             }
             sb.AppendLine();
 
