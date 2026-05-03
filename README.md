@@ -121,7 +121,7 @@ MySorter.Sort(otherData);      // any other size → OnFallback
   the comparer path still throws.
 
 The source generator emits optimized sort methods with:
-- **Scalar unrolled** compare-and-swap for all sizes/types
+- **Scalar unrolled** compare-and-swap for all sizes/types (platform-adaptive: branchless `Math.Min`/`Math.Max` on x86, branching `if/swap` on ARM)
 - **x86 SIMD** (AVX2, AVX-512) when the type and size fit in SIMD registers
 - **ARM64 SIMD** (AdvSimd/NEON) for supported types
 - **IComparer&lt;T&gt;** overloads using loop-based network application
@@ -171,27 +171,45 @@ comparators that involve channel 27.
 ### Scalar implementation
 
 The simplest path unrolls every compare-and-swap from the network into
-straight-line code. For a 3-element example, a depth-3 network looks like:
+straight-line code. For numeric types, the generator emits a runtime platform
+check: on x86, branchless `Math.Min`/`Math.Max` calls are used (the JIT lowers
+these to `cmov` instructions); on ARM, branching `if/swap` is used (branch
+prediction outperforms `csel` data-dependency chains). The JIT
+dead-code-eliminates the unused path. For a 3-element example on x86:
 
 ```csharp
 // Sort 3 elements with a sorting network (depth 3, 3 comparators)
 static void Sort3(ref int e0, ref int e1, ref int e2)
 {
-    // Layer 1 — two independent comparators could go here, but
-    // for 3 elements there is only one pair per layer.
-    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+    // Layer 1
+    { int t0 = Math.Min(e0, e1); int t1 = Math.Max(e0, e1); e0 = t0; e1 = t1; }
 
     // Layer 2
-    if (e1 > e2) { int t = e1; e1 = e2; e2 = t; }
+    { int t0 = Math.Min(e1, e2); int t1 = Math.Max(e1, e2); e1 = t0; e2 = t1; }
 
     // Layer 3
-    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+    { int t0 = Math.Min(e0, e1); int t1 = Math.Max(e0, e1); e0 = t0; e1 = t1; }
 }
 ```
 
+For char and custom types, branching `if (a > b) swap` is used instead
+(char lacks `Math.Min`/`Math.Max` overloads). The swap strategy can also be
+controlled explicitly with the `Branchless` attribute property:
+
+```csharp
+// Force branchless Math.Min/Max on all platforms
+[SortingNetwork(27, typeof(int), Branchless = true)]
+
+// Force branching if/swap on all platforms
+[SortingNetwork(27, typeof(int), Branchless = false)]
+
+// Default: auto-detect at runtime (recommended)
+[SortingNetwork(27, typeof(int))]
+```
+
 For the real 27/28-element networks the same pattern is used — the code
-generator emits all ~185 comparators across 13 layers as a flat `if`/swap
-sequence. Elements are loaded into local variables via `Unsafe.Add(ref T, n)`
+generator emits all ~185 comparators across 13 layers as a flat sequence.
+Elements are loaded into local variables via `Unsafe.Add(ref T, n)`
 to avoid bounds checks:
 
 ```csharp
@@ -200,10 +218,10 @@ int e0 = first;
 int e1 = Unsafe.Add(ref first, 1);
 // ... load e2 through e26 ...
 
-// Layer 1 comparators:
-if (e1  > e26) { int temp = e1;  e1  = e26; e26 = temp; }
-if (e2  > e25) { int temp = e2;  e2  = e25; e25 = temp; }
-if (e3  > e24) { int temp = e3;  e3  = e24; e24 = temp; }
+// Layer 1 comparators (branchless Math.Min/Max for integer types):
+{ int t0 = Math.Min(e1, e26);  int t1 = Math.Max(e1, e26);  e1  = t0; e26 = t1; }
+{ int t0 = Math.Min(e2, e25);  int t1 = Math.Max(e2, e25);  e2  = t0; e25 = t1; }
+{ int t0 = Math.Min(e3, e24);  int t1 = Math.Max(e3, e24);  e3  = t0; e24 = t1; }
 // ... remaining comparators in layers 2–13 ...
 ```
 
@@ -575,16 +593,38 @@ multi-stage TBL overhead exceeds SIMD benefit at these sizes:
 
 | Size | Kind | GeneratedSort | Ratio vs ArraySort |
 |---|---|---|---|
-| 27 | Random | 74 ns | **0.74x** (26% faster) |
-| 27 | Sorted | 30 ns | **0.52x** (48% faster) |
-| 27 | Reversed | 78 ns | 1.22x |
-| 27 | Duplicates | 77 ns | **0.72x** (28% faster) |
-| 28 | Random | 80 ns | **0.65x** (35% faster) |
-| 28 | Sorted | 30 ns | **0.51x** (49% faster) |
-| 28 | Reversed | 73 ns | 1.15x |
-| 28 | Duplicates | 80 ns | **0.73x** (27% faster) |
+| 27 | Random | 74 ns | **0.76x** (24% faster) |
+| 27 | Sorted | 28 ns | **0.52x** (48% faster) |
+| 27 | Reversed | 73 ns | 1.21x |
+| 27 | Duplicates | 77 ns | **0.77x** (23% faster) |
+| 28 | Random | 72 ns | **0.60x** (40% faster) |
+| 28 | Sorted | 30 ns | **0.52x** (48% faster) |
+| 28 | Reversed | 72 ns | 1.17x |
+| 28 | Duplicates | 71 ns | **0.68x** (32% faster) |
 
 > With AVX2 SIMD, GeneratedSort is consistently faster than Array.Sort for `int` across all input patterns. On ARM64, the early-exit sorted check makes sorted input ~2x faster than ArraySort. Reversed input is slightly slower due to the overhead of cross-vector TBL/TBX shuffles with 7 registers.
+
+### int scalar sizes 23-32 (platform-adaptive)
+
+For sizes outside the SIMD range, the scalar unrolled network uses a runtime
+`X86Base.IsSupported` check: branchless `Math.Min`/`Math.Max` on x86 (JIT
+lowers to `cmov`), branching `if/swap` on ARM (where branch prediction
+outperforms `csel` data-dependency chains):
+
+| Size | Ubuntu x64 (EPYC) | Windows x64 (EPYC) | macOS ARM (M1) |
+|---|---|---|---|
+| 23 | **0.82x** (18% faster) | **0.68x** (32% faster) | **0.75x** (25% faster) |
+| 24 | **0.73x** (27% faster) | 1.02x | **0.77x** (23% faster) |
+| 25 | **0.87x** (13% faster) | **0.85x** (15% faster) | **0.75x** (25% faster) |
+| 26 | **0.81x** (19% faster) | **0.84x** (16% faster) | **0.76x** (24% faster) |
+| 29 | **0.95x** | — | — |
+| 30 | **0.93x** | — | — |
+| 31 | **0.75x** (25% faster) | — | — |
+| 32 | **0.78x** (22% faster) | — | — |
+
+> **Note:** The `Branchless` attribute property can force one strategy on all
+> platforms: `[SortingNetwork(27, typeof(int), Branchless = true)]` for
+> branchless-only, `Branchless = false` for branching-only.
 
 ### Sizes 33-64 (x86, scalar unrolled)
 
