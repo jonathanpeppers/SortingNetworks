@@ -106,9 +106,7 @@ partial class MySorter
     // Optional: comparer-aware fallback
     static void OnFallback(Span<int> span, IComparer<int> comparer)
     {
-        int[] temp = span.ToArray();
-        Array.Sort(temp, comparer);
-        temp.CopyTo(span);
+        span.Sort(comparer.Compare);
     }
 }
 
