@@ -999,18 +999,16 @@ namespace SortingNetworks.Generators
 
             public override int GetHashCode()
             {
-                unchecked
-                {
-                    int hash = ClassName.GetHashCode();
-                    hash = hash * 397 ^ (Namespace?.GetHashCode() ?? 0);
-                    foreach (var r in Requests)
-                        hash = hash * 397 ^ r.GetHashCode();
-                    foreach (var f in FallbackTypes)
-                        hash = hash * 397 ^ f.GetHashCode();
-                    foreach (var f in FallbackTypesWithComparer)
-                        hash = hash * 397 ^ f.GetHashCode();
-                    return hash;
-                }
+                var hc = new HashCode();
+                hc.Add(ClassName);
+                hc.Add(Namespace);
+                foreach (var r in Requests)
+                    hc.Add(r);
+                foreach (var f in FallbackTypes)
+                    hc.Add(f);
+                foreach (var f in FallbackTypesWithComparer)
+                    hc.Add(f);
+                return hc.ToHashCode();
             }
         }
 
@@ -1057,14 +1055,7 @@ namespace SortingNetworks.Generators
 
             public override int GetHashCode()
             {
-                unchecked
-                {
-                    int hash = Size;
-                    hash = hash * 397 ^ TypeName.GetHashCode();
-                    hash = hash * 397 ^ (int)SpecialType;
-                    hash = hash * 397 ^ IsComparable.GetHashCode();
-                    return hash;
-                }
+                return HashCode.Combine(Size, TypeName, SpecialType, IsComparable);
             }
         }
     }
