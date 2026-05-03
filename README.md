@@ -121,7 +121,7 @@ MySorter.Sort(otherData);      // any other size → OnFallback
   the comparer path still throws.
 
 The source generator emits optimized sort methods with:
-- **Scalar unrolled** compare-and-swap for all sizes/types
+- **Scalar unrolled** compare-and-swap for all sizes/types (branchless `Math.Min`/`Math.Max` for numeric types)
 - **x86 SIMD** (AVX2, AVX-512) when the type and size fit in SIMD registers
 - **ARM64 SIMD** (AdvSimd/NEON) for supported types
 - **IComparer&lt;T&gt;** overloads using loop-based network application
@@ -171,27 +171,31 @@ comparators that involve channel 27.
 ### Scalar implementation
 
 The simplest path unrolls every compare-and-swap from the network into
-straight-line code. For a 3-element example, a depth-3 network looks like:
+straight-line code. For numeric types, branchless `Math.Min`/`Math.Max` calls
+are used (the JIT lowers these to `cmov` instructions). For a 3-element
+example, a depth-3 network looks like:
 
 ```csharp
 // Sort 3 elements with a sorting network (depth 3, 3 comparators)
 static void Sort3(ref int e0, ref int e1, ref int e2)
 {
-    // Layer 1 — two independent comparators could go here, but
-    // for 3 elements there is only one pair per layer.
-    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+    // Layer 1
+    { int t0 = Math.Min(e0, e1); int t1 = Math.Max(e0, e1); e0 = t0; e1 = t1; }
 
     // Layer 2
-    if (e1 > e2) { int t = e1; e1 = e2; e2 = t; }
+    { int t0 = Math.Min(e1, e2); int t1 = Math.Max(e1, e2); e1 = t0; e2 = t1; }
 
     // Layer 3
-    if (e0 > e1) { int t = e0; e0 = e1; e1 = t; }
+    { int t0 = Math.Min(e0, e1); int t1 = Math.Max(e0, e1); e0 = t0; e1 = t1; }
 }
 ```
 
+For char and custom types, branching `if (a > b) swap` is used instead
+(char lacks `Math.Min`/`Math.Max` overloads).
+
 For the real 27/28-element networks the same pattern is used — the code
-generator emits all ~185 comparators across 13 layers as a flat `if`/swap
-sequence. Elements are loaded into local variables via `Unsafe.Add(ref T, n)`
+generator emits all ~185 comparators across 13 layers as a flat sequence.
+Elements are loaded into local variables via `Unsafe.Add(ref T, n)`
 to avoid bounds checks:
 
 ```csharp
@@ -200,10 +204,10 @@ int e0 = first;
 int e1 = Unsafe.Add(ref first, 1);
 // ... load e2 through e26 ...
 
-// Layer 1 comparators:
-if (e1  > e26) { int temp = e1;  e1  = e26; e26 = temp; }
-if (e2  > e25) { int temp = e2;  e2  = e25; e25 = temp; }
-if (e3  > e24) { int temp = e3;  e3  = e24; e24 = temp; }
+// Layer 1 comparators (branchless Math.Min/Max for integer types):
+{ int t0 = Math.Min(e1, e26);  int t1 = Math.Max(e1, e26);  e1  = t0; e26 = t1; }
+{ int t0 = Math.Min(e2, e25);  int t1 = Math.Max(e2, e25);  e2  = t0; e25 = t1; }
+{ int t0 = Math.Min(e3, e24);  int t1 = Math.Max(e3, e24);  e3  = t0; e24 = t1; }
 // ... remaining comparators in layers 2–13 ...
 ```
 

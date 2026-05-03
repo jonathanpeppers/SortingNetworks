@@ -1,28 +1,41 @@
-using System.Collections.Generic;
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace SortingNetworks.Generators
 {
     /// <summary>
-    /// Emits unrolled scalar compare-and-swap sorting network code.
     /// Emits unrolled scalar sorting code for a given network size and element type.
-    /// uses ref + Unsafe.Add for element access, inline compare-and-swap.
+    /// Uses ref + Unsafe.Add for element access. For numeric types with
+    /// System.Math.Min/Max overloads, emits branchless min/max swaps; for all
+    /// other types (char, string, custom) emits branching if/swap.
     /// </summary>
     internal static class ScalarEmitter
     {
         /// <summary>
-        /// Types that have direct System.Math.Min/Max overloads.
-        /// The JIT lowers these to branchless cmov instructions on x64.
+        /// Returns true if the given <see cref="SpecialType"/> has direct
+        /// System.Math.Min/Max overloads suitable for branchless emission.
+        /// Excludes char/nint/nuint (no Math.Min/Max overloads).
+        /// Float/double are included — NaN is unsupported (see issues #10, #11).
         /// </summary>
-        private static readonly HashSet<string> MathMinMaxTypes = new HashSet<string>
+        internal static bool SupportsBranchlessMinMax(SpecialType specialType) => specialType switch
         {
-            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"
+            SpecialType.System_Byte => true,
+            SpecialType.System_SByte => true,
+            SpecialType.System_Int16 => true,
+            SpecialType.System_UInt16 => true,
+            SpecialType.System_Int32 => true,
+            SpecialType.System_UInt32 => true,
+            SpecialType.System_Int64 => true,
+            SpecialType.System_UInt64 => true,
+            SpecialType.System_Single => true,
+            SpecialType.System_Double => true,
+            _ => false,
         };
 
         /// <summary>
         /// Emits a scalar Sort method for the given network size and element type.
         /// </summary>
-        internal static string EmitSortMethod(int size, string typeName, int[] network, bool useCompareTo = false)
+        internal static string EmitSortMethod(int size, string typeName, SpecialType specialType, int[] network, bool useCompareTo = false)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"        private static void Sort{size}(ref {typeName} first)");
@@ -38,7 +51,7 @@ namespace SortingNetworks.Generators
 
             // Emit compare-and-swap for each pair
             bool isString = typeName == "string";
-            bool useMathMinMax = !useCompareTo && !isString && MathMinMaxTypes.Contains(typeName);
+            bool useMathMinMax = !useCompareTo && !isString && SupportsBranchlessMinMax(specialType);
             for (int i = 0; i < network.Length; i += 2)
             {
                 int a = network[i];

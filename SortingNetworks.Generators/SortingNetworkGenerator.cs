@@ -862,7 +862,7 @@ namespace SortingNetworks.Generators
                         var scalarKey = $"Sort{request.Size}_{delegateTypeName}";
                         if (emittedScalarMethods.Add(scalarKey))
                         {
-                            sb.Append(ScalarEmitter.EmitSortMethod(request.Size, delegateTypeName, network));
+                            sb.Append(ScalarEmitter.EmitSortMethod(request.Size, delegateTypeName, delegateSpecialType, network));
                             sb.AppendLine();
                         }
                     }
@@ -872,7 +872,7 @@ namespace SortingNetworks.Generators
                     var scalarKey = $"Sort{request.Size}_{request.TypeName}";
                     if (emittedScalarMethods.Add(scalarKey))
                     {
-                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
+                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, request.SpecialType, network));
                         sb.AppendLine();
                     }
                 }
@@ -881,7 +881,7 @@ namespace SortingNetworks.Generators
                     var scalarKey = $"Sort{request.Size}_{request.TypeName}";
                     if (emittedScalarMethods.Add(scalarKey))
                     {
-                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network, useCompareTo: true));
+                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, request.SpecialType, network, useCompareTo: true));
                         sb.AppendLine();
                     }
                 }
