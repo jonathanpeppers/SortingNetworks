@@ -220,6 +220,7 @@ public partial class MySorter { }
     [InlineData(64, "float")]
     [InlineData(8, "byte")]
     [InlineData(16, "byte")]
+    [InlineData(32, "byte")]
     [InlineData(48, "byte")]
     [InlineData(64, "byte")]
     [InlineData(8, "ushort")]
@@ -470,6 +471,43 @@ public partial class MySorter {{ }}
 
         // Verify dispatch cascades from AVX-512 BW to AVX2
         Assert.Contains("Avx512BW.IsSupported", generatedSource);
+        Assert.Contains("Avx2.IsSupported", generatedSource);
+    }
+
+    [Theory]
+    [InlineData(8, "byte")]
+    [InlineData(16, "byte")]
+    [InlineData(28, "byte")]
+    [InlineData(32, "byte")]
+    [InlineData(8, "sbyte")]
+    [InlineData(16, "sbyte")]
+    [InlineData(28, "sbyte")]
+    [InlineData(32, "sbyte")]
+    public void SimdCode_8Bit_HasAvx2Fallback(int size, string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork({size}, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        // Verify both AVX-512 VBMI and AVX2 methods were generated
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains($"SortSimd{size}_{typeName}") && s.Contains($"SortSimdAvx2_{size}_{typeName}"));
+        Assert.NotNull(generatedSource);
+
+        // Verify dispatch cascades from AVX-512 VBMI to AVX2
+        Assert.Contains("Avx512Vbmi.IsSupported", generatedSource);
         Assert.Contains("Avx2.IsSupported", generatedSource);
     }
 

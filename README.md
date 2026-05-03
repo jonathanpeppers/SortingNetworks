@@ -216,26 +216,26 @@ For types that fit well in SIMD registers, the library replaces the scalar
 comparing one pair at a time, an entire layer of the sorting network executes
 in a few instructions.
 
-Here is a simplified example for `byte` with AVX2 — all 27 elements fit in a
-single `Vector256<byte>` (32 lanes, 5 unused):
+Here is a simplified example for `byte` with AVX-512 VBMI — all 27 elements fit in a
+single `Vector512<byte>` (64 lanes, 37 unused):
 
 ```csharp
-// Load all elements into one 256-bit vector
-var vec = LoadVector256(ref first); // [e0, e1, ..., e26, 0, 0, 0, 0, 0]
+// Load all elements into one 512-bit vector
+var vec = LoadVector512(ref first); // [e0, e1, ..., e26, pad...]
 
 // For each of the 13 layers:
 //   1. Shuffle: rearrange elements to pair up comparators
-var shuffled = Vector256.Shuffle(vec, layerPermutation);
+var shuffled = Avx512Vbmi.PermuteVar64x8(vec, layerPermutation);
 
 //   2. Min/Max: compare all pairs simultaneously
-var mins = Vector256.Min(vec, shuffled);
-var maxs = Vector256.Max(vec, shuffled);
+var mins = Vector512.Min(vec, shuffled);
+var maxs = Vector512.Max(vec, shuffled);
 
 //   3. Select: pick min or max for each position using a mask
-vec = Vector256.ConditionalSelect(layerMask, maxs, mins);
+vec = Vector512.ConditionalSelect(layerMask, maxs, mins);
 
 // After all 13 layers, store the sorted vector back
-StoreVector256(ref first, vec);
+StoreVector512(ref first, vec);
 ```
 
 Each layer becomes a small handful of SIMD instructions — **shuffle**,
@@ -265,12 +265,13 @@ compiles to a single CPU comparison instruction matching the BCL's internal
 sort helpers; for custom types the JIT can devirtualize `CompareTo` on value
 types, keeping the call nearly as cheap.
 
-For `byte` and `sbyte`, the generator additionally emits SIMD vectorization
-when available — AVX2 on x86 and AdvSimd (NEON) on ARM64. For sizes up to 32,
-all elements fit in a single vector register (or two on ARM64), allowing each
-network step to execute as a vectorized shuffle + min/max + blend operation.
-On ARM64, SIMD extends up to 64 elements using up to four `Vector128<byte>`
-registers with single-group TBL4 lookups.
+For `byte` and `sbyte`, the generator emits SIMD vectorization when available.
+On x86 with AVX-512 VBMI, all elements (sizes 8-64) fit in a single
+`Vector512<byte>` register using `PermuteVar64x8` shuffles — the fastest path.
+On x86 without VBMI, AVX2 is used as a fallback for sizes 8-32 with
+`Vector256<byte>` and `Avx2.Shuffle` (vpshufb). On ARM64 AdvSimd (NEON), up to
+four `Vector128<byte>` registers with single-group TBL4 lookups handle sizes up
+to 64 elements.
 
 For `int` and `uint`, AVX2 SIMD is emitted on x86 with four `Vector256<int>`
 registers (8 elements each). Cross-vector shuffles use `PermuteVar8x32` with
@@ -411,14 +412,21 @@ inlines the call for value types, keeping overhead low:
 
 ### x86 AVX-512F (AMD EPYC 9V74, GitHub Actions)
 
-On CPUs with AVX-512F (e.g., AMD EPYC, Intel Ice Lake+), additional SIMD paths
-are available. For `byte` and `sbyte`, the AVX2 path uses optimized direct
-`Avx2.Shuffle` intrinsics (vpshufb) avoiding the expensive cross-lane emulation:
+On CPUs with AVX-512 VBMI (e.g., AMD Zen 4+, Intel Ice Lake+), `byte` and `sbyte`
+use a single `Vector512<byte>` with `PermuteVar64x8` shuffles for all sizes:
 
-| Type | ArraySort (27) | GeneratedSort (27) | Speedup |
-|---|---|---|---|
-| byte | 1,591 ns | 61 ns | **26x** |
-| sbyte | 1,714 ns | 68 ns | **25x** |
+| Type | Size | ArraySort | GeneratedSort | Speedup |
+|---|---|---|---|---|
+| byte | 27 | 1,250 ns | 53 ns | **24x** |
+| byte | 28 | 1,415 ns | 54 ns | **26x** |
+| byte | 32 | 1,516 ns | 54 ns | **28x** |
+| byte | 34 | 1,759 ns | 64 ns | **27x** |
+| sbyte | 27 | 1,355 ns | 57 ns | **24x** |
+| sbyte | 28 | 1,495 ns | 58 ns | **26x** |
+| sbyte | 32 | 1,598 ns | 58 ns | **28x** |
+| sbyte | 38 | 2,160 ns | 68 ns | **32x** |
+
+> On CPUs without AVX-512 VBMI, byte/sbyte sizes 8-32 fall back to AVX2.
 
 For `int`, `uint`, and `float`, AVX-512F uses two `Vector512` registers with
 `PermuteVar16x32x2` cross-vector shuffles:
