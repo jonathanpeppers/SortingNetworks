@@ -126,6 +126,29 @@ public static class SourceGeneratorDriver
     }
 
     /// <summary>
+    /// Runs the generator twice: first on the initial compilation, then on a second compilation.
+    /// Returns the run result from the second run so callers can inspect incremental step reasons.
+    /// </summary>
+    public static GeneratorDriverRunResult RunGeneratorTwice(CSharpCompilation first, CSharpCompilation second)
+    {
+        var generator = new SortingNetworkGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { generator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(
+                disabledOutputs: IncrementalGeneratorOutputKind.None,
+                trackIncrementalGeneratorSteps: true));
+
+        // First run — primes the cache
+        driver = driver.RunGeneratorsAndUpdateCompilation(first, out _, out _);
+
+        // Second run — should use cache if inputs are equal
+        driver = driver.RunGeneratorsAndUpdateCompilation(second, out _, out _);
+
+        return driver.GetRunResult();
+    }
+
+    /// <summary>
     /// Gets all compilation errors from a compilation (severity = Error).
     /// </summary>
     public static ImmutableArray<Diagnostic> GetErrors(Compilation compilation)
