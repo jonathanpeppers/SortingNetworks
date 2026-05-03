@@ -919,6 +919,7 @@ public partial class MySorter {{ }}
     [InlineData("long")]
     [InlineData("float")]
     [InlineData("double")]
+    [InlineData("decimal")]
     public void HybridSort_GeneratesCode(string typeName)
     {
         var source = $@"

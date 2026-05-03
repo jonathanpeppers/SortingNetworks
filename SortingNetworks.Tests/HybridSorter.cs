@@ -13,4 +13,5 @@ namespace SortingNetworks.Tests;
 [HybridSortingNetwork(typeof(float))]
 [HybridSortingNetwork(typeof(double))]
 [HybridSortingNetwork(typeof(char))]
+[HybridSortingNetwork(typeof(decimal))]
 partial class HybridSorter { }

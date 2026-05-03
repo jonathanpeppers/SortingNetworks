@@ -205,6 +205,17 @@ public class HybridSortTests
         Assert.Equal(expected, data);
     }
 
+    [Fact]
+    public void Sort_Decimal_200Elements()
+    {
+        var rng = new Random(42);
+        var data = Enumerable.Range(0, 200).Select(_ => (decimal)(rng.NextDouble() * 2000 - 1000)).ToArray();
+        var expected = (decimal[])data.Clone();
+        Array.Sort(expected);
+        HybridSorter.Sort(data.AsSpan());
+        Assert.Equal(expected, data);
+    }
+
     // --- Stress test ---
 
     [Fact]

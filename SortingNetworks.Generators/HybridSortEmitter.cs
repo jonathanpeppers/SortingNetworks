@@ -389,6 +389,7 @@ namespace SortingNetworks.Generators
                 SpecialType.System_Int64 => 8,
                 SpecialType.System_UInt64 => 8,
                 SpecialType.System_Double => 8,
+                SpecialType.System_Decimal => 16,
                 _ => 0,
             };
         }
