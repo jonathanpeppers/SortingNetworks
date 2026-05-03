@@ -6,6 +6,7 @@
     <Description>Source generator for sorting-network-based sorting of small arrays, including depth-13 networks for 27 and 28 channels from arXiv:2511.04107.</Description>
     <Authors>Jonathan Peppers</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>sorting sorting-network source-generator simd performance</PackageTags>
     <PackageProjectUrl>https://github.com/jonathanpeppers/SortingNetworks</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jonathanpeppers/SortingNetworks</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
