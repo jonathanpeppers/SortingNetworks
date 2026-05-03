@@ -911,4 +911,117 @@ public partial class MySorter {{ }}
         Assert.Contains($"private static void Sort16(ref {type64} first)", generatedSource);
         Assert.Contains($"private static void Sort16(ref {type32} first)", generatedSource);
     }
+
+    [Fact]
+    public void IncrementalCache_SameCompilation_OutputIsCached()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var result = SourceGeneratorDriver.RunGeneratorTwice(compilation, compilation);
+
+        var generatorResult = result.Results.Single();
+
+        // The ForAttributeWithMetadataName step should report Cached on the second run
+        var outputStep = generatorResult.TrackedOutputSteps
+            .SelectMany(s => s.Value)
+            .SelectMany(s => s.Outputs);
+        Assert.All(outputStep, o =>
+            Assert.Equal(IncrementalStepRunReason.Cached, o.Reason));
+    }
+
+    [Fact]
+    public void IncrementalCache_UnrelatedChange_OutputIsCached()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+
+public class Unrelated { }
+";
+        var modified = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+
+public class Unrelated { public void Foo() { } }
+";
+        var first = SourceGeneratorDriver.CreateCompilation(source);
+        var second = SourceGeneratorDriver.CreateCompilation(modified);
+        var result = SourceGeneratorDriver.RunGeneratorTwice(first, second);
+
+        var generatorResult = result.Results.Single();
+
+        // Output should still be cached — the SortingNetwork attribute didn't change
+        var outputStep = generatorResult.TrackedOutputSteps
+            .SelectMany(s => s.Value)
+            .SelectMany(s => s.Outputs);
+        Assert.All(outputStep, o =>
+            Assert.Equal(IncrementalStepRunReason.Cached, o.Reason));
+    }
+
+    [Fact]
+    public void IncrementalCache_AttributeChanged_OutputIsModified()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+";
+        var modified = @"
+using SortingNetworks;
+
+[SortingNetwork(8, typeof(int))]
+public partial class MySorter { }
+";
+        var first = SourceGeneratorDriver.CreateCompilation(source);
+        var second = SourceGeneratorDriver.CreateCompilation(modified);
+        var result = SourceGeneratorDriver.RunGeneratorTwice(first, second);
+
+        var generatorResult = result.Results.Single();
+
+        // Output should be Modified — the attribute size changed
+        var outputStep = generatorResult.TrackedOutputSteps
+            .SelectMany(s => s.Value)
+            .SelectMany(s => s.Outputs);
+        Assert.Contains(outputStep, o =>
+            o.Reason == IncrementalStepRunReason.Modified);
+    }
+
+    [Fact]
+    public void IncrementalCache_TypeChanged_OutputIsModified()
+    {
+        var source = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(int))]
+public partial class MySorter { }
+";
+        var modified = @"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof(long))]
+public partial class MySorter { }
+";
+        var first = SourceGeneratorDriver.CreateCompilation(source);
+        var second = SourceGeneratorDriver.CreateCompilation(modified);
+        var result = SourceGeneratorDriver.RunGeneratorTwice(first, second);
+
+        var generatorResult = result.Results.Single();
+
+        // Output should be Modified — the element type changed
+        var outputStep = generatorResult.TrackedOutputSteps
+            .SelectMany(s => s.Value)
+            .SelectMany(s => s.Outputs);
+        Assert.Contains(outputStep, o =>
+            o.Reason == IncrementalStepRunReason.Modified);
+    }
 }
