@@ -79,10 +79,16 @@ public class GeneratedSortTests
     public void Sort_28Elements_Byte() => StressSort(28, rng => (byte)rng.Next(0, 256), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
+    public void Sort_32Elements_Byte() => StressSort(32, rng => (byte)rng.Next(0, 256), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
     public void Sort_27Elements_SByte() => StressSort(27, rng => (sbyte)rng.Next(-128, 128), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
     public void Sort_28Elements_SByte() => StressSort(28, rng => (sbyte)rng.Next(-128, 128), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_32Elements_SByte() => StressSort(32, rng => (sbyte)rng.Next(-128, 128), a => GeneratedSorters.Sort(a.AsSpan()));
 
     [Fact]
     public void Sort_27Elements_Short() => StressSort(27, rng => (short)rng.Next(-1000, 1000), a => GeneratedSorters.Sort(a.AsSpan()));
