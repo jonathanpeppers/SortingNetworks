@@ -370,7 +370,7 @@ sorting network dominates:
 | long | 1,465 ns | 100 ns | **15x** |
 | nint | 1,423 ns | 107 ns | **13x** |
 | nuint | 1,427 ns | 105 ns | **14x** |
-| decimal | 2,863 ns | 1,208 ns | **2.4x** |
+| decimal | 2,376 ns | 794 ns | **3.0x** |
 
 > **Note:** On processors with AVX-512, `short`, `ushort`, and `char` use AVX-512BW SIMD, `long` uses AVX-512F SIMD, `int`, `uint`, and `float` use AVX-512F SIMD, and `nint`/`nuint` dispatch to `long`/`ulong` for even greater speedups.
 
