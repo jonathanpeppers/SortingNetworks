@@ -386,8 +386,8 @@ namespace SortingNetworks.Generators
 
         private static (string, string) EmitShort(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            // AVX-512 BW: single Vector512 for ≤ 32 elements
-            if (size > 32) return ("", "");
+            // AVX-512 BW: multi-Vector512 for 33-64 elements
+            if (size > 32) return EmitShortAvx512Multi(size, typeName, specialType, steps);
 
             var sb = new StringBuilder();
             string suffix = $"_{typeName}";
@@ -470,6 +470,169 @@ namespace SortingNetworks.Generators
                 sb.AppendLine("            hiLo.StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, 32));");
                 sb.AppendLine("            lo256.StoreUnsafe(ref first);");
             }
+            sb.AppendLine("        }");
+
+            string dispatchSb =
+                $"            if (System.Runtime.Intrinsics.X86.Avx512BW.IsSupported)\n" +
+                $"            {{\n" +
+                $"                SortSimd{size}{suffix}(span);\n" +
+                $"                return;\n" +
+                $"            }}\n";
+
+            return (sb.ToString(), dispatchSb);
+        }
+
+        // --- 16-bit types: 2x Vector512<ushort> with AVX-512 BW for sizes 33-64 ---
+
+        private static (string, string) EmitShortAvx512Multi(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
+        {
+            if (size > 64) return ("", "");
+
+            int regSize = 32; // Vector512<ushort> holds 32 elements
+            int numRegs = 2;
+            int totalSlots = numRegs * regSize; // 64
+            int elemsInV1 = size - 32;
+
+            var sb = new StringBuilder();
+            string suffix = $"_{typeName}";
+
+            sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
+            sb.AppendLine($"        private static void SortSimd{size}{suffix}(System.Span<{typeName}> span)");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
+
+            // Load v0: always full Vector512 (elements 0-31, 64 bytes)
+            sb.AppendLine("            var v0 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector512<byte>>(ref first).AsUInt16();");
+
+            // Load v1: elements 32 to size-1
+            if (elemsInV1 == regSize)
+            {
+                // Full second vector
+                sb.AppendLine("            var v1 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector512<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, 64)).AsUInt16();");
+            }
+            else
+            {
+                // Partial: read overlapping and permute to shift elements into position
+                int readOffset = (size - 32) * 2; // byte offset for overlapping read
+                int shift = 64 - size; // number of elements to shift right
+                ushort[] loadPerm = new ushort[32];
+                for (int j = 0; j < 32; j++)
+                    loadPerm[j] = (ushort)(j < elemsInV1 ? j + shift : 0);
+                sb.AppendLine($"            var v1 = System.Runtime.Intrinsics.X86.Avx512BW.PermuteVar32x16(");
+                sb.AppendLine($"                System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector512<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {readOffset})).AsUInt16(),");
+                sb.AppendLine($"                {FmtVec512UShort(loadPerm)});");
+            }
+
+            // Emit each step
+            for (int si = 0; si < steps.Count; si++)
+            {
+                var step = steps[si];
+                int[] perm = Enumerable.Range(0, totalSlots).ToArray();
+                foreach (var (a, b) in step) { perm[a] = b; perm[b] = a; }
+
+                ushort[] blend = new ushort[totalSlots];
+                foreach (var (a, b) in step)
+                    blend[Math.Max(a, b)] = 0xFFFF;
+
+                string pairStr = string.Join(", ", step.Select(p => $"({p.A},{p.B})"));
+
+                sb.AppendLine();
+                sb.AppendLine($"            // Step {si}: {pairStr}");
+                sb.AppendLine("            {");
+
+                // Shuffle phase: build shuffled companion for each vector
+                for (int vi = 0; vi < numRegs; vi++)
+                {
+                    // Check if this vector participates in any swap
+                    bool isIdentity = true;
+                    for (int j = 0; j < regSize; j++)
+                    {
+                        int pos = vi * regSize + j;
+                        if (perm[pos] != pos) { isIdentity = false; break; }
+                    }
+                    if (isIdentity) continue;
+
+                    // Build indices for PermuteVar32x16x2:
+                    // bit 5 selects source (0=v0, 1=v1), bits 4:0 select lane
+                    // Element index naturally maps: 0-31 → v0, 32-63 → v1
+                    ushort[] idx = new ushort[32];
+                    bool needsCross = false;
+                    for (int j = 0; j < regSize; j++)
+                    {
+                        int srcElem = perm[vi * regSize + j];
+                        idx[j] = (ushort)srcElem;
+                        if (srcElem / regSize != vi) needsCross = true;
+                    }
+
+                    if (!needsCross)
+                    {
+                        // Intra-vector only: use PermuteVar32x16 (single source)
+                        ushort[] localIdx = new ushort[32];
+                        for (int j = 0; j < regSize; j++)
+                            localIdx[j] = (ushort)(perm[vi * regSize + j] % regSize);
+                        sb.AppendLine($"                var s{vi} = System.Runtime.Intrinsics.X86.Avx512BW.PermuteVar32x16(v{vi}, {FmtVec512UShort(localIdx)});");
+                    }
+                    else
+                    {
+                        // Cross-vector: use PermuteVar32x16x2
+                        sb.AppendLine($"                var s{vi} = System.Runtime.Intrinsics.X86.Avx512BW.PermuteVar32x16x2(v0, {FmtVec512UShort(idx)}, v1);");
+                    }
+                }
+
+                // Min/Max/Blend phase
+                for (int vi = 0; vi < numRegs; vi++)
+                {
+                    bool isIdentity = true;
+                    for (int j = 0; j < regSize; j++)
+                    {
+                        int pos = vi * regSize + j;
+                        if (perm[pos] != pos) { isIdentity = false; break; }
+                    }
+                    if (isIdentity) continue;
+
+                    ushort[] blendSlice = new ushort[32];
+                    for (int j = 0; j < 32; j++) blendSlice[j] = blend[vi * regSize + j];
+
+                    bool allMin = blendSlice.All(v => v == 0);
+                    bool allMax = blendSlice.All(v => v == 0xFFFF);
+
+                    if (allMin)
+                    {
+                        sb.AppendLine($"                v{vi} = {MinExprShort(specialType, $"v{vi}", $"s{vi}")};");
+                    }
+                    else if (allMax)
+                    {
+                        sb.AppendLine($"                v{vi} = {MaxExprShort(specialType, $"v{vi}", $"s{vi}")};");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"                var mins{vi} = {MinExprShort(specialType, $"v{vi}", $"s{vi}")};");
+                        sb.AppendLine($"                var maxs{vi} = {MaxExprShort(specialType, $"v{vi}", $"s{vi}")};");
+                        sb.AppendLine($"                v{vi} = System.Runtime.Intrinsics.Vector512.ConditionalSelect({FmtVec512UShort(blendSlice)}, maxs{vi}, mins{vi});");
+                    }
+                }
+
+                sb.AppendLine("            }");
+            }
+
+            // Store results (reverse order: v1 first, then v0 to fix overlap)
+            sb.AppendLine();
+            if (elemsInV1 == regSize)
+            {
+                sb.AppendLine("            v1.AsByte().StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, 64));");
+            }
+            else
+            {
+                // Partial v1: permute back to overlapping layout and write
+                int readOffset = (size - 32) * 2;
+                int shift = 64 - size;
+                ushort[] storePerm = new ushort[32];
+                for (int j = 0; j < 32; j++)
+                    storePerm[j] = (ushort)(j >= shift ? j - shift : 0);
+                sb.AppendLine($"            System.Runtime.Intrinsics.X86.Avx512BW.PermuteVar32x16(v1, {FmtVec512UShort(storePerm)})");
+                sb.AppendLine($"                .AsByte().StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {readOffset}));");
+            }
+            sb.AppendLine("            v0.AsByte().StoreUnsafe(ref first);");
             sb.AppendLine("        }");
 
             string dispatchSb =
@@ -1312,7 +1475,7 @@ namespace SortingNetworks.Generators
             switch (elemBytes)
             {
                 case 1: return 64;   // Vector256<byte> (≤32) or Vector512<byte> with VBMI (33-64)
-                case 2: return 32;   // Vector512<ushort>
+                case 2: return 64;   // 2x Vector512<ushort> with PermuteVar32x16x2
                 case 4: return 64;   // 8x Vector256<int>
                 case 8: return 32;   // 4x Vector512<long> (double uses AVX2 fallback for >32)
                 default: return 0;
