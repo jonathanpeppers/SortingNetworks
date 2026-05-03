@@ -37,17 +37,15 @@ namespace SortingNetworks.Generators
 
         /// <summary>
         /// Returns the SIMD guard condition string for the given element type and size.
-        /// For byte/sbyte sizes > 32, AVX-512 VBMI is required instead of AVX2.
+        /// For byte/sbyte, AVX-512 VBMI is the primary path for all sizes.
+        /// AVX2 is available as a fallback for sizes ≤ 32 via <see cref="CanEmitAvx2Fallback"/>.
         /// </summary>
         internal static string GetGuardCondition(SpecialType specialType, int size)
         {
             int elemBytes = ElementSize(specialType);
             switch (elemBytes)
             {
-                case 1:
-                    return size > 32
-                        ? "System.Runtime.Intrinsics.X86.Avx512Vbmi.IsSupported"
-                        : "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
+                case 1: return "System.Runtime.Intrinsics.X86.Avx512Vbmi.IsSupported";
                 case 2: return "System.Runtime.Intrinsics.X86.Avx512BW.IsSupported";
                 case 4: return "System.Runtime.Intrinsics.X86.Avx2.IsSupported";
                 case 8: return "System.Runtime.Intrinsics.X86.Avx512F.IsSupported";
@@ -60,6 +58,9 @@ namespace SortingNetworks.Generators
         /// </summary>
         internal static bool CanEmitAvx2Fallback(SpecialType specialType, int size)
         {
+            // 8-bit types: AVX2 fallback for sizes 8-32 (single Vector256<byte>)
+            if (ElementSize(specialType) == 1 && size >= 8 && size <= 32)
+                return true;
             // 16-bit types: AVX2 fallback for sizes 8-16 (single Vector256<ushort>)
             if (ElementSize(specialType) == 2 && size >= 8 && size <= 16)
                 return true;
@@ -92,6 +93,8 @@ namespace SortingNetworks.Generators
         internal static (string MethodSource, string DispatchCode) EmitAvx2Fallback(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
             if (!CanEmitAvx2Fallback(specialType, size)) return ("", "");
+            if (ElementSize(specialType) == 1)
+                return EmitByteAvx2(size, typeName, specialType, steps);
             if (specialType == SpecialType.System_Double)
                 return EmitDoubleAvx2(size, steps);
             return EmitShortAvx2(size, typeName, specialType, steps);
@@ -107,7 +110,7 @@ namespace SortingNetworks.Generators
 
             switch (elemBytes)
             {
-                case 1: return EmitByte(size, typeName, specialType, steps);
+                case 1: return EmitByteAvx512Vbmi(size, typeName, specialType, steps);
                 case 2: return EmitShort(size, typeName, specialType, steps);
                 case 4: return EmitInt32(size, typeName, specialType, steps);
                 case 8: return EmitInt64(size, typeName, specialType, steps);
@@ -146,18 +149,18 @@ namespace SortingNetworks.Generators
             return steps;
         }
 
-        // --- Byte (8-bit) types: single Vector256 for sizes ≤ 32, Vector512 for 33-64 ---
+        // --- Byte (8-bit) types: AVX2 fallback for sizes 8-32 using Vector256<byte> ---
 
-        private static (string, string) EmitByte(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
+        private static (string, string) EmitByteAvx2(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
-            if (size > 32) return EmitByteAvx512Vbmi(size, typeName, specialType, steps);
+            if (size > 32) return ("", "");
 
             var sb = new StringBuilder();
             string suffix = $"_{typeName}";
 
             // Method signature
             sb.AppendLine($"        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]");
-            sb.AppendLine($"        private static void SortSimd{size}{suffix}(System.Span<{typeName}> span)");
+            sb.AppendLine($"        private static void SortSimdAvx2_{size}{suffix}(System.Span<{typeName}> span)");
             sb.AppendLine("        {");
             sb.AppendLine($"            ref byte first = ref System.Runtime.CompilerServices.Unsafe.As<{typeName}, byte>(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(span));");
 
@@ -266,14 +269,14 @@ namespace SortingNetworks.Generators
             string dispatchSb =
                 $"            if (System.Runtime.Intrinsics.X86.Avx2.IsSupported)\n" +
                 $"            {{\n" +
-                $"                SortSimd{size}{suffix}(span);\n" +
+                $"                SortSimdAvx2_{size}{suffix}(span);\n" +
                 $"                return;\n" +
                 $"            }}\n";
 
             return (sb.ToString(), dispatchSb);
         }
 
-        // --- Byte (8-bit) types: single Vector512 for sizes 33-64 using AVX-512 VBMI ---
+        // --- Byte (8-bit) types: single Vector512 for all sizes 8-64 using AVX-512 VBMI ---
 
         private static (string, string) EmitByteAvx512Vbmi(int size, string typeName, SpecialType specialType, List<List<(int A, int B)>> steps)
         {
@@ -292,7 +295,7 @@ namespace SortingNetworks.Generators
             {
                 sb.AppendLine("            var vec = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector512<byte>>(ref first);");
             }
-            else
+            else if (size > 32)
             {
                 // Partial: read lower 256 bits directly, upper 256 bits with overlap
                 int hiReadOffset = size - 32;
@@ -318,6 +321,47 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            var vec = System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(");
                 sb.AppendLine($"                System.Runtime.Intrinsics.Vector512.Create(lo, hiRaw),");
                 sb.AppendLine($"                {FmtVec512Byte(loadPerm)});");
+            }
+            else if (size == 32)
+            {
+                // Full Vector256: zero-extend to Vector512
+                sb.AppendLine("            var vec = System.Runtime.Intrinsics.Vector512.Create(");
+                sb.AppendLine("                System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector256<byte>>(ref first),");
+                sb.AppendLine("                System.Runtime.Intrinsics.Vector256<byte>.Zero);");
+            }
+            else if (size > 16)
+            {
+                // 17-31: overlapping Vector128 reads, combine to Vector256, zero-extend to Vector512
+                int hiReadOffset = size - 16;
+                sb.AppendLine("            var lo128 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref first);");
+                sb.AppendLine($"            var hi128 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset}));");
+                // Build permutation to rearrange into proper element order.
+                // lo128[j] = element j for j in [0..15]
+                // hi128[j] = element (hiReadOffset + j) for j in [0..15]
+                // Combined: lo128 at [0..15], hi128 at [16..31], zeros at [32..63]
+                // For j >= 16: element j is at hi128[j - hiReadOffset] → source index 16 + (j - hiReadOffset)
+                byte[] loadPerm = new byte[64];
+                for (int i = 0; i < 64; i++)
+                {
+                    if (i < 16)
+                        loadPerm[i] = (byte)i;
+                    else if (i < size)
+                        loadPerm[i] = (byte)(i + 32 - size);
+                    else
+                        loadPerm[i] = 0;
+                }
+                sb.AppendLine($"            var vec = System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(");
+                sb.AppendLine($"                System.Runtime.Intrinsics.Vector512.Create(System.Runtime.Intrinsics.Vector256.Create(lo128, hi128), System.Runtime.Intrinsics.Vector256<byte>.Zero),");
+                sb.AppendLine($"                {FmtVec512Byte(loadPerm)});");
+            }
+            else
+            {
+                // 8-16: single Vector128 read, zero-extend to Vector512
+                sb.AppendLine("            var vec = System.Runtime.Intrinsics.Vector512.Create(");
+                sb.AppendLine("                System.Runtime.Intrinsics.Vector256.Create(");
+                sb.AppendLine("                    System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref first),");
+                sb.AppendLine("                    System.Runtime.Intrinsics.Vector128<byte>.Zero),");
+                sb.AppendLine("                System.Runtime.Intrinsics.Vector256<byte>.Zero);");
             }
 
             // Emit each step
@@ -352,7 +396,7 @@ namespace SortingNetworks.Generators
             {
                 sb.AppendLine("            vec.StoreUnsafe(ref first);");
             }
-            else
+            else if (size > 32)
             {
                 int hiReadOffset = size - 32;
                 // Build permutation to extract upper portion for overlapping store
@@ -367,6 +411,29 @@ namespace SortingNetworks.Generators
                 sb.AppendLine($"            System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(vec, {FmtVec512Byte(hiStorePerm)})");
                 sb.AppendLine($"                .GetUpper().StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset}));");
                 sb.AppendLine("            vec.GetLower().StoreUnsafe(ref first);");
+            }
+            else if (size == 32)
+            {
+                // Store lower Vector256
+                sb.AppendLine("            vec.GetLower().StoreUnsafe(ref first);");
+            }
+            else if (size > 16)
+            {
+                // 17-31: overlapping Vector128 stores
+                int hiReadOffset = size - 16;
+                // Extract elements [size-16, size) into lower Vector128 via permutation
+                byte[] hiStorePerm = new byte[64];
+                for (int i = 0; i < 64; i++) hiStorePerm[i] = 0;
+                for (int i = 0; i < 16; i++)
+                    hiStorePerm[i] = (byte)(size - 16 + i);
+                sb.AppendLine($"            System.Runtime.Intrinsics.X86.Avx512Vbmi.PermuteVar64x8(vec, {FmtVec512Byte(hiStorePerm)})");
+                sb.AppendLine($"                .GetLower().GetLower().StoreUnsafe(ref System.Runtime.CompilerServices.Unsafe.Add(ref first, {hiReadOffset}));");
+                sb.AppendLine("            vec.GetLower().GetLower().StoreUnsafe(ref first);");
+            }
+            else
+            {
+                // 8-16: store lower Vector128
+                sb.AppendLine("            vec.GetLower().GetLower().StoreUnsafe(ref first);");
             }
 
             sb.AppendLine("        }");
@@ -1311,7 +1378,7 @@ namespace SortingNetworks.Generators
             // Max elements we support with SIMD
             switch (elemBytes)
             {
-                case 1: return 64;   // Vector256<byte> (≤32) or Vector512<byte> with VBMI (33-64)
+                case 1: return 64;   // Vector512<byte> with VBMI (all sizes 8-64), AVX2 fallback for ≤32
                 case 2: return 32;   // Vector512<ushort>
                 case 4: return 64;   // 8x Vector256<int>
                 case 8: return 32;   // 4x Vector512<long> (double uses AVX2 fallback for >32)
