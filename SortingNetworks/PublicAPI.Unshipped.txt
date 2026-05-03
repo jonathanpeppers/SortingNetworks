@@ -1,0 +1,5 @@
+#nullable enable
+SortingNetworks.SortingNetworkAttribute
+SortingNetworks.SortingNetworkAttribute.ElementType.get -> System.Type!
+SortingNetworks.SortingNetworkAttribute.Size.get -> int
+SortingNetworks.SortingNetworkAttribute.SortingNetworkAttribute(int size, System.Type! elementType) -> void
