@@ -4,5 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Version>0.1.0</Version>
+    <Copyright>Copyright (c) Jonathan Peppers</Copyright>
   </PropertyGroup>
 </Project>
