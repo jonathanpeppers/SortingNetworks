@@ -173,3 +173,7 @@ namespace SortingNetworks.Benchmarks;
 [SortingNetwork(31, typeof(Record))]
 [SortingNetwork(32, typeof(Record))]
 partial class GeneratedSorters { }
+
+[HybridSortingNetwork(typeof(int))]
+[HybridSortingNetwork(typeof(long))]
+partial class HybridSorters { }
