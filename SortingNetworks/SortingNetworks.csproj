@@ -12,6 +12,10 @@
     <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" PrivateAssets="all" />
+  </ItemGroup>
+
   <!-- Build the generator project (for packing), but don't reference its output -->
   <ItemGroup>
     <ProjectReference Include="..\SortingNetworks.Generators\SortingNetworks.Generators.csproj"
