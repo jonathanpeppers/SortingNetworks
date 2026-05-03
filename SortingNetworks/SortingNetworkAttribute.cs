@@ -21,6 +21,19 @@ namespace SortingNetworks
         public Type ElementType { get; }
 
         /// <summary>
+        /// Controls the compare-and-swap strategy for scalar sorting network methods.
+        /// When <c>true</c>, emits branchless <c>Math.Min</c>/<c>Math.Max</c> swaps
+        /// (optimal on x86/x64 where the JIT lowers to <c>cmov</c>).
+        /// When <c>false</c>, emits branching <c>if/swap</c>
+        /// (optimal on ARM where branch prediction outperforms <c>csel</c> chains).
+        /// When not set (default), the generator emits a runtime platform check
+        /// that selects the best strategy automatically.
+        /// Only applies to numeric types with <c>Math.Min</c>/<c>Math.Max</c> overloads;
+        /// ignored for <c>char</c>, <c>string</c>, and custom types.
+        /// </summary>
+        public bool Branchless { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SortingNetworkAttribute"/> class.
         /// </summary>
         /// <param name="size">The number of elements in the sorting network.</param>

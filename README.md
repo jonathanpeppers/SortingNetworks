@@ -121,7 +121,7 @@ MySorter.Sort(otherData);      // any other size → OnFallback
   the comparer path still throws.
 
 The source generator emits optimized sort methods with:
-- **Scalar unrolled** compare-and-swap for all sizes/types (branchless `Math.Min`/`Math.Max` for numeric types)
+- **Scalar unrolled** compare-and-swap for all sizes/types (platform-adaptive: branchless `Math.Min`/`Math.Max` on x86, branching `if/swap` on ARM)
 - **x86 SIMD** (AVX2, AVX-512) when the type and size fit in SIMD registers
 - **ARM64 SIMD** (AdvSimd/NEON) for supported types
 - **IComparer&lt;T&gt;** overloads using loop-based network application
@@ -171,9 +171,11 @@ comparators that involve channel 27.
 ### Scalar implementation
 
 The simplest path unrolls every compare-and-swap from the network into
-straight-line code. For numeric types, branchless `Math.Min`/`Math.Max` calls
-are used (the JIT lowers these to `cmov` instructions). For a 3-element
-example, a depth-3 network looks like:
+straight-line code. For numeric types, the generator emits a runtime platform
+check: on x86, branchless `Math.Min`/`Math.Max` calls are used (the JIT lowers
+these to `cmov` instructions); on ARM, branching `if/swap` is used (branch
+prediction outperforms `csel` data-dependency chains). The JIT
+dead-code-eliminates the unused path. For a 3-element example on x86:
 
 ```csharp
 // Sort 3 elements with a sorting network (depth 3, 3 comparators)
@@ -191,7 +193,19 @@ static void Sort3(ref int e0, ref int e1, ref int e2)
 ```
 
 For char and custom types, branching `if (a > b) swap` is used instead
-(char lacks `Math.Min`/`Math.Max` overloads).
+(char lacks `Math.Min`/`Math.Max` overloads). The swap strategy can also be
+controlled explicitly with the `Branchless` attribute property:
+
+```csharp
+// Force branchless Math.Min/Max on all platforms
+[SortingNetwork(27, typeof(int), Branchless = true)]
+
+// Force branching if/swap on all platforms
+[SortingNetwork(27, typeof(int), Branchless = false)]
+
+// Default: auto-detect at runtime (recommended)
+[SortingNetwork(27, typeof(int))]
+```
 
 For the real 27/28-element networks the same pattern is used — the code
 generator emits all ~185 comparators across 13 layers as a flat sequence.

@@ -1,1 +1,3 @@
 #nullable enable
+SortingNetworks.SortingNetworkAttribute.Branchless.get -> bool
+SortingNetworks.SortingNetworkAttribute.Branchless.set -> void
