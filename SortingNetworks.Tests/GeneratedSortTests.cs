@@ -186,6 +186,12 @@ public class GeneratedSortTests
     [Fact]
     public void Sort_28Elements_Double() => StressSort(28, rng => rng.NextDouble() * 20000 - 10000, a => GeneratedSorters.Sort(a.AsSpan()));
 
+    [Fact]
+    public void Sort_27Elements_Decimal() => StressSort(27, rng => (decimal)(rng.NextDouble() * 20000 - 10000), a => GeneratedSorters.Sort(a.AsSpan()));
+
+    [Fact]
+    public void Sort_28Elements_Decimal() => StressSort(28, rng => (decimal)(rng.NextDouble() * 20000 - 10000), a => GeneratedSorters.Sort(a.AsSpan()));
+
     // --- Stress tests at sizes 48 and 64 for ARM-SIMD-capable types ---
 
     [Fact]
@@ -411,6 +417,21 @@ public class GeneratedSortTests
         Array.Sort(expected);
 
         var actual = (double[])input.Clone();
+        GeneratedSorters.Sort(actual.AsSpan());
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_RandomDecimals(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (decimal)(rng.NextDouble() * 2000 - 1000)).ToArray();
+        var expected = (decimal[])input.Clone();
+        Array.Sort(expected);
+
+        var actual = (decimal[])input.Clone();
         GeneratedSorters.Sort(actual.AsSpan());
 
         Assert.Equal(expected, actual);
@@ -1077,6 +1098,65 @@ public class GeneratedSortTests
         Assert.Equal(expected, input);
     }
 
+    // --- Decimal edge cases ---
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_AlreadySorted_Decimals(int length)
+    {
+        var input = Enumerable.Range(0, length).Select(i => (decimal)i).ToArray();
+        var expected = (decimal[])input.Clone();
+
+        GeneratedSorters.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_ReverseSorted_Decimals(int length)
+    {
+        var input = Enumerable.Range(0, length).Reverse().Select(i => (decimal)i).ToArray();
+        var expected = Enumerable.Range(0, length).Select(i => (decimal)i).ToArray();
+
+        GeneratedSorters.Sort(input.AsSpan());
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Duplicates_Decimals(int length)
+    {
+        var input = Enumerable.Repeat(7.5m, length).ToArray();
+        var expected = (decimal[])input.Clone();
+        GeneratedSorters.Sort(input.AsSpan());
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_DuplicateHeavy_Decimals(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (decimal)rng.Next(0, 3)).ToArray();
+        var expected = (decimal[])input.Clone();
+        Array.Sort(expected);
+        GeneratedSorters.Sort(input.AsSpan());
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_MinMax_Decimal(int length)
+    {
+        var input = BuildMinMaxArray(length, decimal.MinValue, decimal.MaxValue, rng => (decimal)(rng.NextDouble() * 2e10 - 1e10));
+        var expected = (decimal[])input.Clone();
+        Array.Sort(expected);
+        GeneratedSorters.Sort(input.AsSpan());
+        Assert.Equal(expected, input);
+    }
+
     // --- Missing string edge cases ---
 
     [Theory]
@@ -1166,6 +1246,20 @@ public class GeneratedSortTests
         Array.Sort(expected);
 
         GeneratedSorters.Sort(input.AsSpan(), Comparer<double>.Default);
+
+        Assert.Equal(expected, input);
+    }
+
+    [Theory]
+    [MemberData(nameof(Lengths))]
+    public void Sort_Span_WithComparer_Decimals(int length)
+    {
+        var rng = new Random(42 + length);
+        var input = Enumerable.Range(0, length).Select(_ => (decimal)(rng.NextDouble() * 2000 - 1000)).ToArray();
+        var expected = (decimal[])input.Clone();
+        Array.Sort(expected);
+
+        GeneratedSorters.Sort(input.AsSpan(), Comparer<decimal>.Default);
 
         Assert.Equal(expected, input);
     }
@@ -1270,6 +1364,12 @@ public class GeneratedSortTests
         Array.Sort(doublesExpected);
         GeneratedSorters.Sort(doubles.AsSpan(), null);
         Assert.Equal(doublesExpected, doubles);
+
+        var decimals = Enumerable.Range(0, 27).Select(_ => (decimal)(rng.NextDouble() * 2000 - 1000)).ToArray();
+        var decimalsExpected = (decimal[])decimals.Clone();
+        Array.Sort(decimalsExpected);
+        GeneratedSorters.Sort(decimals.AsSpan(), null);
+        Assert.Equal(decimalsExpected, decimals);
 
         var chars = Enumerable.Range(0, 27).Select(_ => (char)rng.Next(32, 127)).ToArray();
         var charsExpected = (char[])chars.Clone();

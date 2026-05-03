@@ -70,6 +70,8 @@ namespace SortingNetworks.Tests;
 [SortingNetwork(16, typeof(nuint))]
 [SortingNetwork(27, typeof(nuint))]
 [SortingNetwork(28, typeof(nuint))]
+[SortingNetwork(27, typeof(decimal))]
+[SortingNetwork(28, typeof(decimal))]
 [SortingNetwork(27, typeof(string))]
 [SortingNetwork(28, typeof(string))]
 [SortingNetwork(4, typeof(Point))]
