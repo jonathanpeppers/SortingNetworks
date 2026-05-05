@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SortingNetworks.SourceGen" Version="*" />
+    <PackageReference Include="SortingNetworks.SourceGen" Version="$(Version)" />
   </ItemGroup>
 
 </Project>
