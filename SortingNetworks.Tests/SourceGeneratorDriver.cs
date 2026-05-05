@@ -40,7 +40,7 @@ public static class SourceGeneratorDriver
 
         return CSharpCompilation.Create(
             assemblyName,
-            new[] { syntaxTree },
+            [syntaxTree],
             references!,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithNullableContextOptions(NullableContextOptions.Enable)
@@ -97,7 +97,7 @@ public static class SourceGeneratorDriver
         var generator = new SortingNetworkGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: new[] { generator.AsSourceGenerator() },
+            generators: [generator.AsSourceGenerator()],
             driverOptions: new GeneratorDriverOptions(
                 disabledOutputs: IncrementalGeneratorOutputKind.None,
                 trackIncrementalGeneratorSteps: true));
@@ -115,7 +115,7 @@ public static class SourceGeneratorDriver
         var generator = new SortingNetworkGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: new[] { generator.AsSourceGenerator() },
+            generators: [generator.AsSourceGenerator()],
             driverOptions: new GeneratorDriverOptions(
                 disabledOutputs: IncrementalGeneratorOutputKind.None,
                 trackIncrementalGeneratorSteps: true));
@@ -134,7 +134,7 @@ public static class SourceGeneratorDriver
         var generator = new SortingNetworkGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: new[] { generator.AsSourceGenerator() },
+            generators: [generator.AsSourceGenerator()],
             driverOptions: new GeneratorDriverOptions(
                 disabledOutputs: IncrementalGeneratorOutputKind.None,
                 trackIncrementalGeneratorSteps: true));

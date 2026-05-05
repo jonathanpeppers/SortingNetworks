@@ -33,15 +33,15 @@ using SortingNetworks;
 partial class MySorter { }
 
 // Sort a span of exactly 27 ints
-Span<int> data = stackalloc int[] {
+Span<int> data = [
     27, 26, 25, 24, 23, 22, 21, 20, 19,
     18, 17, 16, 15, 14, 13, 12, 11, 10,
      9,  8,  7,  6,  5,  4,  3,  2,  1,
-};
+];
 MySorter.Sort(data);
 
 // Array overload
-int[] array = { 3, 1, 4, 1, 5, 9, 2, 6, /* ... 27 elements */ };
+int[] array = [3, 1, 4, 1, 5, 9, 2, 6, /* ... 27 elements */];
 MySorter.Sort(array);
 
 // IComparer<T> overload
