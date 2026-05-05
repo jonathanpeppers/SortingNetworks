@@ -1,1 +1,4 @@
 #nullable enable
+SortingNetworks.HybridSortingNetworkAttribute
+SortingNetworks.HybridSortingNetworkAttribute.ElementType.get -> System.Type!
+SortingNetworks.HybridSortingNetworkAttribute.HybridSortingNetworkAttribute(System.Type! elementType) -> void

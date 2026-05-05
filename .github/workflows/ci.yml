@@ -76,7 +76,11 @@ jobs:
             name=${name%SortingBenchmarks}
             echo "## $name" >> benchmark-summary.md
             echo "" >> benchmark-summary.md
-            echo "> **ArraySort** = BCL baseline \`Array.Sort\`, **GeneratedSort** = this library" >> benchmark-summary.md
+            if [[ "$name" == Hybrid* ]]; then
+              echo "> **ArraySort** = BCL baseline \`Array.Sort\`, **HybridSort** = hybrid quicksort with sorting-network base cases" >> benchmark-summary.md
+            else
+              echo "> **ArraySort** = BCL baseline \`Array.Sort\`, **GeneratedSort** = this library" >> benchmark-summary.md
+            fi
             echo "" >> benchmark-summary.md
             cat "$f" >> benchmark-summary.md
             echo "" >> benchmark-summary.md
