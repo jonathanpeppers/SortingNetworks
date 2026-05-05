@@ -912,6 +912,133 @@ public partial class MySorter {{ }}
         Assert.Contains($"private static void Sort16(ref {type32} first)", generatedSource);
     }
 
+    [Theory]
+    [InlineData("byte")]
+    [InlineData("sbyte")]
+    [InlineData("short")]
+    [InlineData("ushort")]
+    [InlineData("int")]
+    [InlineData("uint")]
+    [InlineData("long")]
+    [InlineData("ulong")]
+    [InlineData("float")]
+    [InlineData("double")]
+    public void PlatformSpecific_EmittedForNumericTypes(string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort4"));
+        Assert.NotNull(generatedSource);
+        // Default: emits runtime platform check with both paths
+        Assert.Contains("X86Base.IsSupported", generatedSource);
+        Assert.Contains("System.Math.Min", generatedSource);
+        Assert.Contains("System.Math.Max", generatedSource);
+        Assert.Contains("if (e", generatedSource);
+    }
+
+    [Theory]
+    [InlineData("int")]
+    [InlineData("float")]
+    public void BranchlessTrue_EmitsOnlyMinMax(string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof({typeName}), Branchless = true)]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort4"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("System.Math.Min", generatedSource);
+        Assert.Contains("System.Math.Max", generatedSource);
+        Assert.DoesNotContain("X86Base.IsSupported", generatedSource);
+        Assert.DoesNotContain("if (e", generatedSource);
+    }
+
+    [Theory]
+    [InlineData("int")]
+    [InlineData("float")]
+    public void BranchlessFalse_EmitsOnlyBranching(string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof({typeName}), Branchless = false)]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort4"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("if (e", generatedSource);
+        Assert.DoesNotContain("System.Math.Min", generatedSource);
+        Assert.DoesNotContain("System.Math.Max", generatedSource);
+        Assert.DoesNotContain("X86Base.IsSupported", generatedSource);
+    }
+
+    [Theory]
+    [InlineData("char")]
+    public void BranchingSwap_EmittedForNonMinMaxTypes(string typeName)
+    {
+        var source = $@"
+using SortingNetworks;
+
+[SortingNetwork(4, typeof({typeName}))]
+public partial class MySorter {{ }}
+";
+        var compilation = SourceGeneratorDriver.CreateCompilation(source);
+        var (result, updatedCompilation) = SourceGeneratorDriver.RunGeneratorWithCompilation(compilation);
+
+        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+        Assert.Empty(errors);
+
+        var compilationErrors = SourceGeneratorDriver.GetErrors(updatedCompilation);
+        Assert.Empty(compilationErrors);
+
+        var generatedSource = result.GeneratedTrees
+            .Select(t => t.GetText().ToString())
+            .FirstOrDefault(s => s.Contains("Sort4"));
+        Assert.NotNull(generatedSource);
+        Assert.Contains("if (e", generatedSource);
+        Assert.DoesNotContain("System.Math.Min", generatedSource);
+        Assert.DoesNotContain("System.Math.Max", generatedSource);
+    }
+
     [Fact]
     public void IncrementalCache_SameCompilation_OutputIsCached()
     {

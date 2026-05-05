@@ -57,6 +57,20 @@ namespace SortingNetworks.Generators
             _ => null,
         };
 
+        /// <summary>
+        /// Reads the optional Branchless named argument from an attribute.
+        /// Returns null if not specified (auto-detect), true/false if explicitly set.
+        /// </summary>
+        private static bool? GetBranchlessArg(AttributeData attr)
+        {
+            foreach (var arg in attr.NamedArguments)
+            {
+                if (arg.Key == "Branchless" && arg.Value.Value is bool value)
+                    return value;
+            }
+            return null;
+        }
+
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Find all class declarations with [SortingNetwork] attributes
@@ -108,7 +122,7 @@ namespace SortingNetworks.Generators
                         }
                     }
 
-                    attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType, isComparable));
+                    attributes.Add(new NetworkRequest(size, typeName, typeSymbol.SpecialType, isComparable, branchless: GetBranchlessArg(attr)));
                 }
             }
 
@@ -862,7 +876,7 @@ namespace SortingNetworks.Generators
                         var scalarKey = $"Sort{request.Size}_{delegateTypeName}";
                         if (emittedScalarMethods.Add(scalarKey))
                         {
-                            sb.Append(ScalarEmitter.EmitSortMethod(request.Size, delegateTypeName, network));
+                            sb.Append(ScalarEmitter.EmitSortMethod(request.Size, delegateTypeName, delegateSpecialType, network, branchless: request.Branchless));
                             sb.AppendLine();
                         }
                     }
@@ -872,7 +886,7 @@ namespace SortingNetworks.Generators
                     var scalarKey = $"Sort{request.Size}_{request.TypeName}";
                     if (emittedScalarMethods.Add(scalarKey))
                     {
-                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network));
+                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, request.SpecialType, network, branchless: request.Branchless));
                         sb.AppendLine();
                     }
                 }
@@ -881,7 +895,7 @@ namespace SortingNetworks.Generators
                     var scalarKey = $"Sort{request.Size}_{request.TypeName}";
                     if (emittedScalarMethods.Add(scalarKey))
                     {
-                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, network, useCompareTo: true));
+                        sb.Append(ScalarEmitter.EmitSortMethod(request.Size, request.TypeName, request.SpecialType, network, useCompareTo: true));
                         sb.AppendLine();
                     }
                 }
@@ -1033,14 +1047,17 @@ namespace SortingNetworks.Generators
             public SpecialType SpecialType { get; }
             public bool IsCustomType { get; }
             public bool IsComparable { get; }
+            /// <summary>null = auto (platform-detect), true = force branchless, false = force branching</summary>
+            public bool? Branchless { get; }
 
-            public NetworkRequest(int size, string typeName, SpecialType specialType, bool isComparable)
+            public NetworkRequest(int size, string typeName, SpecialType specialType, bool isComparable, bool? branchless = null)
             {
                 Size = size;
                 TypeName = typeName;
                 SpecialType = specialType;
                 IsCustomType = !SupportedSpecialTypes.Contains(specialType);
                 IsComparable = isComparable;
+                Branchless = branchless;
             }
 
             public bool Equals(NetworkRequest? other)
