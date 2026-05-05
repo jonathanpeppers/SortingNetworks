@@ -15,7 +15,7 @@ and arbitrary types can be sorted via an `IComparer<T>` overload.
 
 ## Usage
 
-Add the `SortingNetworks` NuGet package, then decorate a `partial class` with
+Add the `SortingNetworks.SourceGen` NuGet package, then decorate a `partial class` with
 `[SortingNetwork(size, typeof(T))]` for each size/type combination you need.
 
 > **Target framework:** The generated SIMD code uses `System.Runtime.Intrinsics`
@@ -622,7 +622,7 @@ dotnet run --project SortingNetworks.Benchmarks -c Release -- --filter *
 
 ## Projects
 
-- **SortingNetworks** -- NuGet package containing the `SortingNetworkAttribute`
+- **SortingNetworks** -- NuGet package (`SortingNetworks.SourceGen`) containing the `SortingNetworkAttribute`
   and bundled source generator
 - **SortingNetworks.Generators** -- Roslyn incremental source generator that
   emits optimized sorting network code (scalar + SIMD)
