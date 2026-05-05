@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageId>SortingNetworks.SourceGen</PackageId>
     <Description>Source generator for sorting-network-based sorting of small arrays, including depth-13 networks for 27 and 28 channels from arXiv:2511.04107.</Description>
     <Authors>Jonathan Peppers</Authors>
