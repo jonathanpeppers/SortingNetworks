@@ -4,6 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Version>0.1.1</Version>
     <Copyright>Copyright (c) Jonathan Peppers</Copyright>
   </PropertyGroup>
